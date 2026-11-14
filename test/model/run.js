@@ -134,15 +134,16 @@ test('time format: the setting decides, 24 h when missing, the TIME constant ove
   eq([T.timeIs12('24', '12'), T.timeIs12('12', '24')], [false, true], 'constant wins');
   const y = fs.readFileSync(path.join(__dirname, '../../plugin/src/settings.yml'), 'utf-8');
   const fields = y.split(/^- keyname: /m).slice(1).map((part) => ({ key: part.split('\n')[0], group: (/^  group: (.+)$/m.exec(part) || [])[1] || null }));
-  eq(fields.map((f) => f.key), ['author_info', 'lat_lon', 'unit', 'time_format', 'bottom', 'hide_title_bar', 'sensor_show', 'sensor_co2', 'sensor_device_id', 'sensor_label', 'sensor_primary'], 'settings in owner order (B13 settings added at the end, no existing key moved)');
+  eq(fields.map((f) => f.key), ['author_info', 'lat_lon', 'unit', 'time_format', 'bottom', 'hide_title_bar', 'sensor_show', 'sensor_device_id', 'sensor_label', 'sensor_primary', 'sensor_co2'], 'settings in owner order (owner 2026-11-15: the sensor group reads source, label, main reading, CO2)');
   eq(fields.map((f) => f.group), [null, null, 'Display', 'Display', 'Display', 'Display', 'Sensor', 'Sensor', 'Sensor', 'Sensor', 'Sensor'], 'settings groups');
   // B13 (owner 2026-11-14) overrides 'a screen shows only its own sensor': an optional setting picks another TRMNL's sensor; empty keeps the own one
   const part = (k) => y.split(/^- keyname: /m).slice(1).find((q) => q.startsWith(k + '\n'));
   ['sensor_device_id', 'sensor_label', 'sensor_primary'].forEach((k) => ['description', 'description-de', 'description-fr', 'description-es-ES', 'description-nl', 'description-ja'].forEach((d) => ok(new RegExp('^  ' + d + ': .{20,}', 'm').test(part(k)), k + ' has ' + d)));
   ok(/field_type: string/.test(part('sensor_device_id')) && /field_type: string/.test(part('sensor_label')) && !/default:/.test(part('sensor_device_id')) && !/default:/.test(part('sensor_label')), 'device id and label: optional text fields with no default (empty = own sensor, icon only)');
   ok(/trmnl\.com/.test(part('sensor_device_id')) && /Leave empty/.test(part('sensor_device_id')), 'the device id description says where the number is and that empty means this screen');
+  ok(!/big/i.test(part('sensor_primary').split('\n').find((l) => l.startsWith('  description: '))) && !/found automatically/.test(part('sensor_show')), 'sensor texts match the layout: no "big" reading (both temperatures are one size), no automatic-only sensor');
   ok(/- Automatic: auto\n  - Sensor: sensor\n  - Outside: outside\n  default: auto\n/.test(part('sensor_primary')), 'main reading: Automatic (default), Sensor, Outside');
-  ok(/- 24 hours \(17:00\): '24'\n  - 12 hours \(5:00 PM\): '12'\n  default: '24'\n/.test(y) && /- Days: days\n  - Hours: hours\n  - Hours, days after 18:00: auto\n  default: auto\n/.test(y), 'time format 24 by default, bottom strip Days by default');
+  ok(/- 24 hours \(17:00\): '24'\n  - 12 hours \(5:00 PM\): '12'\n  default: '24'\n/.test(y) && /- Days: days\n  - Hours: hours\n  - Hours, days after 18:00: auto\n  default: auto\n/.test(y), 'time format 24 by default, bottom strip hours then days after 18:00 by default');
 });
 
 test('temperature trend arrow: +3 h against now, 1 degree C or 2 degrees F', () => {

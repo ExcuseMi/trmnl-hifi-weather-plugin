@@ -17,12 +17,12 @@ custom_fields:
 - keyname: author_info
   name: About This Plugin
   field_type: author_bio
-  description: 'The weather as a calm early-80s hi-fi receiver. A barometer dial with the pressure and its trend arrow, and a temperature dial with today''s low and high; big segment digits for the temperature with what to wear next to it (clothing for the coming hours, an umbrella when rain is on its way, sunglasses on sunny days); block meters for wind with gusts, UV, air quality, humidity, pollen and pressure when they matter; an hour calendar when rain is coming, sunrise, sunset and the moon otherwise; and the coming days or hours as a strip.<br /><br />With a TRMNL temperature sensor on the screen, the indoor reading becomes the big number and outdoor moves beside it. 1-bit, greyscale and colour screens; 24 or 12 hour time.<br /><br />Data: <strong>Open-Meteo</strong> (open-meteo.com)'
-  description-de: 'Das Wetter als ruhiger Hi-Fi-Receiver der frühen 80er. Ein Barometer mit Luftdruck und Tendenzpfeil und ein Thermometer mit Tiefst- und Höchstwert von heute; große Segmentziffern für die Temperatur mit der passenden Kleidung daneben (für die nächsten Stunden, ein Schirm, wenn Regen kommt, eine Sonnenbrille an sonnigen Tagen); Balkenanzeigen für Wind mit Böen, UV, Luftqualität, Feuchte, Pollen und Luftdruck, wenn sie wichtig sind; ein Stundenkalender, wenn Regen kommt, sonst Sonnenaufgang, Sonnenuntergang und Mond; dazu die nächsten Tage oder Stunden als Leiste.<br /><br />Mit einem TRMNL-Sensor zeigt es außen und innen nebeneinander. 1-Bit-, Graustufen- und Farbdisplays; 24- oder 12-Stunden-Zeit.<br /><br />Daten: <strong>Open-Meteo</strong> (open-meteo.com)'
-  description-fr: 'La météo comme un ampli hi-fi apaisé du début des années 80. Un baromètre avec la pression et une flèche de tendance, et un thermomètre avec le minimum et le maximum du jour ; de grands chiffres à segments pour la température avec quoi porter à côté (vêtements pour les prochaines heures, un parapluie quand la pluie arrive, des lunettes de soleil les jours ensoleillés) ; des jauges pour le vent avec rafales, l''UV, la qualité de l''air, l''humidité, le pollen et la pression quand ils comptent ; un calendrier horaire quand la pluie arrive, sinon lever, coucher du soleil et lune ; et les prochains jours ou heures en bandeau.<br /><br />Avec un capteur TRMNL, extérieur et intérieur côte à côte. Écrans 1 bit, niveaux de gris et couleur ; heure sur 24 ou 12 h.<br /><br />Données : <strong>Open-Meteo</strong> (open-meteo.com)'
-  description-es-ES: 'El tiempo como un receptor hi-fi tranquilo de principios de los 80. Un barómetro con la presión y una flecha de tendencia, y un termómetro con la mínima y la máxima de hoy; grandes dígitos de segmentos para la temperatura con qué ponerse al lado (ropa para las próximas horas, un paraguas cuando llega la lluvia, gafas de sol en días soleados); medidores de viento con rachas, UV, calidad del aire, humedad, polen y presión cuando importan; un calendario por horas cuando llega la lluvia, si no amanecer, atardecer y luna; y los próximos días u horas en una franja.<br /><br />Con un sensor TRMNL muestra exterior e interior lado a lado. Pantallas de 1 bit, escala de grises y color; hora de 24 o 12 horas.<br /><br />Datos: <strong>Open-Meteo</strong> (open-meteo.com)'
-  description-nl: 'Het weer als een rustige hifi-receiver uit de vroege jaren 80. Een barometer met de luchtdruk en een trendpijl, en een thermometer met de laagste en hoogste temperatuur van vandaag; grote segmentcijfers voor de temperatuur met ernaast wat je aantrekt (kleding voor de komende uren, een paraplu als er regen komt, een zonnebril op zonnige dagen); blokmeters voor wind met windstoten, UV, luchtkwaliteit, vocht, pollen en luchtdruk als ze ertoe doen; een urenkalender als er regen komt, anders zonsopkomst, zonsondergang en de maan; en de komende dagen of uren als strook.<br /><br />Met een TRMNL-sensor staan buiten en binnen naast elkaar. 1-bit-, grijs- en kleurenschermen; 24- of 12-uursklok.<br /><br />Gegevens: <strong>Open-Meteo</strong> (open-meteo.com)'
-  description-ja: '80年代初頭のハイファイ・レシーバーのような落ち着いた天気表示。気圧と傾向の矢印付きの気圧計と、今日の最低・最高気温付きの温度計。大きなセグメント数字の気温の横に服装の目安（この先数時間の服、雨が近いときは傘、晴れの日はサングラス）。必要なときに風（突風）、UV、大気質、湿度、花粉、気圧のメーター。雨が来るときは時間ごとのカレンダー、それ以外は日の出・日の入りと月。下段には今後の日または時間。<br /><br />TRMNLセンサーがあれば屋外と屋内を並べて表示。1ビット・グレースケール・カラー画面、24時間または12時間表示に対応。<br /><br />データ: <strong>Open-Meteo</strong>（open-meteo.com）'
+  description: 'The weather as a calm early-80s hi-fi receiver. A barometer dial with the pressure and its trend arrow, and a temperature dial with today''s low and high; big segment digits for the temperature with what to wear next to it (clothing for the coming hours, an umbrella when rain is on its way, sunglasses on sunny days); block meters for wind with gusts, UV, air quality, humidity, pollen and pressure when they matter; an hour calendar when rain is coming, sunrise, sunset and the moon otherwise; and the coming days or hours as a strip.<br /><br />With a TRMNL sensor, on this screen or another TRMNL, the indoor and outdoor temperatures stand side by side, with humidity and an optional CO2 meter. 1-bit, greyscale and colour screens; 24 or 12 hour time.<br /><br />Data: <strong>Open-Meteo</strong> (open-meteo.com)'
+  description-de: 'Das Wetter als ruhiger Hi-Fi-Receiver der frühen 80er. Ein Barometer mit Luftdruck und Tendenzpfeil und ein Thermometer mit Tiefst- und Höchstwert von heute; große Segmentziffern für die Temperatur mit der passenden Kleidung daneben (für die nächsten Stunden, ein Schirm, wenn Regen kommt, eine Sonnenbrille an sonnigen Tagen); Balkenanzeigen für Wind mit Böen, UV, Luftqualität, Feuchte, Pollen und Luftdruck, wenn sie wichtig sind; ein Stundenkalender, wenn Regen kommt, sonst Sonnenaufgang, Sonnenuntergang und Mond; dazu die nächsten Tage oder Stunden als Leiste.<br /><br />Mit einem TRMNL-Sensor, an diesem Bildschirm oder einem anderen TRMNL, stehen Innen- und Außentemperatur nebeneinander, mit Feuchte und einem optionalen CO2-Messer. 1-Bit-, Graustufen- und Farbdisplays; 24- oder 12-Stunden-Zeit.<br /><br />Daten: <strong>Open-Meteo</strong> (open-meteo.com)'
+  description-fr: 'La météo comme un ampli hi-fi apaisé du début des années 80. Un baromètre avec la pression et une flèche de tendance, et un thermomètre avec le minimum et le maximum du jour ; de grands chiffres à segments pour la température avec quoi porter à côté (vêtements pour les prochaines heures, un parapluie quand la pluie arrive, des lunettes de soleil les jours ensoleillés) ; des jauges pour le vent avec rafales, l''UV, la qualité de l''air, l''humidité, le pollen et la pression quand ils comptent ; un calendrier horaire quand la pluie arrive, sinon lever, coucher du soleil et lune ; et les prochains jours ou heures en bandeau.<br /><br />Avec un capteur TRMNL, sur cet écran ou un autre TRMNL, températures intérieure et extérieure côte à côte, avec l''humidité et une jauge de CO2 en option. Écrans 1 bit, niveaux de gris et couleur ; heure sur 24 ou 12 h.<br /><br />Données : <strong>Open-Meteo</strong> (open-meteo.com)'
+  description-es-ES: 'El tiempo como un receptor hi-fi tranquilo de principios de los 80. Un barómetro con la presión y una flecha de tendencia, y un termómetro con la mínima y la máxima de hoy; grandes dígitos de segmentos para la temperatura con qué ponerse al lado (ropa para las próximas horas, un paraguas cuando llega la lluvia, gafas de sol en días soleados); medidores de viento con rachas, UV, calidad del aire, humedad, polen y presión cuando importan; un calendario por horas cuando llega la lluvia, si no amanecer, atardecer y luna; y los próximos días u horas en una franja.<br /><br />Con un sensor TRMNL, en esta pantalla o en otro TRMNL, las temperaturas interior y exterior lado a lado, con la humedad y un medidor de CO2 opcional. Pantallas de 1 bit, escala de grises y color; hora de 24 o 12 horas.<br /><br />Datos: <strong>Open-Meteo</strong> (open-meteo.com)'
+  description-nl: 'Het weer als een rustige hifi-receiver uit de vroege jaren 80. Een barometer met de luchtdruk en een trendpijl, en een thermometer met de laagste en hoogste temperatuur van vandaag; grote segmentcijfers voor de temperatuur met ernaast wat je aantrekt (kleding voor de komende uren, een paraplu als er regen komt, een zonnebril op zonnige dagen); blokmeters voor wind met windstoten, UV, luchtkwaliteit, vocht, pollen en luchtdruk als ze ertoe doen; een urenkalender als er regen komt, anders zonsopkomst, zonsondergang en de maan; en de komende dagen of uren als strook.<br /><br />Met een TRMNL-sensor, op dit scherm of een andere TRMNL, staan binnen- en buitentemperatuur naast elkaar, met vocht en een optionele CO2-meter. 1-bit-, grijs- en kleurenschermen; 24- of 12-uursklok.<br /><br />Gegevens: <strong>Open-Meteo</strong> (open-meteo.com)'
+  description-ja: '80年代初頭のハイファイ・レシーバーのような落ち着いた天気表示。気圧と傾向の矢印付きの気圧計と、今日の最低・最高気温付きの温度計。大きなセグメント数字の気温の横に服装の目安（この先数時間の服、雨が近いときは傘、晴れの日はサングラス）。必要なときに風（突風）、UV、大気質、湿度、花粉、気圧のメーター。雨が来るときは時間ごとのカレンダー、それ以外は日の出・日の入りと月。下段には今後の日または時間。<br /><br />TRMNLセンサー（この画面または別のTRMNL）があれば、室内と屋外の気温を湿度と並べて表示し、CO2メーターも選べます。1ビット・グレースケール・カラー画面、24時間または12時間表示に対応。<br /><br />データ: <strong>Open-Meteo</strong>（open-meteo.com）'
   github_url: https://github.com/ExcuseMi/trmnl-radio-weather-plugin
   category: environment
 - keyname: lat_lon
@@ -93,27 +93,13 @@ custom_fields:
 - keyname: sensor_show
   group: Sensor
   field_type: select
-  name: Indoor readings
-  description: 'Show the indoor reading when this screen''s TRMNL sensor reports. The sensor is found automatically.'
-  description-de: 'Die Innenwerte anzeigen, wenn der TRMNL-Sensor dieses Bildschirms Werte meldet. Der Sensor wird automatisch gefunden.'
-  description-fr: 'Afficher les valeurs intérieures lorsque le capteur TRMNL de cet écran transmet des mesures. Le capteur est trouvé automatiquement.'
-  description-es-ES: 'Mostrar los valores interiores cuando el sensor TRMNL de esta pantalla envía lecturas. El sensor se detecta automáticamente.'
-  description-nl: 'Toon de binnenwaarden wanneer de TRMNL-sensor van dit scherm meetwaarden doorgeeft. De sensor wordt automatisch gevonden.'
-  description-ja: 'この画面のTRMNLセンサーが測定値を送信すると、室内の値を表示します。センサーは自動的に検出されます。'
-  options:
-  - Show: show
-  - Hide: hide
-  default: show
-- keyname: sensor_co2
-  group: Sensor
-  field_type: select
-  name: CO2 meter
-  description: 'Show the CO2 meter from a TRMNL sensor.'
-  description-de: 'Den CO2-Messer eines TRMNL-Sensors anzeigen.'
-  description-fr: 'Afficher la jauge de CO2 d’un capteur TRMNL.'
-  description-es-ES: 'Mostrar el medidor de CO2 de un sensor TRMNL.'
-  description-nl: 'Toon de CO2-meter van een TRMNL-sensor.'
-  description-ja: 'TRMNLセンサーのCO2メーターを表示します。'
+  name: Sensor
+  description: 'Show the readings of a TRMNL sensor: this screen''s own, or the TRMNL set below. Hide shows the outside weather only.'
+  description-de: 'Die Werte eines TRMNL-Sensors anzeigen: den dieses Bildschirms oder den des unten gewählten TRMNL. Ausblenden zeigt nur das Außenwetter.'
+  description-fr: 'Afficher les mesures d''un capteur TRMNL : celui de cet écran, ou celui du TRMNL indiqué ci-dessous. Masquer n''affiche que la météo extérieure.'
+  description-es-ES: 'Mostrar las lecturas de un sensor TRMNL: el de esta pantalla o el del TRMNL indicado abajo. Ocultar muestra solo el tiempo exterior.'
+  description-nl: 'Toon de meetwaarden van een TRMNL-sensor: die van dit scherm, of die van de TRMNL hieronder. Verbergen toont alleen het buitenweer.'
+  description-ja: 'TRMNLセンサーの値を表示します（この画面のセンサー、または下で指定したTRMNLのセンサー）。非表示にすると屋外の天気だけを表示します。'
   options:
   - Show: show
   - Hide: hide
@@ -133,28 +119,42 @@ custom_fields:
   group: Sensor
   field_type: string
   name: Sensor label
-  description: 'Optional. A short name for the sensor, for example Upstairs. It shows next to the house icon. Empty shows the icon alone.'
-  description-de: 'Optional. Ein kurzer Name für den Sensor, zum Beispiel Oben. Er steht neben dem Haus-Symbol. Leer zeigt nur das Symbol.'
-  description-fr: 'Facultatif. Un nom court pour le capteur, par exemple Étage. Il s''affiche à côté de l''icône de maison. Vide : l''icône seule.'
-  description-es-ES: 'Opcional. Un nombre corto para el sensor, por ejemplo Arriba. Se muestra junto al icono de la casa. Vacío muestra solo el icono.'
-  description-nl: 'Optioneel. Een korte naam voor de sensor, bijvoorbeeld Boven. Hij staat naast het huisje. Leeg toont alleen het huisje.'
-  description-ja: '任意。センサーの短い名前（例：2階）。家のアイコンの横に表示されます。空欄ならアイコンだけを表示します。'
+  description: 'Optional. A short name for the sensor, for example Upstairs. It shows next to the house icon and on the temperature dial. Empty shows the icon alone.'
+  description-de: 'Optional. Ein kurzer Name für den Sensor, zum Beispiel Oben. Er steht neben dem Haus-Symbol und am Thermometer. Leer zeigt nur das Symbol.'
+  description-fr: 'Facultatif. Un nom court pour le capteur, par exemple Étage. Il s''affiche à côté de l''icône de maison et sur le thermomètre. Vide : l''icône seule.'
+  description-es-ES: 'Opcional. Un nombre corto para el sensor, por ejemplo Arriba. Se muestra junto al icono de la casa y en el termómetro. Vacío muestra solo el icono.'
+  description-nl: 'Optioneel. Een korte naam voor de sensor, bijvoorbeeld Boven. Hij staat naast het huisje en bij de thermometer. Leeg toont alleen het huisje.'
+  description-ja: '任意。センサーの短い名前（例：2階）。家のアイコンの横と温度計に表示されます。空欄ならアイコンだけを表示します。'
   placeholder: Upstairs
 - keyname: sensor_primary
   group: Sensor
   field_type: select
   name: Main reading
-  description: 'Which reading is the big one, in black. Automatic: the sensor when it is this screen''s own, the outside weather when it comes from another TRMNL.'
-  description-de: 'Welcher Wert groß und schwarz erscheint. Automatisch: der Sensor, wenn es der eigene dieses Bildschirms ist, das Außenwetter, wenn er von einem anderen TRMNL kommt.'
-  description-fr: 'Quelle valeur est la grande, en noir. Automatique : le capteur s''il est celui de cet écran, la météo extérieure s''il vient d''un autre TRMNL.'
-  description-es-ES: 'Qué lectura es la grande, en negro. Automático: el sensor si es el de esta pantalla, el tiempo exterior si viene de otro TRMNL.'
-  description-nl: 'Welke waarde groot en zwart staat. Automatisch: de sensor als het die van dit scherm is, het buitenweer als hij van een andere TRMNL komt.'
-  description-ja: 'どちらの値を大きく黒で表示するか。自動：この画面のセンサーならセンサー、別のTRMNLのセンサーなら屋外の天気。'
+  description: 'Which reading comes first, in black; the other follows in grey. Automatic: the sensor when it is this screen''s own, the outside weather when it comes from another TRMNL.'
+  description-de: 'Welcher Wert zuerst und in Schwarz steht; der andere folgt in Grau. Automatisch: der Sensor, wenn es der eigene dieses Bildschirms ist, das Außenwetter, wenn er von einem anderen TRMNL kommt.'
+  description-fr: 'Quelle valeur vient en premier, en noir ; l''autre suit en gris. Automatique : le capteur s''il est celui de cet écran, la météo extérieure s''il vient d''un autre TRMNL.'
+  description-es-ES: 'Qué lectura va primero, en negro; la otra sigue en gris. Automático: el sensor si es el de esta pantalla, el tiempo exterior si viene de otro TRMNL.'
+  description-nl: 'Welke waarde eerst en in zwart staat; de andere volgt in grijs. Automatisch: de sensor als het die van dit scherm is, het buitenweer als hij van een andere TRMNL komt.'
+  description-ja: 'どちらの値を先に黒で表示するか（もう一方は灰色）。自動：この画面のセンサーならセンサー、別のTRMNLのセンサーなら屋外の天気。'
   options:
   - Automatic: auto
   - Sensor: sensor
   - Outside: outside
   default: auto
+- keyname: sensor_co2
+  group: Sensor
+  field_type: select
+  name: CO2 meter
+  description: 'Show the CO2 meter when the sensor measures CO2.'
+  description-de: 'Den CO2-Messer zeigen, wenn der Sensor CO2 misst.'
+  description-fr: 'Afficher la jauge de CO2 quand le capteur mesure le CO2.'
+  description-es-ES: 'Mostrar el medidor de CO2 cuando el sensor mide CO2.'
+  description-nl: 'Toon de CO2-meter als de sensor CO2 meet.'
+  description-ja: 'センサーがCO2を測定するとき、CO2メーターを表示します。'
+  options:
+  - Show: show
+  - Hide: hide
+  default: show
 name: Radio Weather
 description: Weather as a vintage radio receiver
 refresh_interval: 5

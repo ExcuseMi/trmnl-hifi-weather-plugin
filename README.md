@@ -23,11 +23,11 @@ Every view (full, half horizontal, half vertical, quadrant), 1-bit, greyscale an
 | Time format | 24 hours (17:00) or 12 hours (5:00 PM) |
 | Bottom strip | Days, hours, or hours with days after 18:00 |
 | Hide title bar | Hides the title bar on the full view |
-| Indoor readings | With a TRMNL temperature sensor on this screen: the indoor reading becomes the big number, outdoor moves beside it. The screen's own sensor is found automatically. |
-| CO2 meter | Shows the CO2 meter of a TRMNL CO2 sensor |
+| Sensor | Shows the readings of a TRMNL sensor: this screen's own, or the TRMNL set below. Hide: outside weather only. |
 | Sensor from another TRMNL | Optional device number (the digits in the address of its page on trmnl.com). Empty: this screen's own sensor. |
-| Sensor label | Optional short name, for example Upstairs, shown beside the house icon and in the readout. Empty: the icon alone. |
-| Main reading | Which reading is the big black one: Automatic (the sensor when it is this screen's own, outside when it comes from another TRMNL), Sensor, or Outside. The other one is second and grey, its meters after. |
+| Sensor label | Optional short name, for example Upstairs, shown beside the house icon and on the temperature dial. Empty: the icon alone. |
+| Main reading | Which reading comes first, in black: Automatic (the sensor when it is this screen's own, outside when it comes from another TRMNL), Sensor, or Outside. The other one follows in grey, its meters after. Both temperatures are the same size. |
+| CO2 meter | Shows the CO2 meter when the sensor measures CO2. |
 
 Data comes from [Open-Meteo](https://open-meteo.com); no key is needed.
 
