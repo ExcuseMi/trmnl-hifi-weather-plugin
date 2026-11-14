@@ -527,24 +527,30 @@ function icon(href, W, H) {
 var id = 'swink' + (K++);
 return svg(W, H, '<defs><filter id="' + id + '" x="0" y="0" width="1" height="1"><feFlood flood-color="currentColor"/><feComposite in2="SourceAlpha" operator="in"/></filter></defs>' + glow('<image href="' + href + '" x="0" y="0" width="' + n1(W) + '" height="' + n1(H) + '" filter="url(#' + id + ')"/>', GPX));
 }
-function mlp(f, r1, lt, W, H, py, lo) {
-var A = 75 * Math.PI / 180, mfs = H * 0.1, mg = Math.max(2.5, H * 0.008), g = Math.max(4, H * 0.03), hw = mfs * 0.62 * lt.length / 2, an = -A + 2 * A * Math.max(-0.03, Math.min(1.03, f));
-var rr = r1 + mg + Math.abs(Math.sin(an)) * hw + Math.abs(Math.cos(an)) * mfs * 0.4 + r1 * 0.022 * 2 * A, x = W / 2 + rr * Math.sin(an), y = py - rr * Math.cos(an), t = g + mfs * 0.625 + 0.5;
+function dm(H) { return [Math.max(2, H * 0.026), H * 0.045, H * 0.08, H * 0.1, Math.max(2.5, H * 0.008), Math.max(4, H * 0.03), 75 * Math.PI / 180]; }   /* the dial sizes every dial function shares: line, band, mark height, mark font, mark gap, gap, half sweep */
+function capHit(kd, b, g) { return ((API.caps || {})[kd] || []).find((c) => b[0] < c[2] + g && b[2] > c[0] - g && b[1] < c[3] + g && b[3] > c[1] - g); }
+function mlp(f, r1, lt, W, H, py, lo, kd) {
+var [, , , mfs, mg, g, A] = dm(H), hh = mfs * 0.625, mk = r1 * 0.044 * A, hw = mfs * 0.62 * lt.length / 2, an = -A + 2 * A * Math.max(-0.03, Math.min(1.03, f));
+var rr = r1 + mg + Math.abs(Math.sin(an)) * hw + Math.abs(Math.cos(an)) * mfs * 0.4 + mk, x = W / 2 + rr * Math.sin(an), y = py - rr * Math.cos(an), t = g + hh + 0.5;
 var bs = y < t;
-if (bs) { y = Math.max(t, py - r1 * Math.cos(an)); x = W / 2 + r1 * Math.sin(an) + (lo === undefined ? (an < 0 ? -1 : 1) : (lo ? -1 : 1)) * (hw + r1 * 0.022 * 2 * A + mg + 2); /* owner 2026-11-14: right beside its marker at its height, the low value left, the high value right */ }
-return [Math.max(g + hw, Math.min(W - g - hw, x)), y, bs];
+if (bs) { y = Math.max(t, py - r1 * Math.cos(an)); x = W / 2 + r1 * Math.sin(an) + (lo === undefined ? (an < 0 ? -1 : 1) : (lo ? -1 : 1)) * (hw + mk + mg + 2); /* owner 2026-11-14: right beside its marker at its height, the low value left, the high value right */ }
+x = Math.max(g + hw, Math.min(W - g - hw, x));
+var cp = capHit(kd, [x - hw, y - hh, x + hw, y + hh], g);
+/* a label that would touch the caption beside the dial (the readout in the corner) drops below it, outside the band, still on its own side of the marker, so the dial keeps its radius */
+if (cp) { var y2 = cp[3] + g + hh + 4, sd = x < W / 2 ? -1 : 1, x2 = W / 2 + sd * Math.max(Math.abs(x - W / 2), Math.sqrt(Math.max(0, (r1 - H * 0.08) ** 2 - (py - y2 - hh) ** 2)) + hw);
+if (x2 > g + hw && x2 < W - g - hw && !capHit(kd, [x2 - hw, y2 - hh, x2 + hw, y2 + hh], g)) { x = x2; y = y2; } }
+return [x, y, bs];
 }
-function dialR(D, W, H, nums, py) {
-var lw = Math.max(2, H * 0.026), A = 75 * Math.PI / 180, cx = W / 2, bw = H * 0.045, mh = H * 0.05 * 1.6, mfs = H * 0.1, mg = Math.max(2.5, H * 0.008);
-var g = Math.max(4, H * 0.03), r = Math.min(W * 0.42 / Math.sin(A), H * (W < H * 1.8 ? 0.5893 : 0.639), py - g - 1.3 * mh - bw - lw - 2), rmin = Math.min(r, W * 0.37 / Math.sin(A)), ok = true;
-return [r, ok];
+function dialR(W, H, py) {
+var [lw, bw, mh, , , g, A] = dm(H);
+return Math.min(W * 0.42 / Math.sin(A), H * (W < H * 1.8 ? 0.5893 : 0.639), py - g - 1.3 * mh - bw - lw - 2);
 }
 function dialClash(D, W, H, r, py, nums, kind) {
-var g = Math.max(4, H * 0.03), caps = (API.caps || {})[kind] || [];
-return dialInk(D, W, H, r, py, nums, kind === 'baro').some((b) => b[0] < g || b[1] < g || b[2] > W - g || b[3] > H - g || caps.some((c) => b[0] < c[2] + g && b[2] > c[0] - g && b[1] < c[3] + g && b[3] > c[1] - g));
+var g = dm(H)[5];
+return dialInk(D, W, H, r, py, nums, kind === 'baro').some((b) => b[0] < g || b[1] < g || b[2] > W - g || b[3] > H - g || capHit(kind, b, g));
 }
 function dialInk(D, W, H, r, py, nums, baro) {
-var lw = Math.max(2, H * 0.026), A = 75 * Math.PI / 180, cx = W / 2, bw = H * 0.045, mh = H * 0.05 * 1.6, mfs = H * 0.1, mg = Math.max(2.5, H * 0.008), out = [];
+var [lw, bw, mh, mfs, mg, , A] = dm(H), cx = W / 2, out = [];
 var cl = (f) => Math.max(-0.03, Math.min(1.03, f)), at = (f, rad) => { var an = -A + 2 * A * cl(f); return [cx + rad * Math.sin(an), py - rad * Math.cos(an)]; }, F = (v) => (v - D.a) / (D.b - D.a);
 var pt = (q, h) => out.push([q[0] - h, q[1] - h, q[0] + h, q[1] + h]), bx = (q, w, h) => out.push([q[0] - w / 2, q[1] - h / 2, q[0] + w / 2, q[1] + h / 2]);
 for (var f = 0; f <= 1.0001; f += 0.025) { pt(at(f, r), lw); pt(at(f, r - H * 0.07), lw); }
@@ -553,18 +559,17 @@ else for (var v = D.a; v <= D.b + 1e-9; v += D.step) { var fs = H * 0.1; bx(at(F
 if (D.lo !== null && D.lo !== undefined && D.hi !== null && D.hi !== undefined) {
 var r0 = r + lw + bw + 2, r1 = r0 + mh, f0 = F(D.lo), f1 = F(D.hi);
 for (var k = 0; k <= 20; k++) pt(at(f0 + (f1 - f0) * k / 20, r + lw / 2 + bw / 2), bw);
-[D.lo, D.hi].forEach((m) => { var f = F(m); pt(at(f, r1), mh * 0.3); if (nums) { var lt = String(Math.round(m)) + '°'; bx(mlp(f, r1, lt, W, H, py, m === D.lo), mfs * 0.62 * lt.length, mfs * 1.25); } });
+[D.lo, D.hi].forEach((m) => { var f = F(m); pt(at(f, r1), mh * 0.3); if (nums) { var lt = String(Math.round(m)) + '°'; bx(mlp(f, r1, lt, W, H, py, m === D.lo, baro ? 'baro' : 'tdial'), mfs * 0.62 * lt.length, mfs * 1.25); } });
 }
 return out;
 }
 function dial(D, W, H, baro, O) {
-var lw = Math.max(2, H * 0.026), A = 75 * Math.PI / 180, cx = W / 2, py = H * (W < H * 1.8 ? 0.79 : 0.93),
-bw = H * 0.045, mh = H * 0.05 * 1.6;
-var cm = !baro, mfs = H * 0.1, mg = Math.max(2.5, H * 0.008);
-var k0 = baro ? 'baro' : 'tdial', k1 = baro ? 'tdial' : 'baro', R0, R1, r, nums, py0 = py;
+var [lw, bw, mh, mfs, mg, , A] = dm(H), cx = W / 2, py = H * (W < H * 1.8 ? 0.79 : 0.93);
+var cm = !baro;
+var k0 = baro ? 'baro' : 'tdial', k1 = baro ? 'tdial' : 'baro', r, py0 = py;
 for (var yy = py0; yy >= H * 0.5; yy -= H * 0.01) {
-R0 = dialR(D, W, H, cm, yy); R1 = O ? dialR(O, W, H, baro, yy) : R0; r = Math.min(R0[0], R1[0]); nums = cm && R0[1]; py = yy;
-if (!dialClash(D, W, H, r, yy, nums, k0) && !(O && dialClash(O, W, H, r, yy, baro && R1[1], k1))) break;
+r = dialR(W, H, yy); py = yy;
+if (!dialClash(D, W, H, r, yy, cm, k0) && !(O && dialClash(O, W, H, r, yy, baro, k1))) break;
 }
 var F = (v) => (v - D.a) / (D.b - D.a), cl = (f) => Math.max(-0.03, Math.min(1.03, f));
 function at(f, rad) { var an = -A + 2 * A * cl(f); return [cx + rad * Math.sin(an), py - rad * Math.cos(an)]; }
@@ -594,13 +599,13 @@ body += path(arc(r + lw / 2 + bw / 2, F(lo), F(hi)), bw);
 var r0 = r + lw + bw + 2, r1 = r0 + mh;
 [[lo, true], [hi, false]].forEach((m) => {
 var f = F(m[0]), q = 0.022, t = [at(f, r0), at(f - q, r1), at(f + q, r1)];
-if (nums) { var lt = String(Math.round(m[0]) === 0 ? 0 : Math.round(m[0])) + '°', lp = mlp(f, r1, lt, W, H, py, !!m[1]);
+if (cm) { var lt = String(Math.round(m[0]) === 0 ? 0 : Math.round(m[0])) + '°', lp = mlp(f, r1, lt, W, H, py, !!m[1], baro ? 'baro' : 'tdial');
 body += text(lp[0], lp[1], lt, mfs, 'middle', ' dominant-baseline="central" data-sw-mark="' + (m[1] ? 'lo' : 'hi') + '"' + (lp[2] ? ' data-sw-beside' : '')); }
 body += poly(t, ' data-sw-markt="' + (m[1] ? 'lo' : 'hi') + '"' + (m[1] ? ' fill="none" ' + SK + '' + n1(Math.max(1.5, lw * 0.5)) + '" stroke-linejoin="round"' : ''));
 });
 }
 if (D.now !== null && D.now !== undefined) {
-var ang = -A + 2 * A * cl(F(D.now)), ux = Math.sin(ang), uy = -Math.cos(ang), nx = -uy, ny = ux, tipR = r + H * 0.025, tailR = H * 0.1, wb = Math.max(4, H * 0.03), wt = Math.max(1.5, H * 0.012);
+var ang = -A + 2 * A * cl(F(D.now)), ux = Math.sin(ang), uy = -Math.cos(ang), nx = -uy, ny = ux, tipR = r + H * 0.025, tailR = mfs, wb = dm(H)[5], wt = Math.max(1.5, H * 0.012);
 var np = (ox, oy, an, k) => { var vx = an === undefined ? ux : Math.sin(an), vy = an === undefined ? uy : -Math.cos(an), qx = -vy, qy = vx, e = k || 1, b = [cx + ox, py + oy], t = [b[0] + vx * tipR * e, b[1] + vy * tipR * e], q = [b[0] - vx * tailR, b[1] - vy * tailR];
 return [[t[0] + qx * wt / 2, t[1] + qy * wt / 2], [b[0] + qx * wb / 2, b[1] + qy * wb / 2], [q[0] + qx * wb * 1.6, q[1] + qy * wb * 1.6], [q[0] - qx * wb * 1.6, q[1] - qy * wb * 1.6], [b[0] - qx * wb / 2, b[1] - qy * wb / 2], [t[0] - qx * wt / 2, t[1] - qy * wt / 2]]; };
 var hr = Math.max(6, H * 0.035), tw = '';

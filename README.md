@@ -61,7 +61,7 @@ Regenerate the device file after TRMNL adds a model: `python3 tools/make_device_
 
 | Item | Detail |
 |---|---|
-| DIALR at 17.4 | The temperature dial radius shrinks (0.2119 against 0.2348) when the main reading is 17.4 C: the 20 tick label then sits at the right edge. Already so at 202a477 with an own sensor, so not from B13. DIALR-SPREAD stays red for `b13-x-rem-sensor` and `b13-x-long-label` until the dial is fixed. Known red, not to be waved through. |
+| DIALR spread, x-calm-ja | The Japanese caption widths change the dial panel width, so the radius share is 0.2443 against 0.2348 (not the mark label cause fixed in B14). Known red. |
 | Device tier, own-sensor cases | 8 of the 117 `-sens` cases are red at 202a477 and unchanged by B13: `avalue_epd_42s__full-sens`, `avalue_epd_42s__full-port-sens`, `generic_16_9__full-sens` (icon level with block row), `kobo_clara_2e__full-sens` (digit height), `kobo_libra_color__full-port-sens`, `onyx_boox_go_10_3_lumi__full-port-sens`, `tcl_nxtpaper_14__full-port-sens` (row 2 icon meets low), `palma__full-port-sens` (empty band under the days). |
 
 ## Licence
