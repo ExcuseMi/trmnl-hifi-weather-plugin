@@ -23,16 +23,15 @@ Every view (full, half horizontal, half vertical, quadrant), 1-bit, greyscale an
 | Time format | 24 hours (17:00) or 12 hours (5:00 PM) |
 | Bottom strip | Days, hours, or hours with days after 18:00 |
 | Hide title bar | Hides the title bar on the full view |
-| Sensor | Shows the readings of a TRMNL sensor: this screen's own, or the TRMNL set below. Hide: outside weather only. |
-| Sensor source | This TRMNL, Another TRMNL, Home Assistant, Awair, AirGradient, Sensibo, Ecowitt, Adafruit IO or Custom link (JSON); see Indoor sensor sources below. |
-| Sensor from another TRMNL | Optional device number (the digits in the address of its page on trmnl.com). Empty: this screen's own sensor. |
+| Indoor sensor | None (outside weather only), This TRMNL (this screen's own sensor), Another TRMNL, or a provider: Home Assistant, Awair, AirGradient, Sensibo, Ecowitt, Adafruit IO, Custom link (JSON). The fields of the chosen option show; see Indoor sensor sources below. |
+| Sensor from another TRMNL | Shows and is required for Another TRMNL only: the digits in the address of its page on trmnl.com. |
 | Sensor label | Optional short name, for example Upstairs, shown beside the house icon and on the temperature dial. Empty: the icon alone. |
 | Main reading | Which reading comes first, in black: Automatic (the sensor when it is this screen's own, outside when it comes from another TRMNL), Sensor, or Outside. The other one follows in grey, its meters after. Both temperatures are the same size. |
 | CO2 meter | Shows the CO2 meter when the sensor measures CO2. |
 
 ### Indoor sensor sources
 
-Set **Sensor source** to a provider and fill in the fields that show. The reading takes the place of a TRMNL sensor (house icon, label, main reading, CO2 meter). TRMNL fetches it from the cloud: the source must be reachable from the internet. Tokens sit in password fields and go only to the provider. Readings older than 3 hours are ignored; when the source fails the last good reading stays up to 3 hours and the bottom bar says SENSOR OFFLINE with its time.
+Set **Indoor sensor** to a provider and fill in the fields that show. The reading takes the place of a TRMNL sensor (house icon, label, main reading, CO2 meter). TRMNL fetches it from the cloud: the source must be reachable from the internet. Tokens sit in password fields and go only to the provider. Readings older than 3 hours are ignored; when the source fails the last good reading stays up to 3 hours and the bottom bar says SENSOR OFFLINE with its time.
 
 | Source | What you fill in | API docs |
 |---|---|---|
@@ -43,6 +42,17 @@ Set **Sensor source** to a provider and fill in the fields that show. The readin
 | Ecowitt | Application key and API key from ecowitt.net (API management) and the MAC of the station. Indoor temperature, humidity and, with a CO2 sensor, CO2. | https://doc.ecowitt.net/web/#/apiv3en?page_id=17 |
 | Adafruit IO | Username, active key, and the feed key for each reading (temperature required), plus the unit the temperature feed uses. | https://io.adafruit.com/api/docs/ |
 | Custom link (JSON) | Any https:// link that answers JSON: optional header name and token, a dot path for each reading (data.rooms.0.temp), optional time path, the temperature unit. | - |
+
+### Adding a provider
+
+| Step | Where |
+|---|---|
+| 1. One option in the Indoor sensor select; value is the provider word (`home_assistant`, `awair`, `adafruit`) | `plugin/src/settings.yml`, `sensor_source` |
+| 2. Its fields as `sensor_<prefix>_<field>` (field words: `token`, `key`, `id`, `url`, `temp`, `hum`, `co2`, `unit`), group Indoor sensor, `optional: true`, name and description in en, de, fr, es-ES, nl, ja | same file, before `sensor_label` |
+| 3. Rules: one `when` per option hiding every other provider's fields and `sensor_device_id`, `required:` listing only its own must-haves | `conditional_validation` of `sensor_source` |
+| 4. A normaliser returning `{t, h, c, at}` (Celsius, percent, ppm, epoch seconds) and its id in `SENS_IDS` | `SENS_PROV` in `plugin/src/transform.js` |
+| 5. A test with the answer copied from the provider's docs, plus the failures (401, 500, timeout) | `test/model/sensors.js`; the settings guard in `test/model/run.js` checks 2 and 3 |
+| 6. A row in "Indoor sensor sources" here and in `tools/site/page/index.html`, then `tools/site/build.sh` | docs |
 
 ### Reading the screen
 

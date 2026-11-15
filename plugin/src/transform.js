@@ -609,7 +609,7 @@ function fitState(st) {
 // documentation (URLs in README "Indoor sensor sources"). Tokens are only ever put in a request: no log line, no error text, no
 // output field holds one (errors are short codes: timeout, net, http401, http500, json, shape, range, old, setup).
 var SENS_MS = 2000, SENS_RUN_MS = 2300, SENS_MAX_AGE = 10800;   // one request stops at 2 s, the whole source (also a list call then the reading) at 2.3 s; a reading older than 3 h is no reading (as for the TRMNL sensor)
-var SENS_IDS = ['ha', 'awair', 'airgradient', 'sensibo', 'ecowitt', 'adafruit', 'custom'];
+var SENS_IDS = ['home_assistant', 'awair', 'airgradient', 'sensibo', 'ecowitt', 'adafruit', 'custom'];
 function sNum(v) { if (typeof v === 'string' && v.trim() !== '') v = Number(v.trim().replace(',', '.')); return typeof v === 'number' && isFinite(v) ? v : null; }
 function sTxt(v, max) { return String(v === undefined || v === null ? '' : v).trim().slice(0, max || 300); }
 function sToC(v, unit) { v = sNum(v); return v === null ? null : (/f/i.test(String(unit || '')) ? (v - 32) / 1.8 : v); }
@@ -645,9 +645,9 @@ function sOne(o) { return Array.isArray(o) ? o[0] : o; }
 var SENS_PROV = {
   // Home Assistant REST API: GET /api/states/<entity_id>, Bearer long-lived token; state is a string, attributes.unit_of_measurement the unit, last_reported the time of the last report
   // https://developers.home-assistant.io/docs/api/rest/ (moved to https://contributors.home-assistant.io/core/internals/rest-api/)
-  ha: async function (f) {
-    var base = sUrl(f('sensor_ha_url')), tok = sTxt(f('sensor_ha_token'), 600);
-    var ids = [f('sensor_ha_temp'), f('sensor_ha_hum'), f('sensor_ha_co2')].map(function (v) { return sTxt(v, 120).toLowerCase(); });
+  home_assistant: async function (f) {
+    var base = sUrl(f('sensor_hass_url')), tok = sTxt(f('sensor_hass_token'), 600);
+    var ids = [f('sensor_hass_temp'), f('sensor_hass_hum'), f('sensor_hass_co2')].map(function (v) { return sTxt(v, 120).toLowerCase(); });
     if (!base || !tok || !/^[a-z0-9_]+\.[a-z0-9_]+$/.test(ids[0]) || ids.slice(1).some(function (v) { return v && !/^[a-z0-9_]+\.[a-z0-9_]+$/.test(v); })) throw new Error('setup');
     var got = await Promise.allSettled(ids.map(function (id) { return id ? sGet(base + '/api/states/' + encodeURIComponent(id), { Authorization: 'Bearer ' + tok }) : Promise.resolve(null); }));
     if (got[0].status !== 'fulfilled') throw got[0].reason;
@@ -671,7 +671,7 @@ var SENS_PROV = {
   // .../locations/measures/current?token=... (all locations of the place: the first indoor one); fields atmp (Celsius), rhum (%), rco2 (ppm), timestamp (ISO)
   // https://api.airgradient.com/public/docs/api/v1/ (swagger.json next to it; the token comes from https://app.airgradient.com/settings/place)
   airgradient: async function (f) {
-    var tok = sTxt(f('sensor_ag_token'), 200), id = sTxt(f('sensor_ag_location'), 20);
+    var tok = sTxt(f('sensor_airgradient_token'), 200), id = sTxt(f('sensor_airgradient_id'), 20);
     if (!tok || (id && !/^\d+$/.test(id))) throw new Error('setup');
     var r = await sGet('https://api.airgradient.com/public/api/v1/locations/' + (id ? id + '/' : '') + 'measures/current?token=' + encodeURIComponent(tok));
     if (Array.isArray(r)) r = r.filter(function (q) { return q && q.locationType === 'indoor'; })[0] || r[0];
@@ -682,7 +682,7 @@ var SENS_PROV = {
   // measurements {temperature, humidity, time} (schema DeviceMeasurements; the unit is not stated there, Celsius assumed)
   // https://sensibo.github.io/api/ and https://sensibo.github.io/sensibo.openapi.yaml (key from https://home.sensibo.com/me/api)
   sensibo: async function (f) {
-    var key = sTxt(f('sensor_sb_key'), 200), id = sTxt(f('sensor_sb_id'), 40);
+    var key = sTxt(f('sensor_sensibo_key'), 200), id = sTxt(f('sensor_sensibo_id'), 40);
     if (!key || (id && !/^[A-Za-z0-9_-]+$/.test(id))) throw new Error('setup');
     var r = await sGet('https://home.sensibo.com/api/v2/' + (id ? 'pods/' + encodeURIComponent(id) + '?fields=measurements' : 'users/me/pods?fields=id,measurements') + '&apiKey=' + encodeURIComponent(key));
     r = r && typeof r === 'object' && r.result !== undefined ? r.result : r;
@@ -694,7 +694,7 @@ var SENS_PROV = {
   // {code: 0, data: {indoor: {temperature: {time, unit, value}, humidity: {...}}, indoor_co2: {co2: {...}}}}, values are strings
   // https://doc.ecowitt.net/web/#/apiv3en?page_id=17
   ecowitt: async function (f) {
-    var ak = sTxt(f('sensor_ew_app'), 200), pk = sTxt(f('sensor_ew_key'), 200), mac = sTxt(f('sensor_ew_mac'), 40).toUpperCase();
+    var ak = sTxt(f('sensor_ecowitt_app_key'), 200), pk = sTxt(f('sensor_ecowitt_key'), 200), mac = sTxt(f('sensor_ecowitt_id'), 40).toUpperCase();
     if (!ak || !pk || !/^[0-9A-F:]{12,17}$/.test(mac)) throw new Error('setup');
     var r = await sGet('https://api.ecowitt.net/api/v3/device/real_time?application_key=' + encodeURIComponent(ak) + '&api_key=' + encodeURIComponent(pk) + '&mac=' + encodeURIComponent(mac) + '&call_back=all&temp_unitid=1');
     if (!r || typeof r !== 'object' || sNum(r.code) !== 0 || !r.data || typeof r.data !== 'object') throw new Error('shape');
@@ -705,22 +705,22 @@ var SENS_PROV = {
   // Adafruit IO REST API v2: GET https://io.adafruit.com/api/v2/{username}/feeds/{feed_key}/data/last, header X-AIO-Key; {value: string, created_epoch, created_at}
   // https://io.adafruit.com/api/docs/ (the API description: https://github.com/adafruit/io-api/blob/master/v2.json)
   adafruit: async function (f) {
-    var user = sTxt(f('sensor_ada_user'), 60), key = sTxt(f('sensor_ada_key'), 100), feeds = [f('sensor_ada_temp'), f('sensor_ada_hum'), f('sensor_ada_co2')].map(function (v) { return sTxt(v, 100); });
+    var user = sTxt(f('sensor_adafruit_user'), 60), key = sTxt(f('sensor_adafruit_key'), 100), feeds = [f('sensor_adafruit_temp'), f('sensor_adafruit_hum'), f('sensor_adafruit_co2')].map(function (v) { return sTxt(v, 100); });
     if (!/^[A-Za-z0-9_-]+$/.test(user) || !key || !/^[A-Za-z0-9._-]+$/.test(feeds[0]) || feeds.slice(1).some(function (v) { return v && !/^[A-Za-z0-9._-]+$/.test(v); })) throw new Error('setup');
     var got = await Promise.allSettled(feeds.map(function (k) { return k ? sGet('https://io.adafruit.com/api/v2/' + encodeURIComponent(user) + '/feeds/' + encodeURIComponent(k) + '/data/last', { 'X-AIO-Key': key }) : Promise.resolve(null); }));
     if (got[0].status !== 'fulfilled') throw got[0].reason;
     var g = function (q) { return q.status === 'fulfilled' && q.value && typeof q.value === 'object' ? q.value : null; }, a = g(got[0]), b = g(got[1]), c = g(got[2]);
     var ts = [a, b, c].map(function (q) { return q ? sTime(q.created_epoch !== undefined ? q.created_epoch : q.created_at) : null; }).filter(function (v) { return v !== null; });
-    return { t: sToC(a && a.value, f('sensor_temp_unit')), h: b ? sNum(b.value) : null, c: c ? sNum(c.value) : null, at: ts.length ? Math.min.apply(null, ts) : null };
+    return { t: sToC(a && a.value, f('sensor_adafruit_unit')), h: b ? sNum(b.value) : null, c: c ? sNum(c.value) : null, at: ts.length ? Math.min.apply(null, ts) : null };
   },
   // A link that answers JSON: one GET, an optional header (name + token; a token without a name is sent as Authorization: Bearer), a dot path per reading
   custom: async function (f) {
-    var url = sUrl(f('sensor_cu_url')), hn = sTxt(f('sensor_cu_header'), 60), tok = sTxt(f('sensor_cu_token'), 600), h = {}, p = ['sensor_cu_temp', 'sensor_cu_hum', 'sensor_cu_co2'].map(function (k) { return sTxt(f(k), 200); });
+    var url = sUrl(f('sensor_custom_url')), hn = sTxt(f('sensor_custom_header'), 60), tok = sTxt(f('sensor_custom_token'), 600), h = {}, p = ['sensor_custom_temp', 'sensor_custom_hum', 'sensor_custom_co2'].map(function (k) { return sTxt(f(k), 200); });
     if (!url || !p[0] || (hn && !/^[A-Za-z0-9-]+$/.test(hn))) throw new Error('setup');
     if (tok) { if (hn) h[hn] = tok; else h.Authorization = 'Bearer ' + tok; }
-    var r = await sGet(url, h), at = sTxt(f('sensor_cu_time'), 200);
+    var r = await sGet(url, h), at = sTxt(f('sensor_custom_time'), 200);
     if (r === null || typeof r !== 'object') throw new Error('shape');
-    return { t: sToC(sPath(r, p[0]), f('sensor_temp_unit')), h: p[1] ? sNum(sPath(r, p[1])) : null, c: p[2] ? sNum(sPath(r, p[2])) : null, at: at ? sTime(sPath(r, at)) : null };
+    return { t: sToC(sPath(r, p[0]), f('sensor_custom_unit')), h: p[1] ? sNum(sPath(r, p[1])) : null, c: p[2] ? sNum(sPath(r, p[2])) : null, at: at ? sTime(sPath(r, at)) : null };
   }
 };
 // The source's answer made safe: ranges, rounding, age. {ok: true, r: {t, h, c, at}} or {ok: false, err: code}
@@ -772,7 +772,7 @@ async function run(input) {
   var cap = (p) => { var t; return Promise.race([p, new Promise((res, rej) => { t = setTimeout(() => rej(new Error('run deadline')), RUN_MS); })]).finally(() => clearTimeout(t)); };
   var st0 = stObj(((input || {}).trmnl || {}).state) || {}, nowS = +(((input || {}).trmnl || {}).system || {}).timestamp_utc || Date.now() / 1000;   // TRMNL hands the transform no system namespace: the clock
   // B22: an indoor source other than a TRMNL sensor is read in parallel with the forecast (its own deadline inside RUN_MS); readIndoor never throws
-  var prov = String(field(input, 'sensor_source', 'own')), indoorP = SENS_IDS.indexOf(prov) < 0 || (field(input, 'sensor_show', 'show') === 'hide' && field(input, 'sensor_co2', 'show') === 'hide') ? Promise.resolve(null) : readIndoor(prov, (k) => field(input, k, ''), nowS);
+  var prov = String(field(input, 'sensor_source', 'own')), indoorP = SENS_IDS.indexOf(prov) < 0 ? Promise.resolve(null) : readIndoor(prov, (k) => field(input, k, ''), nowS);
   var got = await Promise.allSettled([okPre(pre[0]) ? Promise.resolve(pre[0]) : cap(getJson(forecast)), okPre(pre[1]) ? Promise.resolve(pre[1]) : cap(getJson(air))]);
   var sres = await indoorP;
   var wr = got[0].status === 'fulfilled' ? got[0].value : null, snap = null, fb = null;
@@ -803,9 +803,9 @@ async function run(input) {
   // ph, only the parts of the view that differ when an indoor reading exists: the markup merges them into ui and its page
   // script puts the real values in. Built from the view with a stand-in reading (the outdoor temperature, humidity 50).
   // B13: another TRMNL's sensor (sensor_device_id), its label, and which reading is the main one (sensor_primary: auto = the sensor when it is this screen's own, outside when it comes from another device)
-  var sId = sres ? '' : String(field(input, 'sensor_device_id', '')).replace(/\D/g, '').slice(0, 12), sLab = String(field(input, 'sensor_label', '')).replace(/[<>"'&{}%]/g, '').trim().replace(/\s+/g, ' ').toLocaleUpperCase(String(i18n.loc || 'en')), sPri = field(input, 'sensor_primary', 'auto'), sIm = sPri === 'sensor' || (sPri !== 'outside' && !sId);
+  var sId = prov !== 'other' ? '' : String(field(input, 'sensor_device_id', '')).replace(/\D/g, '').slice(0, 12), sLab = String(field(input, 'sensor_label', '')).replace(/[<>"'&{}%]/g, '').trim().replace(/\s+/g, ' ').toLocaleUpperCase(String(i18n.loc || 'en')), sPri = field(input, 'sensor_primary', 'auto'), sIm = sPri === 'sensor' || (sPri !== 'outside' && !sId);
   sLab = Array.from(sLab).slice(0, 40).join('');   // B20: the whole label up to 40 characters (a bound on the data); the page's Framework Clamp cuts what does not fit
-  var phTemp = model.now.temp, ph = null, showIn = field(input, 'sensor_show', 'show') !== 'hide', showCo = field(input, 'sensor_co2', 'show') !== 'hide';
+  var phTemp = model.now.temp, ph = null, showIn = prov !== 'none', showCo = field(input, 'sensor_co2', 'show') !== 'hide';
   if ((showIn || showCo) && phTemp !== null && phTemp !== undefined) {
     var stand = (co2, hum) => buildView(Object.assign({}, model, { inn: { temp: phTemp, hum: hum === undefined ? 50 : hum, co2: co2, press: null, main: sIm } }), i18n, w.daily, moon, phase, vo);
     ph = showIn ? phOverlay(stand(null)) : {}; ph.id = sId; ph.im = sIm; ph.lab = sLab || null;

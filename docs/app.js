@@ -137,7 +137,7 @@
 
   function settingsFor(lat, lon) {
     var f = S.f, s = { lat_lon: lat + ',' + lon, unit: f.unit, time_format: f.time_format, bottom: f.bottom, hide_title_bar: f.hide_title_bar,
-      sensor_show: f.sensor_show, sensor_label: f.sensor_label, sensor_primary: f.sensor_primary, sensor_co2: f.sensor_co2, sensor_device_id: S.hw === 'other' ? '2' : '' };
+      sensor_source: f.sensor_show === 'hide' ? 'none' : (S.hw === 'other' ? 'other' : 'own'), sensor_label: f.sensor_label, sensor_primary: f.sensor_primary, sensor_co2: f.sensor_co2, sensor_device_id: S.hw === 'other' ? '2' : '' };
     return s;
   }
   function sensorFor(sc) {

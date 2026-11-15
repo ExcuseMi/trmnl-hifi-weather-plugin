@@ -9,7 +9,7 @@
   };
   var MOUNT = { full: '', half_horizontal: 'mashup mashup--1Tx1B', half_vertical: 'mashup mashup--1Lx1R', quadrant: 'mashup mashup--2x2' };
   var DEFAULT_FIELDS = { lat_lon: '52.52,13.41', unit: 'celsius', time_format: '24', bottom: 'auto', hide_title_bar: 'false',
-    sensor_show: 'show', sensor_primary: 'auto', sensor_co2: 'show', days_shown: 'auto', dial_span: '24h' };
+    sensor_source: 'own', sensor_primary: 'auto', sensor_co2: 'show', days_shown: 'auto', dial_span: '24h' };
   var LOCALES = { en: 'en-US', de: 'de-DE', fr: 'fr-FR', es: 'es-ES', nl: 'nl', ja: 'ja-JP' };
 
   function pad(n) { return (n < 10 ? '0' : '') + n; }

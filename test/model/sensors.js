@@ -26,7 +26,7 @@ module.exports = async function sensorSourceTests({ T, fx, check, eq, ok }) {
   const keep = setInterval(() => {}, 1000);   // AbortSignal.timeout does not hold the Node loop
   try {
     // ---- one case per provider: the documented answer gives the normalised reading ----
-    const HA = { sensor_source: 'ha', sensor_ha_url: 'https://ha.example.com/', sensor_ha_token: TOKEN, sensor_ha_temp: 'sensor.t', sensor_ha_hum: 'sensor.h', sensor_ha_co2: 'sensor.c' };
+    const HA = { sensor_source: 'home_assistant', sensor_hass_url: 'https://ha.example.com/', sensor_hass_token: TOKEN, sensor_hass_temp: 'sensor.t', sensor_hass_hum: 'sensor.h', sensor_hass_co2: 'sensor.c' };
     const haRoute = (over) => (url, o) => {
       const id = url.split('/api/states/')[1];
       const st = { 'sensor.t': { state: '19.6', attributes: { unit_of_measurement: '°C', device_class: 'temperature' } }, 'sensor.h': { state: '48', attributes: { unit_of_measurement: '%' } }, 'sensor.c': { state: '612', attributes: { unit_of_measurement: 'ppm' } } }[id];
@@ -36,7 +36,7 @@ module.exports = async function sensorSourceTests({ T, fx, check, eq, ok }) {
       calls = []; global.fetch = fake(haRoute());
       const r = await run(HA);
       eq(r.ph.sx, { t: 19.6, h: 48, c: 612 });
-      eq(r.sensor, { src: 'ha', ok: true, err: null, kept: false });
+      eq(r.sensor, { src: 'home_assistant', ok: true, err: null, kept: false });
       eq(r.trmnl_state.sx, { t: 19.6, h: 48, c: 612, at: NOW - 60 }, 'saved for the next run');
       const ha = calls.filter((c) => /ha\.example\.com/.test(c.url));
       eq(ha.map((c) => c.url).sort(), ['https://ha.example.com/api/states/sensor.c', 'https://ha.example.com/api/states/sensor.h', 'https://ha.example.com/api/states/sensor.t']);
@@ -46,7 +46,7 @@ module.exports = async function sensorSourceTests({ T, fx, check, eq, ok }) {
     });
     await check('B22 Home Assistant: Fahrenheit entity converted; unavailable humidity and a missing CO2 entity give null, not a failure', async () => {
       global.fetch = fake(haRoute({ 'sensor.t': { status: 200, body: { state: '68.0', attributes: { unit_of_measurement: '°F' }, last_reported: iso(10) } }, 'sensor.h': { status: 200, body: { state: 'unavailable', attributes: {} } } }));
-      const r = await run(Object.assign({}, HA, { sensor_ha_co2: '' }));
+      const r = await run(Object.assign({}, HA, { sensor_hass_co2: '' }));
       eq(r.ph.sx, { t: 20, h: null, c: null });
     });
     await check('B22 Awair (GET .../devices/{type}/{id}/air-data/latest?fahrenheit=false, Bearer): comp temp, humid, co2', async () => {
@@ -69,33 +69,33 @@ module.exports = async function sensorSourceTests({ T, fx, check, eq, ok }) {
     });
     await check('B22 AirGradient (GET /public/api/v1/locations/{id}/measures/current?token=): atmp, rhum, rco2, timestamp', async () => {
       calls = []; global.fetch = fake(() => ({ status: 200, body: { locationId: 1, locationType: 'indoor', pm02: 4.1, atmp: 22.3, rhum: 41, rco2: 733, timestamp: iso(30) } }));
-      const r = await run({ sensor_source: 'airgradient', sensor_ag_token: TOKEN, sensor_ag_location: '1' });
+      const r = await run({ sensor_source: 'airgradient', sensor_airgradient_token: TOKEN, sensor_airgradient_id: '1' });
       eq(r.ph.sx, { t: 22.3, h: 41, c: 733 });
       eq(calls.map((c) => c.url).filter((u) => /airgradient/.test(u)), ['https://api.airgradient.com/public/api/v1/locations/1/measures/current?token=' + TOKEN]);
       global.fetch = fake(() => ({ status: 200, body: [{ locationType: 'outdoor', atmp: 5, rhum: 90 }, { locationType: 'indoor', atmp: 21, rhum: 40, rco2: 600, timestamp: iso(5) }] }));
-      eq((await run({ sensor_source: 'airgradient', sensor_ag_token: TOKEN })).ph.sx, { t: 21, h: 40, c: 600 }, 'no id: the first indoor location of the place');
+      eq((await run({ sensor_source: 'airgradient', sensor_airgradient_token: TOKEN })).ph.sx, { t: 21, h: 40, c: 600 }, 'no id: the first indoor location of the place');
     });
     await check('B22 Sensibo (GET /pods/{id}?fields=measurements&apiKey=): measurements temperature, humidity, time', async () => {
       calls = []; global.fetch = fake(() => ({ status: 200, body: { status: 'success', result: { measurements: { temperature: 23.4, humidity: 55.2, time: iso(20) } } } }));
-      const r = await run({ sensor_source: 'sensibo', sensor_sb_key: TOKEN, sensor_sb_id: 'AbCd1234' });
+      const r = await run({ sensor_source: 'sensibo', sensor_sensibo_key: TOKEN, sensor_sensibo_id: 'AbCd1234' });
       eq(r.ph.sx, { t: 23.4, h: 55, c: null });
       eq(calls.map((c) => c.url).filter((u) => /sensibo/.test(u)), ['https://home.sensibo.com/api/v2/pods/AbCd1234?fields=measurements&apiKey=' + TOKEN]);
       global.fetch = fake(() => ({ status: 200, body: { result: [{ id: 'x' }, { id: 'y', measurements: { temperature: 20, humidity: 40, time: iso(5) } }] } }));
-      eq((await run({ sensor_source: 'sensibo', sensor_sb_key: TOKEN })).ph.sx, { t: 20, h: 40, c: null }, 'no id: the first device with a measurement');
+      eq((await run({ sensor_source: 'sensibo', sensor_sensibo_key: TOKEN })).ph.sx, { t: 20, h: 40, c: null }, 'no id: the first device with a measurement');
     });
     await check('B22 Ecowitt (GET /api/v3/device/real_time, call_back=all, temp_unitid=1): indoor.temperature, indoor.humidity, indoor_co2.co2 as strings', async () => {
       calls = []; const t = String(NOW - 40);
       global.fetch = fake(() => ({ status: 200, body: { code: 0, msg: 'success', time: String(NOW), data: { outdoor: { temperature: { time: t, unit: 'ºC', value: '3.1' } }, indoor: { temperature: { time: t, unit: 'ºC', value: '21.4' }, humidity: { time: t, unit: '%', value: '47' } }, indoor_co2: { co2: { time: t, unit: 'ppm', value: '655' } } } } }));
-      const r = await run({ sensor_source: 'ecowitt', sensor_ew_app: 'APP' + TOKEN, sensor_ew_key: 'KEY' + TOKEN, sensor_ew_mac: 'ff:ee:dd:cc:bb:aa' });
+      const r = await run({ sensor_source: 'ecowitt', sensor_ecowitt_app_key: 'APP' + TOKEN, sensor_ecowitt_key: 'KEY' + TOKEN, sensor_ecowitt_id: 'ff:ee:dd:cc:bb:aa' });
       eq(r.ph.sx, { t: 21.4, h: 47, c: 655 });
       const u = calls.map((c) => c.url).filter((x) => /ecowitt/.test(x))[0];
       ok(u.startsWith('https://api.ecowitt.net/api/v3/device/real_time?') && /temp_unitid=1/.test(u) && /mac=FF%3AEE%3ADD%3ACC%3ABB%3AAA/.test(u), 'request ' + u.replace(TOKEN, '*'));
       global.fetch = fake(() => ({ status: 200, body: { code: 40010, msg: 'Invalid application Key', time: '1', data: [] } }));
-      eq((await run({ sensor_source: 'ecowitt', sensor_ew_app: 'a', sensor_ew_key: 'b', sensor_ew_mac: 'FF:EE:DD:CC:BB:AA' })).sensor.err, 'shape', 'an error code in the body is a failure');
+      eq((await run({ sensor_source: 'ecowitt', sensor_ecowitt_app_key: 'a', sensor_ecowitt_key: 'b', sensor_ecowitt_id: 'FF:EE:DD:CC:BB:AA' })).sensor.err, 'shape', 'an error code in the body is a failure');
     });
     await check('B22 Adafruit IO (GET /api/v2/{user}/feeds/{key}/data/last, X-AIO-Key): value is a string, created_epoch the time; Fahrenheit converted', async () => {
       calls = []; global.fetch = fake((url) => ({ status: 200, body: { id: '1', value: url.includes('/temp/') ? '68.9' : url.includes('/hum/') ? '44' : '900', feed_id: 1, created_at: iso(50), created_epoch: NOW - 50 } }));
-      const r = await run({ sensor_source: 'adafruit', sensor_ada_user: 'jane', sensor_ada_key: TOKEN, sensor_ada_temp: 'temp', sensor_ada_hum: 'hum', sensor_ada_co2: 'co2', sensor_temp_unit: 'fahrenheit' });
+      const r = await run({ sensor_source: 'adafruit', sensor_adafruit_user: 'jane', sensor_adafruit_key: TOKEN, sensor_adafruit_temp: 'temp', sensor_adafruit_hum: 'hum', sensor_adafruit_co2: 'co2', sensor_adafruit_unit: 'fahrenheit' });
       eq(r.ph.sx, { t: 20.5, h: 44, c: 900 });
       const ad = calls.filter((c) => /adafruit/.test(c.url));
       eq(ad.map((c) => c.url).sort(), ['https://io.adafruit.com/api/v2/jane/feeds/co2/data/last', 'https://io.adafruit.com/api/v2/jane/feeds/hum/data/last', 'https://io.adafruit.com/api/v2/jane/feeds/temp/data/last']);
@@ -103,13 +103,13 @@ module.exports = async function sensorSourceTests({ T, fx, check, eq, ok }) {
     });
     await check('B22 custom link: dot paths (lists by index), header name + token, Fahrenheit, optional time path', async () => {
       calls = []; global.fetch = fake(() => ({ status: 200, body: { data: { rooms: [{ t: '70.7', h: '38.4' }], co2: 701, at: NOW - 15 } } }));
-      const v = { sensor_source: 'custom', sensor_cu_url: 'https://example.com/api/room.json?x=1', sensor_cu_header: 'X-Api-Key', sensor_cu_token: TOKEN, sensor_cu_temp: 'data.rooms.0.t', sensor_cu_hum: 'data.rooms.0.h', sensor_cu_co2: 'data.co2', sensor_cu_time: 'data.at', sensor_temp_unit: 'fahrenheit' };
+      const v = { sensor_source: 'custom', sensor_custom_url: 'https://example.com/api/room.json?x=1', sensor_custom_header: 'X-Api-Key', sensor_custom_token: TOKEN, sensor_custom_temp: 'data.rooms.0.t', sensor_custom_hum: 'data.rooms.0.h', sensor_custom_co2: 'data.co2', sensor_custom_time: 'data.at', sensor_custom_unit: 'fahrenheit' };
       const r = await run(v);
       eq(r.ph.sx, { t: 21.5, h: 38, c: 701 });
       eq(calls.filter((c) => /example\.com/.test(c.url)).map((c) => [c.url, c.headers['X-Api-Key']]), [['https://example.com/api/room.json?x=1', TOKEN]]);
-      calls = []; await run(Object.assign({}, v, { sensor_cu_header: '' }));
+      calls = []; await run(Object.assign({}, v, { sensor_custom_header: '' }));
       eq(calls.filter((c) => /example\.com/.test(c.url))[0].headers.Authorization, 'Bearer ' + TOKEN, 'a token without a header name is a Bearer token');
-      eq((await run(Object.assign({}, v, { sensor_cu_temp: 'data.nothing' }))).sensor.err, 'shape', 'a path that finds nothing is a failure');
+      eq((await run(Object.assign({}, v, { sensor_custom_temp: 'data.nothing' }))).sensor.err, 'shape', 'a path that finds nothing is a failure');
     });
 
     // ---- failures: the weather stays, the reading is the last good one (with its age) or none ----
@@ -137,9 +137,9 @@ module.exports = async function sensorSourceTests({ T, fx, check, eq, ok }) {
       global.fetch = fake(haRoute({ 'sensor.t': { status: 200, body: { state: '450', attributes: {} } } }));
       eq((await run(HA)).sensor.err, 'range');
       calls = []; global.fetch = fake(haRoute());
-      for (const url of ['http://ha.example.com', 'https://localhost:8123', 'https://192.168.1.5', 'https://user:pw@ha.example.com', 'ftp://x', '']) eq((await run(Object.assign({}, HA, { sensor_ha_url: url }))).sensor.err, 'setup', 'address ' + url);
-      eq((await run(Object.assign({}, HA, { sensor_ha_temp: 'not an entity' }))).sensor.err, 'setup');
-      eq((await run(Object.assign({}, HA, { sensor_ha_token: '' }))).sensor.err, 'setup');
+      for (const url of ['http://ha.example.com', 'https://localhost:8123', 'https://192.168.1.5', 'https://user:pw@ha.example.com', 'ftp://x', '']) eq((await run(Object.assign({}, HA, { sensor_hass_url: url }))).sensor.err, 'setup', 'address ' + url);
+      eq((await run(Object.assign({}, HA, { sensor_hass_temp: 'not an entity' }))).sensor.err, 'setup');
+      eq((await run(Object.assign({}, HA, { sensor_hass_token: '' }))).sensor.err, 'setup');
       eq(calls.filter((c) => !/open-meteo/.test(c.url)).length, 0, 'a refused setup makes no request');
     });
     await check('B22 the forecast status wins over the sensor status; a failing source never changes the forecast', async () => {
@@ -151,13 +151,13 @@ module.exports = async function sensorSourceTests({ T, fx, check, eq, ok }) {
     });
     await check('B22 no provider chosen (or a TRMNL source): no request to any source, no sx, existing behaviour', async () => {
       calls = []; global.fetch = fake(() => 'timeout');
-      for (const v of [{}, { sensor_source: 'own' }, { sensor_source: 'other', sensor_device_id: '2' }, { sensor_source: 'nonsense' }, { sensor_source: 'ha', sensor_show: 'hide', sensor_co2: 'hide' }]) {
+      for (const v of [{}, { sensor_source: 'own' }, { sensor_source: 'none' }, { sensor_source: 'other', sensor_device_id: '2' }, { sensor_source: 'nonsense' }]) {
         const r = await run(v);
-        eq([r.sensor, r.ph ? r.ph.sx : 'noph', r.trmnl_state.sx], [null, v.sensor_show ? 'noph' : undefined, undefined]);
+        eq([r.sensor, r.ph ? r.ph.sx : 'noph', r.trmnl_state.sx], [null, undefined, undefined]);
       }
       eq(calls.filter((c) => !/open-meteo/.test(c.url)).length, 0);
       eq((await run({ sensor_source: 'other', sensor_device_id: '2' })).ph.id, '2');
-      eq((await run({ sensor_device_id: '2' })).ph.id, '2', 'a device number saved before the source setting existed still works');
+      eq([(await run({ sensor_device_id: '2' })).ph.id, (await run({ sensor_source: 'none', sensor_device_id: '2' })).ph.id], ['', ''], 'the device number counts only for Another TRMNL');
     });
 
     // ---- the secret never leaves ----
@@ -166,7 +166,7 @@ module.exports = async function sensorSourceTests({ T, fx, check, eq, ok }) {
       try {
         for (const route of [haRoute(), () => ({ status: 401, body: { message: 'bad token ' } }), () => 'timeout', () => 'text']) {
           global.fetch = fake(route);
-          for (const v of [HA, { sensor_source: 'airgradient', sensor_ag_token: TOKEN }, { sensor_source: 'sensibo', sensor_sb_key: TOKEN }, { sensor_source: 'custom', sensor_cu_url: 'https://example.com/x?key=' + TOKEN, sensor_cu_token: TOKEN, sensor_cu_temp: 'a' }]) {
+          for (const v of [HA, { sensor_source: 'airgradient', sensor_airgradient_token: TOKEN }, { sensor_source: 'sensibo', sensor_sensibo_key: TOKEN }, { sensor_source: 'custom', sensor_custom_url: 'https://example.com/x?key=' + TOKEN, sensor_custom_token: TOKEN, sensor_custom_temp: 'a' }]) {
             const r = await run(v, { v: 1 });
             ok(!JSON.stringify(r).includes(TOKEN), 'token in the output of ' + v.sensor_source);
           }
@@ -179,7 +179,7 @@ module.exports = async function sensorSourceTests({ T, fx, check, eq, ok }) {
     // ---- the run budget ----
     await check('B22 a source that never answers (deaf to its abort signal) ends inside the run budget and the weather is there', async () => {
       global.fetch = fake(() => 'hang');
-      for (const v of [HA, { sensor_source: 'awair', sensor_awair_token: TOKEN }, { sensor_source: 'adafruit', sensor_ada_user: 'u', sensor_ada_key: 'k', sensor_ada_temp: 't' }]) {
+      for (const v of [HA, { sensor_source: 'awair', sensor_awair_token: TOKEN }, { sensor_source: 'adafruit', sensor_adafruit_user: 'u', sensor_adafruit_key: 'k', sensor_adafruit_temp: 't' }]) {
         const t0 = Date.now(), r = await run(v);
         const ms = Date.now() - t0;
         ok(ms < 3200, v.sensor_source + ' ran ' + ms + ' ms (TRMNL stops at 5000 incl. VM start)');
@@ -195,7 +195,7 @@ module.exports = async function sensorSourceTests({ T, fx, check, eq, ok }) {
     await check('B22 the source is read in parallel with the forecast (a slow forecast does not delay the sensor start)', async () => {
       const order = [];
       global.fetch = (url) => { order.push(/open-meteo/.test(url) ? 'om' : 'src'); return /open-meteo/.test(url) ? new Promise(() => {}) : Promise.resolve({ ok: true, status: 200, json: async () => ({ state: '20', attributes: {}, last_reported: iso(1) }) }); };
-      await run(Object.assign({}, HA, { sensor_ha_hum: '', sensor_ha_co2: '' }));
+      await run(Object.assign({}, HA, { sensor_hass_hum: '', sensor_hass_co2: '' }));
       ok(order.includes('src') && order.indexOf('src') < 3, 'the source request starts with the forecast requests: ' + order.join());
     });
   } finally { global.fetch = of; clearInterval(keep); unspy(); }
