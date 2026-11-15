@@ -72,6 +72,7 @@ RSpec.describe 'renders' do
       now = (Time.utc(*t.split(/[-T:]/).map(&:to_i)) - answer['utc_offset_seconds'].to_i + 600).iso8601
       mocks = { 'https://api.open-meteo.com/*' => { json: answer } }
       mocks['https://air-quality-api.open-meteo.com/*'] = { json: c['aq'] } if c['aq']
+      c['mocks_extra']&.each { |u, m| mocks[u] = m.transform_keys(&:to_sym) }   # B22: an indoor source (Home Assistant) answers from here
       fields = { 'lat_lon' => '52.52,13.41', 'unit' => 'celsius', 'days_shown' => 'auto', 'dial_span' => '24h', 'hide_title_bar' => 'false' }.merge(c['fields'] || {})
       opts = { view: c['view'] || 'full', device: dev, mocks:, custom_fields: fields, now:, wait_for: "document.querySelector('[data-sw-drawn],[data-sw-error]') !== null" }
       opts[:variables] = { 'trmnl' => { 'user' => { 'locale' => c['locale'] } } } if c['locale']
