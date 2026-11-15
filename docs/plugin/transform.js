@@ -651,11 +651,11 @@ async function run(input) {
   // script puts the real values in. Built from the view with a stand-in reading (the outdoor temperature, humidity 50).
   // B13: another TRMNL's sensor (sensor_device_id), its label, and which reading is the main one (sensor_primary: auto = the sensor when it is this screen's own, outside when it comes from another device)
   var sId = String(field(input, 'sensor_device_id', '')).replace(/\D/g, '').slice(0, 12), sLab = String(field(input, 'sensor_label', '')).replace(/[<>"'&{}%]/g, '').trim().replace(/\s+/g, ' ').toLocaleUpperCase(String(i18n.loc || 'en')), sPri = field(input, 'sensor_primary', 'auto'), sIm = sPri === 'sensor' || (sPri !== 'outside' && !sId);
-  if (Array.from(sLab).length > 12) { var sc12 = Array.from(sLab).slice(0, 13), sp = sc12.lastIndexOf(' '); sLab = sp >= 3 ? sc12.slice(0, sp).join('') : sc12.slice(0, 11).join('') + '\u2026'; }   // a long label: whole words up to 12 characters, else cut with an ellipsis
+  sLab = Array.from(sLab).slice(0, 40).join('');   // B20: the whole label up to 40 characters (a bound on the data); the page's Framework Clamp cuts what does not fit
   var phTemp = model.now.temp, ph = null, showIn = field(input, 'sensor_show', 'show') !== 'hide', showCo = field(input, 'sensor_co2', 'show') !== 'hide';
   if ((showIn || showCo) && phTemp !== null && phTemp !== undefined) {
     var stand = (co2, hum) => buildView(Object.assign({}, model, { inn: { temp: phTemp, hum: hum === undefined ? 50 : hum, co2: co2, press: null, main: sIm } }), i18n, w.daily, moon, phase, vo);
-    ph = showIn ? phOverlay(stand(null)) : {}; ph.id = sId; ph.im = sIm; ph.lab = sLab || null; ph.l8 = sLab.length > 8 ? sLab.slice(0, 7) + '.' : sLab;
+    ph = showIn ? phOverlay(stand(null)) : {}; ph.id = sId; ph.im = sIm; ph.lab = sLab || null;
     if (showIn) ph.hn = slimL(stand(null));   // the indoor order without CO2 (indoor humidity first)
     if (showCo) {   // the CO2 meter (B9): the meter list with a normal and with a high reading (key, label, idx, rank), the markup picks one by the real reading
       var lo = stand(800, showIn ? 50 : null), slim = slimL;
