@@ -221,7 +221,7 @@ ol.legend li{padding:5px 0;font-size:.92rem}
 </section>
 <section id="sources">
   <h2>Indoor sensor sources</h2>
-  <p>Set <b>Sensor</b> to a provider and fill in the fields that show. The reading takes the place of a TRMNL sensor: same house icon, label, main reading and CO2 meter (shown when the source gives CO2). TRMNL fetches it from the cloud, so the source must be reachable from the internet. Tokens go in password fields and are only sent to the provider. A reading older than 3 hours is ignored; when the source fails, the last good reading stays for up to 3 hours and the bottom bar says SENSOR OFFLINE with its time.</p>
+  <p>Set <b>Sensor</b> to a provider and fill in the fields that show. The reading takes the place of a TRMNL sensor: same icon (Sensor icon), name, main reading and CO2 meter (shown when the source gives CO2). TRMNL fetches it from the cloud, so the source must be reachable from the internet. Tokens go in password fields and are only sent to the provider. A reading older than 3 hours is ignored; when the source fails, the last good reading stays for up to 3 hours and the bottom bar says SENSOR OFFLINE with its time.</p>
   <p><b>Beta</b> = built from the provider's API docs, not yet confirmed with a real device; tell us if one fails.</p>
   <table>
     <tr><th>Home Assistant</th><td><b>Tested.</b> Address of your Home Assistant from the internet (https://, for example Nabu Casa or a Cloudflare tunnel; a local address does not work), a long-lived access token (your profile, Security), the entity ids for temperature, humidity and CO2 (humidity and CO2 optional). Fahrenheit entities are converted. <a href="https://developers.home-assistant.io/docs/api/rest/">API</a>.</td></tr>
