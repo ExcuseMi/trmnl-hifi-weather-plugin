@@ -219,12 +219,12 @@ function swNameFit() {
 var cx = swCv();
 document.querySelectorAll('[data-sw-slab]').forEach(function (e) {
 var b = e.getBoundingClientRect(); if (!b.width || !b.height) return;
-var wr = e.parentElement.hasAttribute('data-sw-lw') ? e.parentElement : e, ic = wr.previousElementSibling, ib = ic && ic.getBoundingClientRect(), ip = ic && ic.querySelector('path,circle,rect,line,polygon'); if (!ib || !ib.height || !ip) return;
-e.style.transform = ''; e.style.color = getComputedStyle(ip).stroke;
+var wr = e.parentElement.hasAttribute('data-sw-lw') ? e.parentElement : e, ic = wr.previousElementSibling, ib = ic && ic.getBoundingClientRect(), ip = ic && ic.querySelector('path'); if (!ib || !ib.height || !ip) return;
+e.style.transform = ''; e.style.color = getComputedStyle(ip).color;
 var n = e.querySelector('text') || e, cs = getComputedStyle(n), kk = (e.offsetWidth && e.getBoundingClientRect().width / e.offsetWidth) || 1, ik = ((ic.querySelector('[data-sw-ink]') || ic).getAttribute('data-sw-ink') || '0,1').split(',').map(Number), rr = document.createRange();
 cx.font = cs.fontWeight + ' ' + parseFloat(cs.fontSize) + 'px ' + cs.fontFamily; var m = cx.measureText('H'); rr.selectNodeContents(e);
-var dy = (ib.top + (ik[0] + ik[1] / 2) * ib.height - ((rr.getClientRects()[0] || e.getBoundingClientRect()).top + (m.fontBoundingBoxAscent - m.actualBoundingBoxAscent / 2) * kk)) / kk;
-if (Math.abs(dy) > 0.05) e.style.transform = 'translateY(' + dy.toFixed(2) + 'px)';
+var dy = (ib.top + (ik[0] + ik[1] / 2) * ib.height - (rr.getClientRects()[0].top + (m.fontBoundingBoxAscent - m.actualBoundingBoxAscent / 2) * kk)) / kk;
+e.style.transform = 'translateY(' + dy.toFixed(2) + 'px)';
 });
 }
 function swLab() { var go; document.querySelectorAll('[data-sw-slab]').forEach(function (e) { var k = e.style.fontSize + e.parentElement.clientWidth + e.clientWidth; if (e.getAttribute('data-sw-ck') === k) return; e.setAttribute('data-sw-ck', k); e.textContent = e.getAttribute('data-clamp-original') || e.textContent; e.removeAttribute('data-clamp-cached'); go = 1; }); if (go) terminalize(); }
@@ -302,10 +302,11 @@ function ko(k, fs, b) { return '<g data-sw-' + k + ' stroke="' + ((API.paint && 
 var GLYPH = { '0': 'abcdef', '1': 'bc', '2': 'abdeg', '3': 'abcdg', '4': 'bcfg', '5': 'acdfg', '6': 'acdefg', '7': 'abc', '8': 'abcdefg', '9': 'abcdfg', '-': 'g', ' ': '' };
 var SHADOW = 'dark:hidden 1bit:hidden', SO = 3, K = 0;
 var SK = 'stroke="currentColor" stroke-width="', FS = ' fill="none" ' + SK, LR = ' stroke-linecap="round" stroke-linejoin="round"';   // size: the stroke attributes most shapes share
+function wh(w, h) { return 'width="' + n1(w) + '" height="' + n1(h) + '"'; }   /* size: width and height attributes, eight callers */
 function n1(v) { return String(Math.round(v * 10) / 10); }
 function pts(p) { return p.map((q) => n1(q[0]) + ',' + n1(q[1])).join(' '); }
 function poly(p, extra) { return '<polygon points="' + pts(p) + '"' + (extra || '') + '/>'; }
-function rect(x, y, w, h, rx, extra) { return '<rect x="' + n1(x) + '" y="' + n1(y) + '" width="' + n1(Math.max(0, w)) + '" height="' + n1(Math.max(0, h)) + '"' + (rx ? ' rx="' + n1(rx) + '"' : '') + (extra || '') + '/>'; }
+function rect(x, y, w, h, rx, extra) { return '<rect x="' + n1(x) + '" y="' + n1(y) + '" ' + wh(Math.max(0, w), Math.max(0, h)) + '' + (rx ? ' rx="' + n1(rx) + '"' : '') + (extra || '') + '/>'; }
 var DEFS = '';
 var OC = () => !API.mode ? 'text--gray-50' : (API.mode.bits <= 1 ? '' : (DKM() ? 'text--gray-' + (B2() ? 70 : 60) : (B2() ? 'text--gray-45' : 'text--gray-50')));   /* the empty cell's grey */
 function b1() { return API.mode && API.mode.bits <= 1; }
@@ -341,7 +342,7 @@ function hg(tok, body) { return '<g data-sw-hue="' + tok + '">' + g('text--' + t
 function circ(x, y, r, ex) { return '<circle cx="' + n1(x) + '" cy="' + n1(y) + '" r="' + n1(r) + '"' + (ex || '') + '/>'; }
 function text(x, y, s, fs, anc, bl, extra) { return '<text x="' + n1(x) + '" y="' + n1(y) + '" font-size="' + n1(fs) + '" font-weight="700" text-anchor="' + (anc || 'middle') + '"' + (bl ? ' dominant-baseline="' + bl + '"' : '') + (extra || '') + '>' + s + '</text>'; }
 function svg(W, H, body, vb) { var d0 = DEFS; DEFS = ''; return svg0(W, H, body, vb, d0); }
-function svg0(W, H, body, vb, DEFS) { return '<svg xmlns="http://www.w3.org/2000/svg" width="' + n1(W) + '" height="' + n1(H) + '" viewBox="' + (vb || '0 0 ' + n1(W) + ' ' + n1(H)) + '" fill="currentColor" overflow="visible"' + (API.font ? ' font-family="' + API.font.replace(/"/g, "'") + '"' : '') + '>' + (DEFS ? '<defs>' + DEFS + '</defs>' : '') + body + '</svg>'; }
+function svg0(W, H, body, vb, DEFS) { return '<svg xmlns="http://www.w3.org/2000/svg" ' + wh(W, H) + ' viewBox="' + (vb || '0 0 ' + n1(W) + ' ' + n1(H)) + '" fill="currentColor" overflow="visible"' + (API.font ? ' font-family="' + API.font.replace(/"/g, "'") + '"' : '') + '>' + (DEFS ? '<defs>' + DEFS + '</defs>' : '') + body + '</svg>'; }
 function hseg(x0, x1, y, t) { var h = t / 2; return [[x0, y], [x0 + h, y - h], [x1 - h, y - h], [x1, y], [x1 - h, y + h], [x0 + h, y + h]]; }
 function vseg(x, y0, y1, t) { var h = t / 2; return [[x, y0], [x + h, y0 + h], [x + h, y1 - h], [x, y1], [x - h, y1 - h], [x - h, y0 + h]]; }
 function shapes(x, w, h, t, g0) {
@@ -387,7 +388,7 @@ return { html: svg(vw * k, HH * k, glow(body, GPX / k), '0 0 ' + vw + ' ' + HH).
 var LOC = { out: "<path d='M8 17a4.5 4.5 0 0 1 .5-8.8A5.5 5.5 0 0 1 19.5 8.2 4.5 4.5 0 0 1 20 17z'/><path d='M14 17v8M10.5 25h7'/>", st: "<path fill='currentColor' stroke='none' d='M12.8 12.5h2.4V21l2.3 4H10.5l2.3-4zM11.3 9.2h5.4v3.3h-5.4zM8 7.6h12v1.8H8zM9 4.2a4.3 4.3 0 0 0 0 8.6zM19 4.2a4.3 4.2 0 0 1 0 8.6zM13.3.8a2.4 3.4 0 0 1 0 6.8z'/>", in: "<path d='M3 14L14 4l11 10'/><path d='M6 12v12h16V12'/><path d='M12 24v-7h4v7'/>" };
 function loc(k, W, H) { return svg(W, H, locAt(k, (W - Math.min(W, H)) / 2, (H - Math.min(W, H)) / 2, Math.min(W, H))); }
 var swSec = () => typeof SW !== 'undefined' && SW.sim === false;   /* B13: the sensor is the second reading */
-function locAt(k, x, y, s) { return g(!API.mk && (swSec() ? k === 'in' : k === 'out') ? inc() : '', '<svg x="' + n1(x) + '" y="' + n1(y) + '" width="' + n1(s) + '" height="' + n1(s) + '" viewBox="0 0 28 28" overflow="visible"><g fill="none" ' + SK + n1(Math.max(1.8, 1.5 * 28 / Math.max(1, s)) * 100) / 100 + '"' + LR + ' data-sw-loc="' + k + '">' + LOC[k === 'in' && typeof SW !== 'undefined' && SW.po ? 'st' : k] + '</g></svg>'); }
+function locAt(k, x, y, s) { return g(!API.mk && (swSec() ? k === 'in' : k === 'out') ? inc() : '', '<svg x="' + n1(x) + '" y="' + n1(y) + '" ' + wh(s, s) + ' viewBox="0 0 28 28" overflow="visible"><g fill="none" ' + SK + n1(Math.max(1.8, 1.5 * 28 / Math.max(1, s)) * 100) / 100 + '"' + LR + ' data-sw-loc="' + k + '">' + LOC[k === 'in' && typeof SW !== 'undefined' && SW.po ? 'st' : k] + '</g></svg>'); }
 var inc = () => b1() ? '' : (B2() ? 'text--gray-30' : dgr()), dgr = () => 'text--gray-' + (b1() || B2() ? (DKM() ? 45 : 50) : (DKM() ? 40 : 35));   /* B18 owner 2026-11-15: the dial's outdoor grey (arc, marks, needle) on the greyscale X: gray-35 (102, 5.7:1 on white) light, gray-40 (136, 5.9:1 on black) dark; still far from the black main needle; 1-bit and 2-bit keep inb() */
 function cells(frac, n) { return frac === null || frac === undefined || !(frac > 0) ? 0 : Math.max(1, Math.round(Math.min(1, frac) * n)); }
 function cellStates(m, n) {
@@ -520,7 +521,7 @@ ri = bits <= 1 && !dk ? r - sw * 1.6 : r;
 if (f > 0.01) lit = '<path d="' + moonLit(p, cx, cx, ri) + '" data-sw-moon="lit"' + (lb == null ? '' : ' transform="rotate(' + n1(-(lb - (p < 0.5 ? 270 : 90))) + ' ' + n1(cx) + ' ' + n1(cx) + ')"') + '/>';   // lb: the bright limb as the observer sees it (transform moonLimb, owner 2026-11-14: true tilt)
 var limb = circ(cx, cx, r, FS + n1(sw) + '"');
 var h = dk ? halo(circ(cx, cx, r), GPX) : '';
-if (h) { var mid = 'swmk' + (K++); h = '<defs><mask id="' + mid + '" maskUnits="userSpaceOnUse" x="' + n1(-H) + '" y="' + n1(-H) + '" width="' + n1(3 * H) + '" height="' + n1(3 * H) + '"><rect x="' + n1(-H) + '" y="' + n1(-H) + '" width="' + n1(3 * H) + '" height="' + n1(3 * H) + '" fill="#fff"/><circle cx="' + n1(cx) + '" cy="' + n1(cx) + '" r="' + n1(r + sw / 2) + '" fill="#000"/></mask></defs><g mask="url(#' + mid + ')" data-sw-moonhalo>' + h + '</g>'; }
+if (h) { var mid = 'swmk' + (K++); h = '<defs><mask id="' + mid + '" maskUnits="userSpaceOnUse" x="' + n1(-H) + '" y="' + n1(-H) + '" ' + wh(3 * H, 3 * H) + '><rect x="' + n1(-H) + '" y="' + n1(-H) + '" ' + wh(3 * H, 3 * H) + ' fill="#fff"/><circle cx="' + n1(cx) + '" cy="' + n1(cx) + '" r="' + n1(r + sw / 2) + '" fill="#000"/></mask></defs><g mask="url(#' + mid + ')" data-sw-moonhalo>' + h + '</g>'; }
 var disk = circ(cx, cx, r, ' data-sw-moon="disk"');
 if (dk) { if (f < 0.08) return svg(H, H, h + g('text--gray-45', disk.replace('r="' + n1(r) + '"', 'r="' + n1(ri) + '"').replace('"disk"', '"lit"')) + limb); return svg(H, H, h + lit + limb); }
 // Light (owner 2026-11-14, like a printed moon-phase icon): the shadow is a dark disc, the lit part paper white, the outline kept.
@@ -528,8 +529,8 @@ return svg(H, H, g(bits <= 1 ? '' : (bits === 2 ? 'text--gray-10' : 'text--gray-
 }
 var PKD = "M7.4 9.2q-.9-1.1 0-2.2q-.2-1.4 1.2-1.9q.4-1.3 1.8-1.3q.9-1 2.2-.6q1.4-.6 2.8 0q1.3-.4 2.2.6q1.4 0 1.8 1.3q1.4.5 1.2 1.9q.9 1.1 0 2.2", CLOTH = { umbrella: "<path d='M3.5 14a10.5 10.5 0 0 1 21 0c-1.7-1.4-3.5-1.4-5.2 0-1.7-1.4-3.6-1.4-5.3 0-1.7-1.4-3.6-1.4-5.3 0-1.7-1.4-3.5-1.4-5.2 0z'/><path d='M14 14v8.5a2 2 0 0 1-4 0'/><path d='M14 2.5v1'/>",
 parka: "<g transform='translate(0 -0.70)'><path class='text--gray-65' fill='currentColor' stroke='none' d='" + PKD + "L18 9.7Q14 13 10 9.7Z'/><path d='" + PKD + "' stroke-width='1.4'/><path d='M10 9.7Q14 13 18 9.7L20 9.5 22.5 10.5 24 22.5h-3L19.7 14 20.2 26H7.8L8.3 14 7 22.5H4L5.5 10.5 8 9.5Z'/><path d='M14 11.3v14.7'/><path d='M15.1 14.4h.9M15.1 17.6h.9' stroke-width='1.6'/><path d='M10 20.2h2M16 20.2h2' stroke-width='1.6'/></g>",
-jacket: "<path d='M10.5 4.5L5.5 7 4 22h3l1.5-10V24h11V12L21 22h3L22.5 7l-5-2.5'/><path d='M10.5 4.5L14 9l3.5-4.5'/><path d='M14 9v15'/>",
-sweater: "<path d='M10.2 5Q14 8.4 17.8 5L22.5 7 24 22h-3L19.5 12V24h-11V12L7 22H4L5.5 7Z'/><path d='M8.5 21.5h11M8.5 19h11' stroke-width='1.3'/>",
+jacket: "<path d='M10.5 5.5L5.5 7.5 4 22h3l1.5-10V24h11V12L21 22h3L22.5 7.5l-5-2'/><path d='M10.5 2.8h7v2.9h-7z'/><path d='M14 5.7V24'/><path d='M13 10.5h2' stroke-width='1.8'/><path d='M9.8 18.6l2.4-1.4M18.2 18.6l-2.4-1.4'/>",
+sweater: "<path d='M10.2 5Q14 8.4 17.8 5L22.5 7 24 22h-3L19.5 12V24h-11V12L7 22H4L5.5 7Z'/><path d='M11.3 5.6Q14 7.6 16.7 5.6' stroke-width='1.3'/><path d='M8.5 21.3h11M4.4 19.8h2.9M20.7 19.8h2.9' stroke-width='1.6'/>",
 tshirt: "<path d='M10 5Q14 9.2 18 5L24 8.5 21.5 13 19 11.5V24H9V11.5L6.5 13 4 8.5Z'/>" };
 // Garment strokes (owner 2026-11-13: "milder"): the weight of the weather and rain icons, 1.05 of 28 units, scaling with the size; at least 0.9 px (1.25 px on 1-bit).
 function cue(ks, W, H, mid) {
@@ -538,7 +539,7 @@ if (!mid) W = Math.max(W, 1.6 * H);
 var s = Math.min(48, 30 * W / H), e = s * 0.55, sw = (z) => n1(Math.max(1.05, (b1() ? 1.25 : 0.9) * 28 / (z * H / 48)) * 100) / 100,
 it = (k, x, y, z) => '<g data-sw-item="' + (k === 'umbrella' ? k : 'top') + '" transform="translate(' + n1(x) + ' ' + n1(y) + ') scale(' + n1(z / 28 * 1000) / 1000 + ')" stroke-width="' + sw(z) + '">' + CLOTH[k] + '</g>', y0 = (48 - s) / 2;
 var body = it(ks[0], 0, y0, s) + (ks[1] ? it(ks[1], s * 1.6 - e, y0, e) : '');
-return svg(W, H, '<svg width="' + n1(W) + '" height="' + n1(H) + '" viewBox="0 0 ' + n1(48 * W / H) + ' 48" overflow="visible"><g data-sw-cloth data-sw-box="0,0,' + n1(H) + '"><g fill="none" stroke="currentColor"' + LR + ' stroke-width="' + sw(s) + '">' + body + '</g></g></svg>');
+return svg(W, H, '<svg ' + wh(W, H) + ' viewBox="0 0 ' + n1(48 * W / H) + ' 48" overflow="visible"><g data-sw-cloth data-sw-box="0,0,' + n1(H) + '"><g fill="none" stroke="currentColor"' + LR + ' stroke-width="' + sw(s) + '">' + body + '</g></g></svg>');
 }
 function backlight(W, H, cx, cy, rad, ryk, rx) {
 var m = API.mode || {}, pa = API.paint ? API.paint(m.bits === 2 ? 'gray-55' : 'gray-75') : null;
@@ -558,7 +559,7 @@ var GPX = 4;
 function swFilt(id) { return '<defs><filter id="' + id + '" x="0" y="0" width="1" height="1"><feFlood flood-color="currentColor"/><feComposite in2="SourceAlpha" operator="in"/></filter></defs>'; }
 function icon(href, W, H) {
 var id = 'swink' + (K++);
-return svg(W, H, swFilt(id) + glow('<image href="' + href + '" x="0" y="0" width="' + n1(W) + '" height="' + n1(H) + '" filter="url(#' + id + ')"/>', GPX));
+return svg(W, H, swFilt(id) + glow('<image href="' + href + '" x="0" y="0" ' + wh(W, H) + ' filter="url(#' + id + ')"/>', GPX));
 }
 function cl(f) { return Math.max(-0.03, Math.min(1.03, f)); }
 function dm(H) { return [Math.max(2, H * 0.026), H * 0.045, H * 0.08, H * 0.1, Math.max(2.5, H * 0.008), Math.max(4, H * 0.03), 75 * Math.PI / 180]; }   /* the dial sizes every dial function shares: line, band, mark height, mark font, mark gap, gap, half sweep */
@@ -617,7 +618,7 @@ var zro = r - H * 0.085, zri = zro - H * 0.05, zg = 0.012, isz = r * 0.34;
 var a0 = at(z[0] + zg, zri), a1 = at(z[1] - zg, zri), d = arc(zro, z[0] + zg, z[1] - zg) + ' L' + n1(a1[0]) + ' ' + n1(a1[1]) + ' A' + n1(zri) + ' ' + n1(zri) + ' 0 0 0 ' + n1(a0[0]) + ' ' + n1(a0[1]) + ' Z';
 body += (z[2] ? g('text--gray-45', '<path d="' + d + '"/>') : '') + path(d, Math.max(1, lw * 0.5));
 });
-(D.icons || []).forEach((u, i) => { var q = at((2 * i + 1) / 8, zri - isz * 0.62); body += glow('<image href="' + u + '" x="' + n1(q[0] - isz / 2) + '" y="' + n1(q[1] - isz / 2) + '" width="' + n1(isz) + '" height="' + n1(isz) + '" filter="url(#' + id + ')"/>', lg); });
+(D.icons || []).forEach((u, i) => { var q = at((2 * i + 1) / 8, zri - isz * 0.62); body += glow('<image href="' + u + '" x="' + n1(q[0] - isz / 2) + '" y="' + n1(q[1] - isz / 2) + '" ' + wh(isz, isz) + ' filter="url(#' + id + ')"/>', lg); });
 }
 body += glow(path(arc(r, 0, 1), lw), lg);
 var step = baro ? 10 : D.step / 2, major = baro ? 20 : D.step, labs = '';
