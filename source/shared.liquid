@@ -211,8 +211,22 @@
 {%- if ui and ui.ok %}
 <script type="text/javascript">
 var SW = {{ ui | json }};
+function swCv() { return document.createElement('canvas').getContext('2d'); }   /* size: a measuring canvas, four callers */
 function px(v, n) { return v.toFixed(n) + 'px'; }   /* B20 (size): a length written 45 times */
 /* B20: the Framework Clamp (data-clamp) measures once, when the page loads; the label's size and width are set by this script afterwards, so the clamp runs again whenever they change */
+/* B27 (owner photo, BOVEN): the sensor's name takes the icon's colour and its caps are centred on the icon's ink (render check B20: colour, centre within 1 px) */
+function swNameFit() {
+var cx = swCv();
+document.querySelectorAll('[data-sw-slab]').forEach(function (e) {
+var b = e.getBoundingClientRect(); if (!b.width || !b.height) return;
+var wr = e.parentElement.hasAttribute('data-sw-lw') ? e.parentElement : e, ic = wr.previousElementSibling, ib = ic && ic.getBoundingClientRect(), ip = ic && ic.querySelector('path,circle,rect,line,polygon'); if (!ib || !ib.height || !ip) return;
+e.style.transform = ''; e.style.color = getComputedStyle(ip).stroke;
+var n = e.querySelector('text') || e, cs = getComputedStyle(n), kk = (e.offsetWidth && e.getBoundingClientRect().width / e.offsetWidth) || 1, ik = ((ic.querySelector('[data-sw-ink]') || ic).getAttribute('data-sw-ink') || '0,1').split(',').map(Number), rr = document.createRange();
+cx.font = cs.fontWeight + ' ' + parseFloat(cs.fontSize) + 'px ' + cs.fontFamily; var m = cx.measureText('H'); rr.selectNodeContents(e);
+var dy = (ib.top + (ik[0] + ik[1] / 2) * ib.height - (rr.getBoundingClientRect().top + (m.fontBoundingBoxAscent - m.actualBoundingBoxAscent / 2) * kk)) / kk;
+if (Math.abs(dy) > 0.05) e.style.transform = 'translateY(' + dy.toFixed(2) + 'px)';
+});
+}
 function swLab() { var go; document.querySelectorAll('[data-sw-slab]').forEach(function (e) { var k = e.style.fontSize + e.parentElement.clientWidth + e.clientWidth; if (e.getAttribute('data-sw-ck') === k) return; e.setAttribute('data-sw-ck', k); e.textContent = e.getAttribute('data-clamp-original') || e.textContent; e.removeAttribute('data-clamp-cached'); go = 1; }); if (go) terminalize(); }
 // Indoor overlay (ph, only the parts of the view that differ with an indoor reading): merged into SW, then the real
 // reading from the merge variable replaces the stand-in's values: the BINNEN readout, the humidity under it and the twin
@@ -780,7 +794,8 @@ cs.forEach(function (c) { c.firstElementChild.style.cssText += ';text-align:righ
 // view), its icon 2.3 cap heights, unit 0.3 D, clothing cue and rain calendar 0.55 D each. The layout (temperature beside or above the cue
 // and rain column, that column stacked or side by side) that allows the largest D wins; a meter row is added only while D keeps 85 % and its
 // label stays readable; nothing is shrunk below its share, lower items are dropped whole.
-var SWR = (SWS[4] ? (SWS[5] ? 0.455 : 0.385) : 0.356) * (parseFloat(getComputedStyle(document.querySelector('.screen')).getPropertyValue('--device-ui-scale')) || 1) * (SWS[4] && SWS[5] ? Math.min(1, 1040 / (Math.max(parseFloat(getComputedStyle(document.querySelector('.screen')).getPropertyValue('--screen-w')), parseFloat(getComputedStyle(document.querySelector('.screen')).getPropertyValue('--screen-h'))) || 1040)) : 1);   /* B15: the full view's digits grow with the screen height (7.5 %), its label does not: a taller lg portrait screen (Kobo Sage, Forma: 1371 framework px) has a smaller label share than the 1040 px ones */ // B12: the framework's text scale (Palma, Kindle 2024: 0.8) shrinks the full view's label too   // the full view's condition/temperature ratio per device class (render check CONDRATIO)
+var scv = (k) => parseFloat(getComputedStyle(document.querySelector('.screen')).getPropertyValue(k));   /* size: a --screen-* custom property as a number */
+var SWR = (SWS[4] ? (SWS[5] ? 0.455 : 0.385) : 0.356) * (scv('--device-ui-scale') || 1) * (SWS[4] && SWS[5] ? Math.min(1, 1040 / (Math.max(scv('--screen-w'), scv('--screen-h')) || 1040)) : 1);   /* B15: the full view's digits grow with the screen height (7.5 %), its label does not: a taller lg portrait screen (Kobo Sage, Forma: 1371 framework px) has a smaller label share than the 1040 px ones */ // B12: the framework's text scale (Palma, Kindle 2024: 0.8) shrinks the full view's label too   // the full view's condition/temperature ratio per device class (render check CONDRATIO)
 function swSmall(cx) {
 var box = document.querySelector('[data-sw-sbox]'); if (!box) return;
 var bb = box.getBoundingClientRect(); if (!bb.width || !bb.height) return;
@@ -976,7 +991,7 @@ if (lb > p.getBoundingClientRect().bottom + 0.5 && ov < 0.08 * rh) rs.forEach(fu
 var swN = 0;
 function swAlign() {
 if (++swN > 60) return;
-var cx = document.createElement('canvas').getContext('2d');
+var cx = swCv();
 swSmall(cx); swNames(); swNums(); swSeg(cx); swCond(cx); swDayIcons(); swFit(); swBadge(cx); swFit(); swBadge(cx); swTri(); swRows();
 }
 // The OG portrait layouts serve every portrait screen below lg: md and sm (Kindle 2024, B12)
@@ -1035,7 +1050,7 @@ if (!dr) r.style.setProperty('height', px(2 * r.offsetHeight, 1), 'important'); 
 swOGPortrait(); swOGPortraitDays();
 whenReady(function () {
 swRepaint = swPaint;
-swSmall(document.createElement('canvas').getContext('2d'));
+swSmall(swCv());
 // Days strip (device tier B12, wider portrait md screens: the half vertical's bigger console left the last day row cut): the
 // rows that do not fit inside their panel go whole, from the last, today always stays.
 document.querySelectorAll('[data-sw-dstrip] [data-sw-panel]').forEach(function (p) { var b = p.getBoundingClientRect().bottom + 1, rs = [].filter.call(p.querySelectorAll('[data-sw-row="day"]'), function (r) { return r.getBoundingClientRect().height > 0; });
@@ -1043,7 +1058,7 @@ var lo = function (r) { return Math.max(r.getBoundingClientRect().bottom, r.quer
 while (rs.length > 1 && lo(rs[rs.length - 1]) > b) rs.pop().style.setProperty('display', 'none', 'important'); });
 // Rain calendar cells at most twice as wide as high (B12, Palma's short wide half view: 43x21): the calendar narrows to 1.95, never flattens.
 document.querySelectorAll('[data-sw-part="rain"]').forEach(function (e) { var n = +(e.getAttribute('data-sw-rows') || '2,2').split(',')[SWS[4] ? 1 : 0], mw = 5.85 * e.offsetHeight / n; if (e.offsetWidth > 6 * e.offsetHeight / n) e.style.setProperty('width', px(mw, 1), 'important'); });
-swArrow(document.createElement('canvas').getContext('2d')); swCapBase();
+swArrow(swCv()); swCapBase();
 document.querySelectorAll('[data-sw-part="gauge"]').forEach(function (el) {
 var un = el.previousElementSibling, cal = un && un.querySelector('[data-sw-part="rain"]'); if (!cal) return;
 var ml = swVis('[data-sw-mlabel]')[0], lp = ml ? parseFloat(getComputedStyle(ml).fontSize) * (ml.getBoundingClientRect().width / (ml.offsetWidth || 1)) : 0;
@@ -1109,6 +1124,7 @@ if (document.fonts && document.fonts.ready) document.fonts.ready.then(swAlign);
 if (window.ResizeObserver) { var ro = new ResizeObserver(function () { swAlign(); }); document.querySelectorAll('[data-sw-unit=""], [data-sw-part="temp"], [data-sw-cond]').forEach(function (q) { ro.observe(q); ro.observe(q.parentElement); }); }
 if (window.MutationObserver) { var mo = new MutationObserver(function () { swAlign(); }); document.querySelectorAll('[data-sw-cond]').forEach(function (q) { mo.observe(q, { attributes: true, childList: true, characterData: true, subtree: true }); }); }
 [200, 800, 2000].forEach(function (ms) { setTimeout(function () { swN = 0; swAlign(); }, ms); });
+swNameFit();
 document.body.setAttribute('data-sw-drawn', '1');
 });
 })();

@@ -52,5 +52,475 @@
   "fields": {
    "bottom": "days"
   }
+ },
+ {
+  "name": "b27-name-x-sen",
+  "device": "v2",
+  "view": "full",
+  "locale": "en-US",
+  "vars": {
+   "sensor_readings": {
+    "device_1": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 21.6
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 48
+      }
+     ],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 1500
+      }
+     ],
+     "pressure": []
+    },
+    "device_2": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 17.4
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 56
+      }
+     ],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 620
+      }
+     ],
+     "pressure": []
+    }
+   }
+  },
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days",
+   "sensor_device_id": "2",
+   "sensor_label": "Boven",
+   "sensor_primary": "sensor",
+   "sensor_source": "other"
+  },
+  "want_in": "17.4",
+  "want_label": "BOVEN",
+  "co2": "yes",
+  "want_whole": true
+ },
+ {
+  "name": "b27-name-x-dark-sen",
+  "device": "v2",
+  "view": "full",
+  "locale": "en-US",
+  "vars": {
+   "sensor_readings": {
+    "device_1": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 21.6
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 48
+      }
+     ],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 1500
+      }
+     ],
+     "pressure": []
+    },
+    "device_2": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 17.4
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 56
+      }
+     ],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 620
+      }
+     ],
+     "pressure": []
+    }
+   }
+  },
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days",
+   "sensor_device_id": "2",
+   "sensor_label": "Boven",
+   "sensor_primary": "sensor",
+   "sensor_source": "other"
+  },
+  "want_in": "17.4",
+  "want_label": "BOVEN",
+  "co2": "yes",
+  "want_whole": true,
+  "dark": true
+ },
+ {
+  "name": "b27-name-og-sen",
+  "device": "og_plus",
+  "view": "full",
+  "locale": "en-US",
+  "vars": {
+   "sensor_readings": {
+    "device_1": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 21.6
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 48
+      }
+     ],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 1500
+      }
+     ],
+     "pressure": []
+    },
+    "device_2": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 17.4
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 56
+      }
+     ],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 620
+      }
+     ],
+     "pressure": []
+    }
+   }
+  },
+  "palette": "gray-4",
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days",
+   "sensor_device_id": "2",
+   "sensor_label": "Boven",
+   "sensor_primary": "sensor",
+   "sensor_source": "other"
+  },
+  "want_in": "17.4",
+  "want_label": "BOVEN",
+  "co2": "yes",
+  "want_whole": true
+ },
+ {
+  "name": "b27-name-og1-sen",
+  "device": "og_png",
+  "view": "full",
+  "locale": "nl",
+  "vars": {
+   "sensor_readings": {
+    "device_1": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 21.6
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 48
+      }
+     ],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 1500
+      }
+     ],
+     "pressure": []
+    },
+    "device_2": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 17.4
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 56
+      }
+     ],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 620
+      }
+     ],
+     "pressure": []
+    }
+   }
+  },
+  "palette": "bw",
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days",
+   "sensor_device_id": "2",
+   "sensor_label": "Boven",
+   "sensor_primary": "sensor",
+   "sensor_source": "other"
+  },
+  "want_in": "17.4",
+  "want_label": "BOVEN",
+  "co2": "yes",
+  "want_whole": true
+ },
+ {
+  "name": "b27-name-x-out",
+  "device": "v2",
+  "view": "full",
+  "locale": "en-US",
+  "vars": {
+   "sensor_readings": {
+    "device_1": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 21.6
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 48
+      }
+     ],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 1500
+      }
+     ],
+     "pressure": []
+    },
+    "device_2": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 17.4
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 56
+      }
+     ],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 620
+      }
+     ],
+     "pressure": []
+    }
+   }
+  },
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days",
+   "sensor_device_id": "2",
+   "sensor_label": "Boven",
+   "sensor_primary": "outside",
+   "sensor_source": "other"
+  },
+  "want_in": "17.4",
+  "want_label": "BOVEN",
+  "co2": "yes",
+  "want_whole": true
+ },
+ {
+  "name": "b27-name-x-dark-out",
+  "device": "v2",
+  "view": "full",
+  "locale": "en-US",
+  "vars": {
+   "sensor_readings": {
+    "device_1": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 21.6
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 48
+      }
+     ],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 1500
+      }
+     ],
+     "pressure": []
+    },
+    "device_2": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 17.4
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 56
+      }
+     ],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 620
+      }
+     ],
+     "pressure": []
+    }
+   }
+  },
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days",
+   "sensor_device_id": "2",
+   "sensor_label": "Boven",
+   "sensor_primary": "outside",
+   "sensor_source": "other"
+  },
+  "want_in": "17.4",
+  "want_label": "BOVEN",
+  "co2": "yes",
+  "want_whole": true,
+  "dark": true
+ },
+ {
+  "name": "b27-name-og-out",
+  "device": "og_plus",
+  "view": "full",
+  "locale": "en-US",
+  "vars": {
+   "sensor_readings": {
+    "device_1": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 21.6
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 48
+      }
+     ],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 1500
+      }
+     ],
+     "pressure": []
+    },
+    "device_2": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 17.4
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 56
+      }
+     ],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 620
+      }
+     ],
+     "pressure": []
+    }
+   }
+  },
+  "palette": "gray-4",
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days",
+   "sensor_device_id": "2",
+   "sensor_label": "Boven",
+   "sensor_primary": "outside",
+   "sensor_source": "other"
+  },
+  "want_in": "17.4",
+  "want_label": "BOVEN",
+  "co2": "yes",
+  "want_whole": true
+ },
+ {
+  "name": "b27-name-og1-out",
+  "device": "og_png",
+  "view": "full",
+  "locale": "nl",
+  "vars": {
+   "sensor_readings": {
+    "device_1": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 21.6
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 48
+      }
+     ],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 1500
+      }
+     ],
+     "pressure": []
+    },
+    "device_2": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 17.4
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 56
+      }
+     ],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 620
+      }
+     ],
+     "pressure": []
+    }
+   }
+  },
+  "palette": "bw",
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days",
+   "sensor_device_id": "2",
+   "sensor_label": "Boven",
+   "sensor_primary": "outside",
+   "sensor_source": "other"
+  },
+  "want_in": "17.4",
+  "want_label": "BOVEN",
+  "co2": "yes",
+  "want_whole": true
  }
 ]
