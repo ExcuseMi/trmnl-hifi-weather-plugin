@@ -92,14 +92,14 @@ custom_fields:
   description-ja: '下部のプラグイン名と更新時刻のバーを非表示にします。'
   default: false
 - keyname: sensor_source
-  group: Indoor sensor
+  group: Sensor
   field_type: select
-  name: 'Indoor sensor'
-  name-de: 'Innensensor'
-  name-fr: 'Capteur intérieur'
-  name-es-ES: 'Sensor interior'
-  name-nl: 'Binnensensor'
-  name-ja: '室内センサー'
+  name: 'Sensor'
+  name-de: 'Sensor'
+  name-fr: 'Capteur'
+  name-es-ES: 'Sensor'
+  name-nl: 'Sensor'
+  name-ja: 'センサー'
   description: 'Where the indoor reading comes from. None: outside weather only. This TRMNL: this screen''s own sensor. Another TRMNL: needs its device number. Home Assistant: address, token, entity ids. Awair: token. AirGradient: token. Sensibo: API key. Ecowitt: application key, API key, MAC. Adafruit IO: user, key, feeds. Custom link: a JSON link and where the readings are in it. The fields for the chosen option show below.'
   description-de: 'Woher der Innenwert kommt. Keiner: nur das Außenwetter. Dieses TRMNL: der eigene Sensor dieses Bildschirms. Anderes TRMNL: braucht dessen Gerätenummer. Home Assistant: Adresse, Token, Entitäts-IDs. Awair: Token. AirGradient: Token. Sensibo: API-Schlüssel. Ecowitt: Application-Key, API-Schlüssel, MAC. Adafruit IO: Benutzer, Schlüssel, Feeds. Eigener Link: ein JSON-Link und die Fundstellen der Werte. Die Felder der gewählten Option erscheinen darunter.'
   description-fr: 'D''où vient la mesure intérieure. Aucun : seulement la météo extérieure. Ce TRMNL : le capteur de cet écran. Autre TRMNL : demande son numéro d''appareil. Home Assistant : adresse, jeton, identifiants d''entités. Awair : jeton. AirGradient : jeton. Sensibo : clé API. Ecowitt : clé d''application, clé API, MAC. Adafruit IO : utilisateur, clé, flux. Lien perso : un lien JSON et l''emplacement des mesures. Les champs de l''option choisie s''affichent dessous.'
@@ -418,7 +418,7 @@ custom_fields:
     - sensor_adafruit_co2
     - sensor_adafruit_unit
 - keyname: sensor_device_id
-  group: Indoor sensor
+  group: Sensor
   field_type: string
   name: 'Sensor from another TRMNL'
   name-de: 'Sensor eines anderen TRMNL'
@@ -426,16 +426,16 @@ custom_fields:
   name-es-ES: 'Sensor de otro TRMNL'
   name-nl: 'Sensor van een andere TRMNL'
   name-ja: '別のTRMNLのセンサー'
-  description: 'The number of the other TRMNL: the digits in the address of its page on trmnl.com (.../devices/1234).'
-  description-de: 'Die Nummer des anderen TRMNL: die Ziffern in der Adresse seiner Seite auf trmnl.com (.../devices/1234).'
-  description-fr: 'Le numéro de l''autre TRMNL : les chiffres dans l''adresse de sa page sur trmnl.com (.../devices/1234).'
-  description-es-ES: 'El número del otro TRMNL: los dígitos de la dirección de su página en trmnl.com (.../devices/1234).'
-  description-nl: 'Het nummer van de andere TRMNL: de cijfers in het adres van zijn pagina op trmnl.com (.../devices/1234).'
-  description-ja: 'もう一方のTRMNLの番号（trmnl.comのデバイスページのアドレスにある数字、.../devices/1234）。'
+  description: 'The number of the other TRMNL: the digits in the address of its page on trmnl.com (.../devices/1234). Empty or not found: this TRMNL''s own sensor.'
+  description-de: 'Die Nummer des anderen TRMNL: die Ziffern in der Adresse seiner Seite auf trmnl.com (.../devices/1234). Leer oder nicht gefunden: der eigene Sensor dieses TRMNL.'
+  description-fr: 'Le numéro de l''autre TRMNL : les chiffres dans l''adresse de sa page sur trmnl.com (.../devices/1234). Vide ou introuvable : le capteur de ce TRMNL.'
+  description-es-ES: 'El número del otro TRMNL: los dígitos de la dirección de su página en trmnl.com (.../devices/1234). Vacío o no encontrado: el sensor de este TRMNL.'
+  description-nl: 'Het nummer van de andere TRMNL: de cijfers in het adres van zijn pagina op trmnl.com (.../devices/1234). Leeg of niet gevonden: de eigen sensor van deze TRMNL.'
+  description-ja: 'もう一方のTRMNLの番号（trmnl.comのデバイスページのアドレスにある数字、.../devices/1234）。空欄または見つからない場合は、このTRMNLのセンサーを使います。'
   placeholder: '1234'
   optional: true
 - keyname: sensor_hass_url
-  group: Indoor sensor
+  group: Sensor
   field_type: string
   name: 'Home Assistant address'
   name-de: 'Home-Assistant-Adresse'
@@ -452,7 +452,7 @@ custom_fields:
   placeholder: 'https://home.example.com'
   optional: true
 - keyname: sensor_hass_token
-  group: Indoor sensor
+  group: Sensor
   field_type: password
   name: 'Home Assistant token'
   name-de: 'Home-Assistant-Token'
@@ -468,7 +468,7 @@ custom_fields:
   description-ja: '長期アクセストークン：Home Assistantのプロフィール、セキュリティ、長期間有効なアクセストークン。'
   optional: true
 - keyname: sensor_hass_temp
-  group: Indoor sensor
+  group: Sensor
   field_type: string
   name: 'Temperature entity'
   name-de: 'Temperatur-Entität'
@@ -485,7 +485,7 @@ custom_fields:
   placeholder: 'sensor.living_room_temperature'
   optional: true
 - keyname: sensor_hass_hum
-  group: Indoor sensor
+  group: Sensor
   field_type: string
   name: 'Humidity entity'
   name-de: 'Feuchte-Entität'
@@ -502,7 +502,7 @@ custom_fields:
   placeholder: 'sensor.living_room_humidity'
   optional: true
 - keyname: sensor_hass_co2
-  group: Indoor sensor
+  group: Sensor
   field_type: string
   name: 'CO2 entity'
   name-de: 'CO2-Entität'
@@ -519,7 +519,7 @@ custom_fields:
   placeholder: 'sensor.living_room_co2'
   optional: true
 - keyname: sensor_awair_token
-  group: Indoor sensor
+  group: Sensor
   field_type: password
   name: 'Awair access token'
   name-de: 'Awair-Zugriffstoken'
@@ -535,7 +535,7 @@ custom_fields:
   description-ja: 'Awair Developer Console（developer.getawair.com）のアクセストークン。無料枠は1台につき1日300回までです。'
   optional: true
 - keyname: sensor_awair_type
-  group: Indoor sensor
+  group: Sensor
   field_type: string
   name: 'Awair device type'
   name-de: 'Awair-Gerätetyp'
@@ -552,7 +552,7 @@ custom_fields:
   placeholder: 'awair-element'
   optional: true
 - keyname: sensor_awair_id
-  group: Indoor sensor
+  group: Sensor
   field_type: string
   name: 'Awair device id'
   name-de: 'Awair-Geräte-ID'
@@ -569,7 +569,7 @@ custom_fields:
   placeholder: '12345'
   optional: true
 - keyname: sensor_airgradient_token
-  group: Indoor sensor
+  group: Sensor
   field_type: password
   name: 'AirGradient token'
   name-de: 'AirGradient-Token'
@@ -585,7 +585,7 @@ custom_fields:
   description-ja: '場所のトークン：app.airgradient.com、設定、場所。'
   optional: true
 - keyname: sensor_airgradient_id
-  group: Indoor sensor
+  group: Sensor
   field_type: string
   name: 'AirGradient location id'
   name-de: 'AirGradient-Standort-ID'
@@ -602,7 +602,7 @@ custom_fields:
   placeholder: '12345'
   optional: true
 - keyname: sensor_sensibo_key
-  group: Indoor sensor
+  group: Sensor
   field_type: password
   name: 'Sensibo API key'
   name-de: 'Sensibo-API-Schlüssel'
@@ -618,7 +618,7 @@ custom_fields:
   description-ja: 'キー：home.sensibo.com/me/api。'
   optional: true
 - keyname: sensor_sensibo_id
-  group: Indoor sensor
+  group: Sensor
   field_type: string
   name: 'Sensibo device id'
   name-de: 'Sensibo-Geräte-ID'
@@ -635,7 +635,7 @@ custom_fields:
   placeholder: 'AbCd1234'
   optional: true
 - keyname: sensor_ecowitt_app_key
-  group: Indoor sensor
+  group: Sensor
   field_type: password
   name: 'Ecowitt application key'
   name-de: 'Ecowitt-Application-Key'
@@ -651,7 +651,7 @@ custom_fields:
   description-ja: 'ecowitt.netのアカウント、API管理から取得します。'
   optional: true
 - keyname: sensor_ecowitt_key
-  group: Indoor sensor
+  group: Sensor
   field_type: password
   name: 'Ecowitt API key'
   name-de: 'Ecowitt-API-Schlüssel'
@@ -667,7 +667,7 @@ custom_fields:
   description-ja: 'ecowitt.netのアカウント、API管理から取得します。'
   optional: true
 - keyname: sensor_ecowitt_id
-  group: Indoor sensor
+  group: Sensor
   field_type: string
   name: 'Ecowitt MAC address'
   name-de: 'Ecowitt-MAC-Adresse'
@@ -684,7 +684,7 @@ custom_fields:
   placeholder: 'FF:FF:FF:FF:FF:FF'
   optional: true
 - keyname: sensor_adafruit_user
-  group: Indoor sensor
+  group: Sensor
   field_type: string
   name: 'Adafruit IO username'
   name-de: 'Adafruit-IO-Benutzername'
@@ -700,7 +700,7 @@ custom_fields:
   description-ja: 'Adafruit IOのユーザー名。'
   optional: true
 - keyname: sensor_adafruit_key
-  group: Indoor sensor
+  group: Sensor
   field_type: password
   name: 'Adafruit IO key'
   name-de: 'Adafruit-IO-Schlüssel'
@@ -716,7 +716,7 @@ custom_fields:
   description-ja: 'Adafruit IOのキー（ダッシュボードの有効なキー）。'
   optional: true
 - keyname: sensor_adafruit_temp
-  group: Indoor sensor
+  group: Sensor
   field_type: string
   name: 'Temperature feed key'
   name-de: 'Schlüssel des Temperatur-Feeds'
@@ -733,7 +733,7 @@ custom_fields:
   placeholder: 'living-room-temperature'
   optional: true
 - keyname: sensor_adafruit_hum
-  group: Indoor sensor
+  group: Sensor
   field_type: string
   name: 'Humidity feed key'
   name-de: 'Schlüssel des Feuchte-Feeds'
@@ -750,7 +750,7 @@ custom_fields:
   placeholder: 'living-room-humidity'
   optional: true
 - keyname: sensor_adafruit_co2
-  group: Indoor sensor
+  group: Sensor
   field_type: string
   name: 'CO2 feed key'
   name-de: 'Schlüssel des CO2-Feeds'
@@ -767,7 +767,7 @@ custom_fields:
   placeholder: 'living-room-co2'
   optional: true
 - keyname: sensor_adafruit_unit
-  group: Indoor sensor
+  group: Sensor
   field_type: select
   name: 'Temperature unit of the source'
   name-de: 'Temperatureinheit der Quelle'
@@ -787,7 +787,7 @@ custom_fields:
   default: celsius
   optional: true
 - keyname: sensor_custom_url
-  group: Indoor sensor
+  group: Sensor
   field_type: string
   name: 'JSON link'
   name-de: 'JSON-Link'
@@ -804,7 +804,7 @@ custom_fields:
   placeholder: 'https://example.com/api/room.json'
   optional: true
 - keyname: sensor_custom_header
-  group: Indoor sensor
+  group: Sensor
   field_type: string
   name: 'Header name'
   name-de: 'Header-Name'
@@ -821,7 +821,7 @@ custom_fields:
   placeholder: 'X-Api-Key'
   optional: true
 - keyname: sensor_custom_token
-  group: Indoor sensor
+  group: Sensor
   field_type: password
   name: 'Token'
   name-de: 'Token'
@@ -837,7 +837,7 @@ custom_fields:
   description-ja: '任意。ヘッダーで送るトークン。'
   optional: true
 - keyname: sensor_custom_temp
-  group: Indoor sensor
+  group: Sensor
   field_type: string
   name: 'Temperature path'
   name-de: 'Pfad der Temperatur'
@@ -854,7 +854,7 @@ custom_fields:
   placeholder: 'data.temperature'
   optional: true
 - keyname: sensor_custom_hum
-  group: Indoor sensor
+  group: Sensor
   field_type: string
   name: 'Humidity path'
   name-de: 'Pfad der Feuchte'
@@ -871,7 +871,7 @@ custom_fields:
   placeholder: 'data.humidity'
   optional: true
 - keyname: sensor_custom_co2
-  group: Indoor sensor
+  group: Sensor
   field_type: string
   name: 'CO2 path'
   name-de: 'Pfad des CO2'
@@ -888,7 +888,7 @@ custom_fields:
   placeholder: 'data.co2'
   optional: true
 - keyname: sensor_custom_time
-  group: Indoor sensor
+  group: Sensor
   field_type: string
   name: 'Time path'
   name-de: 'Pfad der Zeit'
@@ -905,7 +905,7 @@ custom_fields:
   placeholder: 'data.time'
   optional: true
 - keyname: sensor_custom_unit
-  group: Indoor sensor
+  group: Sensor
   field_type: select
   name: 'Temperature unit of the source'
   name-de: 'Temperatureinheit der Quelle'
@@ -925,7 +925,7 @@ custom_fields:
   default: celsius
   optional: true
 - keyname: sensor_label
-  group: Indoor sensor
+  group: Sensor
   field_type: string
   name: 'Sensor label'
   name-de: 'Sensor-Beschriftung'
@@ -942,7 +942,7 @@ custom_fields:
   placeholder: Upstairs
   optional: true
 - keyname: sensor_primary
-  group: Indoor sensor
+  group: Sensor
   field_type: select
   name: 'Main reading'
   name-de: 'Hauptwert'
@@ -961,26 +961,6 @@ custom_fields:
   - Sensor: sensor
   - Outside: outside
   default: auto
-  optional: true
-- keyname: sensor_co2
-  group: Indoor sensor
-  field_type: select
-  name: 'CO2 meter'
-  name-de: 'CO2-Messer'
-  name-fr: 'Jauge de CO2'
-  name-es-ES: 'Medidor de CO2'
-  name-nl: 'CO2-meter'
-  name-ja: 'CO2メーター'
-  description: 'Show the CO2 meter when the sensor measures CO2.'
-  description-de: 'Den CO2-Messer zeigen, wenn der Sensor CO2 misst.'
-  description-fr: 'Afficher la jauge de CO2 quand le capteur mesure le CO2.'
-  description-es-ES: 'Mostrar el medidor de CO2 cuando el sensor mide CO2.'
-  description-nl: 'Toon de CO2-meter als de sensor CO2 meet.'
-  description-ja: 'センサーがCO2を測定するとき、CO2メーターを表示します。'
-  options:
-  - Show: show
-  - Hide: hide
-  default: show
   optional: true
 - keyname: legend
   group: Legend

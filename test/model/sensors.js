@@ -153,11 +153,11 @@ module.exports = async function sensorSourceTests({ T, fx, check, eq, ok }) {
       calls = []; global.fetch = fake(() => 'timeout');
       for (const v of [{}, { sensor_source: 'own' }, { sensor_source: 'none' }, { sensor_source: 'other', sensor_device_id: '2' }, { sensor_source: 'nonsense' }]) {
         const r = await run(v);
-        eq([r.sensor, r.ph ? r.ph.sx : 'noph', r.trmnl_state.sx], [null, undefined, undefined]);
+        eq([r.sensor, r.ph ? r.ph.sx : 'noph', r.trmnl_state.sx], [null, v.sensor_source === 'none' ? 'noph' : undefined, undefined]);
       }
       eq(calls.filter((c) => !/open-meteo/.test(c.url)).length, 0);
       eq((await run({ sensor_source: 'other', sensor_device_id: '2' })).ph.id, '2');
-      eq([(await run({ sensor_device_id: '2' })).ph.id, (await run({ sensor_source: 'none', sensor_device_id: '2' })).ph.id], ['', ''], 'the device number counts only for Another TRMNL');
+      eq([(await run({ sensor_device_id: '2' })).ph.id, (await run({ sensor_source: 'none', sensor_device_id: '2' })).ph], ['', null], 'the device number counts only for Another TRMNL');
     });
 
     // ---- the secret never leaves ----

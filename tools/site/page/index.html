@@ -103,7 +103,6 @@ ol.legend li{padding:5px 0;font-size:.92rem}
       <div class="row"><label>Sensor</label><div class="seg2" id="sensor_show"><button data-v="show">Show</button><button data-v="hide">Hide</button></div></div>
       <div class="row"><label for="sensor_label">Sensor label</label><input type="text" id="sensor_label" maxlength="20" placeholder="Upstairs" autocomplete="off"></div>
       <div class="row"><label for="sensor_primary">Main reading</label><select id="sensor_primary"><option value="auto">Automatic</option><option value="sensor">Sensor</option><option value="outside">Outside</option></select></div>
-      <div class="row"><label>CO2 meter</label><div class="seg2" id="sensor_co2"><button data-v="show">Show</button><button data-v="hide">Hide</button></div></div>
     </fieldset>
   </aside>
 </div>
@@ -116,7 +115,7 @@ ol.legend li{padding:5px 0;font-size:.92rem}
     <li><b>Meters</b> for wind and gusts, UV, air quality, humidity, pollen and pressure, only when they matter.</li>
     <li><b>Rain or sun</b>: an hour calendar when rain is coming, otherwise sunrise, sunset and the moon as seen from your place.</li>
     <li><b>Bottom strip</b>: the coming days or hours.</li>
-    <li><b>Indoor sensor</b>: a TRMNL temperature sensor on this screen or on another TRMNL, with an optional label and CO2 meter.</li>
+    <li><b>Indoor sensor</b>: a TRMNL temperature sensor on this screen or on another TRMNL, with an optional label; the CO2 meter shows when the source gives a CO2 reading.</li>
     <li><b>Every view</b>: full, half horizontal, half vertical, quadrant; 1-bit, greyscale and colour screens; dark mode.</li>
     <li><b>Offline</b>: when Open-Meteo is slow or down, the last saved forecast shows with its time.</li>
   </ul>
@@ -209,17 +208,16 @@ ol.legend li{padding:5px 0;font-size:.92rem}
     <tr><th>Time format</th><td>24 hours (17:00) or 12 hours (5:00 PM).</td></tr>
     <tr><th>Bottom strip</th><td>Days, hours, or hours with days after 18:00.</td></tr>
     <tr><th>Hide title bar</th><td>Hides the bar with the plugin name and update time on the full view.</td></tr>
-    <tr><th>Indoor sensor</th><td>None (outside weather only), This TRMNL, Another TRMNL, or a provider: Home Assistant, Awair, AirGradient, Sensibo, Ecowitt, Adafruit IO or a JSON link. Readings older than 3 hours are ignored. See Indoor sensor sources below. On this page: "Sensor on" and "Sensor".</td></tr>
-    <tr><th>Sensor from another TRMNL</th><td>Shows and is required for Another TRMNL only: the digits in the address of its page on trmnl.com.</td></tr>
+    <tr><th>Sensor</th><td>None (outside weather only), This TRMNL, Another TRMNL, or a provider: Home Assistant, Awair, AirGradient, Sensibo, Ecowitt, Adafruit IO or a JSON link. Readings older than 3 hours are ignored. See Indoor sensor sources below. On this page: "Sensor on" and "Sensor".</td></tr>
+    <tr><th>Sensor from another TRMNL</th><td>Shows for Another TRMNL only: the digits in the address of its page on trmnl.com. Empty or not found: this TRMNL's own sensor.</td></tr>
     <tr><th>Sensor label</th><td>Optional short name, for example Upstairs, next to the house icon and on the temperature dial.</td></tr>
     <tr><th>Main reading</th><td>Which reading comes first, in black: Automatic, Sensor or Outside. The other follows in grey.</td></tr>
-    <tr><th>CO2 meter</th><td>Shows the CO2 meter when the sensor measures CO2.</td></tr>
   </table>
   <p class="note">The language follows your TRMNL account language (English, German, French, Spanish, Dutch, Japanese and the languages TRMNL translates).</p>
 </section>
 <section id="sources">
   <h2>Indoor sensor sources</h2>
-  <p>Set <b>Indoor sensor</b> to a provider and fill in the fields that show. The reading takes the place of a TRMNL sensor: same house icon, label, main reading and CO2 meter. TRMNL fetches it from the cloud, so the source must be reachable from the internet. Tokens go in password fields and are only sent to the provider. A reading older than 3 hours is ignored; when the source fails, the last good reading stays for up to 3 hours and the bottom bar says SENSOR OFFLINE with its time.</p>
+  <p>Set <b>Sensor</b> to a provider and fill in the fields that show. The reading takes the place of a TRMNL sensor: same house icon, label, main reading and CO2 meter (shown when the source gives CO2). TRMNL fetches it from the cloud, so the source must be reachable from the internet. Tokens go in password fields and are only sent to the provider. A reading older than 3 hours is ignored; when the source fails, the last good reading stays for up to 3 hours and the bottom bar says SENSOR OFFLINE with its time.</p>
   <table>
     <tr><th>Home Assistant</th><td>Address of your Home Assistant from the internet (https://, for example Nabu Casa or a Cloudflare tunnel; a local address does not work), a long-lived access token (your profile, Security), the entity ids for temperature, humidity and CO2 (humidity and CO2 optional). Fahrenheit entities are converted. <a href="https://developers.home-assistant.io/docs/api/rest/">API</a>.</td></tr>
     <tr><th>Awair</th><td>Access token from the Awair Developer Console. Device type and id are optional (empty: your first Awair). The free tier allows 300 readings per device per day. <a href="https://docs.developer.getawair.com/">API</a>.</td></tr>

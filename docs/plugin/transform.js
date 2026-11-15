@@ -805,7 +805,7 @@ async function run(input) {
   // B13: another TRMNL's sensor (sensor_device_id), its label, and which reading is the main one (sensor_primary: auto = the sensor when it is this screen's own, outside when it comes from another device)
   var sId = prov !== 'other' ? '' : String(field(input, 'sensor_device_id', '')).replace(/\D/g, '').slice(0, 12), sLab = String(field(input, 'sensor_label', '')).replace(/[<>"'&{}%]/g, '').trim().replace(/\s+/g, ' ').toLocaleUpperCase(String(i18n.loc || 'en')), sPri = field(input, 'sensor_primary', 'auto'), sIm = sPri === 'sensor' || (sPri !== 'outside' && !sId);
   sLab = Array.from(sLab).slice(0, 40).join('');   // B20: the whole label up to 40 characters (a bound on the data); the page's Framework Clamp cuts what does not fit
-  var phTemp = model.now.temp, ph = null, showIn = prov !== 'none', showCo = field(input, 'sensor_co2', 'show') !== 'hide';
+  var phTemp = model.now.temp, ph = null, showIn = prov !== 'none', showCo = showIn   /* owner 2026-11-15: no sensor_co2 setting; the CO2 meter shows whenever the chosen source gives a CO2 reading, None never */;
   if ((showIn || showCo) && phTemp !== null && phTemp !== undefined) {
     var stand = (co2, hum) => buildView(Object.assign({}, model, { inn: { temp: phTemp, hum: hum === undefined ? 50 : hum, co2: co2, press: null, main: sIm } }), i18n, w.daily, moon, phase, vo);
     ph = showIn ? phOverlay(stand(null)) : {}; ph.id = sId; ph.im = sIm; ph.lab = sLab || null;

@@ -134,14 +134,14 @@ test('time format: the setting decides, 24 h when missing, the TIME constant ove
   eq([T.timeIs12('24', '12'), T.timeIs12('12', '24')], [false, true], 'constant wins');
   const y = fs.readFileSync(path.join(__dirname, '../../plugin/src/settings.yml'), 'utf-8');
   const fields = y.split(/^- keyname: /m).slice(1).map((part) => ({ key: part.split('\n')[0], group: (/^  group: (.+)$/m.exec(part) || [])[1] || null }));
-  const OLD = ['author_info', 'lat_lon', 'unit', 'time_format', 'bottom', 'hide_title_bar', 'sensor_label', 'sensor_primary', 'sensor_co2', 'legend'];
-  const keys = fields.map((f) => f.key), GRP = 'Indoor sensor';
-  eq(keys.filter((k) => OLD.includes(k)), OLD, 'B22: the live setting keys that stay (label, main reading, CO2 meter) keep their name and order; sensor_show is merged into sensor_source (owner 2026-11-15)');
-  eq(fields.filter((f) => OLD.includes(f.key)).map((f) => f.group), [null, null, 'Display', 'Display', 'Display', 'Display', GRP, GRP, GRP, 'Legend'], 'settings groups (the legend is the last, collapsed group)');
-  ok(!keys.includes('sensor_show'), 'sensor_show is gone: "None" in the Indoor sensor select is the hide');
-  ok(fields.filter((f) => !OLD.includes(f.key)).every((f) => f.group === GRP && /^sensor_/.test(f.key)), 'B22: the new source settings are all in the Indoor sensor group');
+  const OLD = ['author_info', 'lat_lon', 'unit', 'time_format', 'bottom', 'hide_title_bar', 'sensor_label', 'sensor_primary', 'legend'];
+  const keys = fields.map((f) => f.key), GRP = 'Sensor';
+  eq(keys.filter((k) => OLD.includes(k)), OLD, 'B22: the live setting keys that stay (label, main reading) keep their name and order; sensor_show is merged into sensor_source and sensor_co2 is removed (owner 2026-11-15: the CO2 meter follows the source) (owner 2026-11-15)');
+  eq(fields.filter((f) => OLD.includes(f.key)).map((f) => f.group), [null, null, 'Display', 'Display', 'Display', 'Display', GRP, GRP, 'Legend'], 'settings groups (the legend is the last, collapsed group)');
+  ok(!keys.includes('sensor_show'), 'sensor_show is gone: "None" in the Sensor select is the hide');
+  ok(fields.filter((f) => !OLD.includes(f.key)).every((f) => f.group === GRP && /^sensor_/.test(f.key)), 'B22: the new source settings are all in the Sensor group');
   const grp = keys.slice(keys.indexOf('sensor_source'), keys.indexOf('legend'));
-  eq([grp[0], grp[1], grp.slice(-3)], ['sensor_source', 'sensor_device_id', ['sensor_label', 'sensor_primary', 'sensor_co2']], 'order in the group: source, provider fields, label, main reading, CO2 meter');
+  eq([grp[0], grp[1], grp.slice(-2)], ['sensor_source', 'sensor_device_id', ['sensor_label', 'sensor_primary']], 'order in the group: source, provider fields, label, main reading');
   // B22 (coordinator, server copy 541930): TRMNL silently fails the form's required check for a field a rule hides unless it is optional: true; a provider's must-haves are required only when it is chosen
   const blocks = y.split(/^- keyname: /m).slice(1), blk = (k) => blocks.find((q) => q.startsWith(k + '\n'));
   const cv = blk('sensor_source').split(/^  - when: /m).slice(1).map((w) => ({ when: w.split('\n')[0].replace(/'/g, ''), hidden: [...w.matchAll(/^    - (\w+)$/gm)].map((m) => m[1]), required: ((/^    required: \[(.*)\]$/m.exec(w) || [])[1] || '').split(', ').filter(Boolean) }));
@@ -150,7 +150,7 @@ test('time format: the setting decides, 24 h when missing, the TIME constant ove
   // one naming pattern (owner 2026-11-15): option value = provider word, keys sensor_<prefix>_<field>, the same field words everywhere; a new provider adds one option and its prefixed keys
   const PREF = { home_assistant: 'hass', awair: 'awair', airgradient: 'airgradient', sensibo: 'sensibo', ecowitt: 'ecowitt', adafruit: 'adafruit', custom: 'custom' }, PROV = Object.keys(PREF);
   const optVals = [...blk('sensor_source').matchAll(/^  - [^:\n]+: (\w+)$/gm)].map((m) => m[1]);
-  eq(optVals, ['none', 'own', 'other'].concat(PROV), 'Indoor sensor options: None (hide), This TRMNL, Another TRMNL, then the providers');
+  eq(optVals, ['none', 'own', 'other'].concat(PROV), 'Sensor options: None (hide), This TRMNL, Another TRMNL, then the providers');
   eq(cv.map((c) => c.when), optVals, 'one visibility rule per option');
   const all = [...new Set(cv.flatMap((c) => c.hidden))], FIELD = /^(token|key|app_key|temp|hum|co2|id|url|type|header|time|unit|user)$/;
   all.forEach((k) => { if (k === 'sensor_device_id') return; const m = /^sensor_(\w+?)_(app_key|\w+)$/.exec(k), pv = PROV.find((x) => k.startsWith('sensor_' + PREF[x] + '_')); ok(pv && FIELD.test(k.slice(('sensor_' + PREF[pv] + '_').length)), k + ' follows sensor_<provider>_<field>'); });
@@ -647,11 +647,10 @@ async function sensorSettingsTests() {
       ok(Buffer.byteLength(JSON.stringify(io)) < 400, 'indoor overlay ' + Buffer.byteLength(JSON.stringify(io)) + ' bytes');
       ok(Buffer.byteLength(JSON.stringify(none.ph)) < 1200, 'overlay with the CO2 meter lists ' + Buffer.byteLength(JSON.stringify(none.ph)) + ' bytes');
     });
-    await check('sensor_source none leaves no indoor overlay, This TRMNL and the default carry it; None with the CO2 meter hidden: no overlay', async () => {
+    await check('sensor_source none leaves no overlay at all (no CO2 meter either), This TRMNL and the default carry it', async () => {
       const hid = await run({ sensor_source: 'none' }, false, null);
-      eq([hid.ph.inn, hid.ph.tw, hid.ph.twin, hid.ui.inn], [undefined, undefined, undefined, null], 'None: no indoor overlay');
-      const both = await run({ sensor_source: 'none', sensor_co2: 'hide' }, false, null);
-      eq([both.ph, both.ui.inn], [null, null], 'None and no CO2 meter: no overlay');
+      eq([hid.ph, hid.ui.inn], [null, null], 'None: no indoor overlay and no CO2 meter (owner 2026-11-15: the CO2 meter follows the Sensor setting)');
+      ok(!/keyname: sensor_co2/.test(fs.readFileSync(path.join(__dirname, '../../plugin/src/settings.yml'), 'utf-8')), 'owner 2026-11-15: no sensor_co2 setting any more, the CO2 meter follows the Sensor source');
       for (const values of [{}, { sensor_source: 'own' }]) { const r = await run(values, false, null); eq([r.ph.inn.out, r.ph.inn.in, r.ph.tw.k, r.ui.inn], ['BUITEN', 'BINNEN', 'humidity', null]); }
     });
     await check('B13: another TRMNL\'s sensor, label and main reading come from the settings into the overlay', async () => {
@@ -669,8 +668,8 @@ async function sensorSettingsTests() {
       ok(!/[<>"'&]/.test(bad.ph.lab), 'no markup characters survive in the label: ' + bad.ph.lab);
       const lg = await run({ sensor_label: 'Upstairs guest bedroom north wing' }, false, null), one = await run({ sensor_label: 'a'.repeat(60) }, false, null);
       eq([lg.ph.lab, one.ph.lab.length], ['UPSTAIRS GUEST BEDROOM NORTH WING', 40], 'a long label stays whole (the page Clamp cuts it to its space); only a bound of 40 characters on the data');
-      const hid = await run({ sensor_source: 'none', sensor_device_id: '2' }, false, null);
-      eq([hid.ph.id, hid.ph.im], ['', true], 'None ignores the device number (the CO2 meter then comes from this screen)');
+      eq((await run({ sensor_source: 'none', sensor_device_id: '2' }, false, null)).ph, null, 'None ignores the device number and shows nothing');
+      eq([(await run({ sensor_source: 'own', sensor_device_id: '2' }, false, null)).ph.id, (await run({ sensor_source: 'other', sensor_device_id: 'abc' }, false, null)).ph.id, (await run({ sensor_source: 'other', sensor_device_id: '' }, false, null)).ph.im], ['', '', true], 'Another TRMNL with an empty or non-numeric number is this TRMNL: no id, the sensor is the main reading (owner 2026-11-15: TRMNL saves the form without the number)');
     });
     await check('B13: with the outside reading main, the sensor\'s meters come after the outdoor ones (CO2 last, the twin humidity pair together)', async () => {
       const so = await run({ sensor_source: 'other', sensor_device_id: '2' }, false, null), me = await run({}, false, null);
@@ -681,14 +680,13 @@ async function sensorSettingsTests() {
       eq(k(so.ph.mn).filter((x) => x !== 'co2'), k(me.ph.mn).filter((x) => x !== 'co2').sort((a, b) => k(so.ph.mn).indexOf(a) - k(so.ph.mn).indexOf(b)), 'the other meters keep one order');
       eq(so.ph.tw.k, 'humidity', 'the humidity row is still the twin');
     });
-    await check('CO2 overlay (owner 2026-11-14): sensor_co2 show carries the meter list, hide carries none, independent of the indoor setting', async () => {
-      const on = await run({}, false, null), off = await run({ sensor_co2: 'hide' }, false, null), only = await run({ sensor_source: 'none' }, false, null);
+    await check('CO2 overlay (owner 2026-11-14, changed 2026-11-15: no sensor_co2 setting, the CO2 meter follows the Sensor source, None = none): the overlay always carries the CO2 list, None carries nothing', async () => {
+      const on = await run({}, false, null), only = await run({ sensor_source: 'none' }, false, null);
       const slim = (l) => l.map((m) => Object.keys(m).sort().join());
-      ok(Array.isArray(on.ph.mn) && on.ph.mn.length > 0 && Array.isArray(on.ph.hn), 'show: the CO2 list and the list without CO2');
+      ok(Array.isArray(on.ph.mn) && on.ph.mn.length > 0 && Array.isArray(on.ph.hn), 'the CO2 list and the list without CO2');
       ok(slim(on.ph.mn).every((k) => k === 'idx,key,label,rank') && slim(on.ph.hn).every((k) => k === 'idx,key,label,rank'), 'lists hold key, label, idx, rank only (no view copies)');
       eq([on.ph.mn[0].key, on.ph.hn[0].key, on.ph.mu], ['co2', 'humidity', undefined], 'owner 2026-11-14: CO2 first at any reading (one list, no high-reading variant), the humidity twin first without CO2');
-      eq([off.ph.mn, off.ph.cz, off.ph.inn.in], [undefined, undefined, 'BINNEN'], 'hide: no CO2 list, indoor stays');
-      ok(Array.isArray(only.ph.mn) && only.ph.inn === undefined, 'co2 shown with the indoor readings hidden');
+      eq(only.ph, null, 'owner 2026-11-15: Sensor None = no CO2 meter at all');
       eq(on.ui.meters.some((m) => m.key === 'co2'), false, 'the plain view never carries CO2');
     });
     await check('CO2 overlay parity: the meters of the view with a stand-in reading equal the page script merge of the list, with and without the other meters', async () => {
