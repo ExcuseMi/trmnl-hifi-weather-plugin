@@ -183,6 +183,7 @@ custom_fields:
     - sensor_cu_co2
     - sensor_cu_time
   - when: 'ha'
+    required: [sensor_ha_url, sensor_ha_token, sensor_ha_temp]
     hidden:
     - sensor_device_id
     - sensor_awair_token
@@ -209,6 +210,7 @@ custom_fields:
     - sensor_cu_co2
     - sensor_cu_time
   - when: 'awair'
+    required: [sensor_awair_token]
     hidden:
     - sensor_device_id
     - sensor_ha_url
@@ -237,6 +239,7 @@ custom_fields:
     - sensor_cu_co2
     - sensor_cu_time
   - when: 'airgradient'
+    required: [sensor_ag_token]
     hidden:
     - sensor_device_id
     - sensor_ha_url
@@ -266,6 +269,7 @@ custom_fields:
     - sensor_cu_co2
     - sensor_cu_time
   - when: 'sensibo'
+    required: [sensor_sb_key]
     hidden:
     - sensor_device_id
     - sensor_ha_url
@@ -295,6 +299,7 @@ custom_fields:
     - sensor_cu_co2
     - sensor_cu_time
   - when: 'ecowitt'
+    required: [sensor_ew_app, sensor_ew_key, sensor_ew_mac]
     hidden:
     - sensor_device_id
     - sensor_ha_url
@@ -323,6 +328,7 @@ custom_fields:
     - sensor_cu_co2
     - sensor_cu_time
   - when: 'adafruit'
+    required: [sensor_ada_user, sensor_ada_key, sensor_ada_temp]
     hidden:
     - sensor_device_id
     - sensor_ha_url
@@ -348,6 +354,7 @@ custom_fields:
     - sensor_cu_co2
     - sensor_cu_time
   - when: 'custom'
+    required: [sensor_cu_url, sensor_cu_temp]
     hidden:
     - sensor_device_id
     - sensor_ha_url
@@ -381,23 +388,27 @@ custom_fields:
   description-nl: 'Optioneel. Om de sensor van een andere TRMNL te tonen, vul het nummer van dat apparaat in: de cijfers in het adres van zijn pagina op trmnl.com (.../devices/1234). Laat leeg voor de sensor van dit scherm.'
   description-ja: '任意。別のTRMNLのセンサーを表示するには、そのデバイスの番号（trmnl.comのデバイスページのアドレスにある数字、.../devices/1234）を入力します。空欄ならこの画面のセンサーを使います。'
   placeholder: '1234'
+  optional: true
 - keyname: sensor_ha_url
   group: Sensor
   field_type: string
   name: 'Home Assistant address'
   description: 'The address of your Home Assistant from the internet, starting with https:// (for example a Cloudflare tunnel or Nabu Casa address). TRMNL fetches it from the cloud, so a local address does not work.'
   placeholder: 'https://home.example.com'
+  optional: true
 - keyname: sensor_ha_token
   group: Sensor
   field_type: password
   name: 'Home Assistant token'
   description: 'A long-lived access token: your profile in Home Assistant, Security, Long-lived access tokens.'
+  optional: true
 - keyname: sensor_ha_temp
   group: Sensor
   field_type: string
   name: 'Temperature entity'
   description: 'Entity id of the temperature sensor, for example sensor.living_room_temperature. Fahrenheit is converted.'
   placeholder: 'sensor.living_room_temperature'
+  optional: true
 - keyname: sensor_ha_hum
   group: Sensor
   field_type: string
@@ -417,6 +428,7 @@ custom_fields:
   field_type: password
   name: 'Awair access token'
   description: 'The access token from the Awair Developer Console (developer.getawair.com). The free tier allows 300 readings per device per day.'
+  optional: true
 - keyname: sensor_awair_type
   group: Sensor
   field_type: string
@@ -436,6 +448,7 @@ custom_fields:
   field_type: password
   name: 'AirGradient token'
   description: 'The token of your place: app.airgradient.com, Settings, Place.'
+  optional: true
 - keyname: sensor_ag_location
   group: Sensor
   field_type: string
@@ -448,6 +461,7 @@ custom_fields:
   field_type: password
   name: 'Sensibo API key'
   description: 'Your key: home.sensibo.com/me/api.'
+  optional: true
 - keyname: sensor_sb_id
   group: Sensor
   field_type: string
@@ -460,33 +474,39 @@ custom_fields:
   field_type: password
   name: 'Ecowitt application key'
   description: 'From your account on ecowitt.net, API management.'
+  optional: true
 - keyname: sensor_ew_key
   group: Sensor
   field_type: password
   name: 'Ecowitt API key'
   description: 'From your account on ecowitt.net, API management.'
+  optional: true
 - keyname: sensor_ew_mac
   group: Sensor
   field_type: string
   name: 'Ecowitt MAC address'
   description: 'The MAC of the weather station or gateway, for example FF:FF:FF:FF:FF:FF.'
   placeholder: 'FF:FF:FF:FF:FF:FF'
+  optional: true
 - keyname: sensor_ada_user
   group: Sensor
   field_type: string
   name: 'Adafruit IO username'
   description: 'Your Adafruit IO username.'
+  optional: true
 - keyname: sensor_ada_key
   group: Sensor
   field_type: password
   name: 'Adafruit IO key'
   description: 'Your Adafruit IO key (the active key on your dashboard).'
+  optional: true
 - keyname: sensor_ada_temp
   group: Sensor
   field_type: string
   name: 'Temperature feed key'
   description: 'The key of the feed that holds the temperature (the last value is used).'
   placeholder: 'living-room-temperature'
+  optional: true
 - keyname: sensor_ada_hum
   group: Sensor
   field_type: string
@@ -510,12 +530,14 @@ custom_fields:
   - Celsius: celsius
   - Fahrenheit: fahrenheit
   default: celsius
+  optional: true
 - keyname: sensor_cu_url
   group: Sensor
   field_type: string
   name: 'JSON link'
   description: 'A link starting with https:// that answers JSON. Any key it needs can be part of the link or go in the header below.'
   placeholder: 'https://example.com/api/room.json'
+  optional: true
 - keyname: sensor_cu_header
   group: Sensor
   field_type: string
@@ -535,6 +557,7 @@ custom_fields:
   name: 'Temperature path'
   description: 'Where the temperature is in the answer, with dots: data.temperature, or readings.0.temp for a list.'
   placeholder: 'data.temperature'
+  optional: true
 - keyname: sensor_cu_hum
   group: Sensor
   field_type: string
@@ -567,6 +590,7 @@ custom_fields:
   description-nl: 'Optioneel. Een korte naam voor de sensor, bijvoorbeeld Boven. Hij staat naast het huisje en bij de thermometer. Leeg toont alleen het huisje.'
   description-ja: '任意。センサーの短い名前（例：2階）。家のアイコンの横と温度計に表示されます。空欄ならアイコンだけを表示します。'
   placeholder: Upstairs
+  optional: true
 - keyname: sensor_primary
   group: Sensor
   field_type: select

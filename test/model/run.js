@@ -139,6 +139,18 @@ test('time format: the setting decides, 24 h when missing, the TIME constant ove
   eq(fields.filter((f) => OLD.includes(f.key)).map((f) => f.group), [null, null, 'Display', 'Display', 'Display', 'Display', 'Sensor', 'Sensor', 'Sensor', 'Sensor', 'Sensor', 'Legend'], 'settings groups (the legend is the last, collapsed group)');
   ok(fields.filter((f) => !OLD.includes(f.key)).every((f) => f.group === 'Sensor' && /^sensor_/.test(f.key)), 'B22: the new source settings are all in the Sensor group');
   eq(fields.map((f) => f.key).indexOf('sensor_source'), fields.map((f) => f.key).indexOf('sensor_show') + 1, 'the source select follows the Sensor show/hide select');
+  // B22 (coordinator, server copy 541930): TRMNL silently fails the form's required check for a field a rule hides unless it is optional: true; a provider's must-haves are required only when it is chosen
+  const blocks = y.split(/^- keyname: /m).slice(1), blk = (k) => blocks.find((q) => q.startsWith(k + '\n'));
+  const cv = blk('sensor_source').split(/^  - when: /m).slice(1).map((w) => ({ when: w.split('\n')[0].replace(/'/g, ''), hidden: [...w.matchAll(/^    - (\w+)$/gm)].map((m) => m[1]), required: ((/^    required: \[(.*)\]$/m.exec(w) || [])[1] || '').split(', ').filter(Boolean) }));
+  const named = new Set(cv.flatMap((c) => c.hidden).concat(['sensor_label']));
+  eq([...named].filter((k) => !blk(k) || !/^  optional: true$/m.test(blk(k))), [], 'every field a rule hides is optional: true (else the form cannot be saved with it hidden)');
+  const PROV = ['ha', 'awair', 'airgradient', 'sensibo', 'ecowitt', 'adafruit', 'custom'], all = [...new Set(cv.flatMap((c) => c.hidden))];
+  PROV.forEach((pv) => {
+    const c = cv.find((q) => q.when === pv), own = all.filter((k) => !c.hidden.includes(k));
+    ok(c.required.length > 0 && c.required.every((k) => own.includes(k)), pv + ': required names only its own fields: ' + c.required);
+    ok(c.required.every((k) => !named.has(k) || /^  optional: true$/m.test(blk(k))), pv + ': required fields stay optional in the field itself (the rule makes them required)');
+  });
+  eq(cv.filter((c) => !PROV.includes(c.when)).map((c) => c.required), [[], []], 'own and other TRMNL require nothing');
   // B13 (owner 2026-11-14) overrides 'a screen shows only its own sensor': an optional setting picks another TRMNL's sensor; empty keeps the own one
   const part = (k) => y.split(/^- keyname: /m).slice(1).find((q) => q.startsWith(k + '\n'));
   ['sensor_device_id', 'sensor_label', 'sensor_primary'].forEach((k) => ['description', 'description-de', 'description-fr', 'description-es-ES', 'description-nl', 'description-ja'].forEach((d) => ok(new RegExp('^  ' + d + ': .{20,}', 'm').test(part(k)), k + ' has ' + d)));
