@@ -221,6 +221,10 @@ return rows.map(function(q){return q.map(function(v){return v===null?'-':v.toFix
           expect((top - bot).abs).to be <= 1
         end
       end
+      # B27 (owner 2026-11-15, option B): a small console shows no meter row or at least two, never a lone row. (Seen red at 9715cc4: the one-row fallback.)
+      lone = s.evaluate(%q{(function(){var n=[].filter.call(document.querySelectorAll('[data-sw-small] [data-sw-srow="meter"]'),function(e){var b=e.getBoundingClientRect();return b.width>0&&b.height>0}).length;return n===1?'a lone meter row':''})()})
+      puts "LONEROW #{c['name']}: #{lone}" unless lone.empty?
+      expect(lone).to eq('')
       if c['og_quadrant_console']
         console = s.evaluate(%q{(function(){function vis(e){var b=e.getBoundingClientRect();return b.width>0&&b.height>0}var labels=[].filter.call(document.querySelectorAll('[data-sw-mlabel]'),vis).map(function(e){return e.textContent.trim()});var moon=[].filter.call(document.querySelectorAll('[data-sw-part="moon"]'),vis)[0];var ring=moon&&moon.querySelector('circle[stroke]');return {labels:labels,ring:!!ring,lit:!!(moon&&moon.querySelector('[data-sw-moon="lit"]'))}})()})
         small_q = s.evaluate("document.querySelectorAll('[data-sw-small]').length").positive?

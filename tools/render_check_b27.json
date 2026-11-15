@@ -1,0 +1,56 @@
+[
+ {
+  "name": "b27-x-hv",
+  "device": "v2",
+  "view": "half_vertical",
+  "locale": "en-US",
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days"
+  }
+ },
+ {
+  "name": "b27-x-hv-dark",
+  "device": "v2",
+  "view": "half_vertical",
+  "locale": "en-US",
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days"
+  },
+  "dark": true
+ },
+ {
+  "name": "b27-x-q",
+  "device": "v2",
+  "view": "quadrant",
+  "locale": "en-US",
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days"
+  }
+ },
+ {
+  "name": "b27-og-hv",
+  "device": "og_plus",
+  "view": "half_vertical",
+  "locale": "en-US",
+  "past_press": 1016,
+  "palette": "gray-4",
+  "fields": {
+   "bottom": "days"
+  }
+ },
+ {
+  "name": "b27-og-q",
+  "device": "og_plus",
+  "palette": "gray-4",
+  "view": "quadrant",
+  "locale": "en-US",
+  "past_press": 1016,
+  "og_quadrant_console": true,
+  "fields": {
+   "bottom": "days"
+  }
+ }
+]
