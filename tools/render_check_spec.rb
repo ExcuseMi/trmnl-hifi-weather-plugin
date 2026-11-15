@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require 'json'
 require 'fileutils'
-# SW_CASES: JSON list of {name, view, device, fields, fixture, patch (json merged into current), mocks_extra, palette, orientation}
+# SW_CASES (or SW_CASES_FILE: a path): JSON list of {name, view, device, fields, fixture, patch (json merged into current), mocks_extra, palette, orientation}
 # A real device: the serverless transform input has no sensor_readings (TRMNL adds it to the markup's merge variables at
 # render time). trmnlp hands every case variable to both, so sensor_readings is taken out of the transform input and put
 # back into the markup's variables.
@@ -48,7 +48,7 @@ RSpec.describe 'renders' do
       expect(hi / lo).to be <= 1.02, "dial radius differs across #{k.inspect}: #{v.inspect}"
     end
   end
-  cases = JSON.parse(ENV.fetch('SW_CASES'))
+  cases = JSON.parse(ENV['SW_CASES_FILE'] ? File.read(ENV['SW_CASES_FILE']) : ENV.fetch('SW_CASES'))   # a file when the list is over the 128 KB limit of one environment variable (B20: the base list passed it)
   out = ENV.fetch('SW_OUT')
   fx = File.join(TRMNLP::Testing.plugin_dir, 'tests', 'fixtures')
   cases.each do |c|
@@ -251,12 +251,25 @@ var tws=[].filter.call(document.querySelectorAll('[data-sw-twin]'),vis).sort(fun
 if(first&&first!==(wm==='sensor'?'in':'out'))bad.push('first readout '+first+', main '+wm);}
 var sl=[].filter.call(document.querySelectorAll('[data-sw-slab]'),vis);
 if(wl===''){if(sl.length)bad.push('label shown without one');}
-else if(SW.inn){if(!sl.length)bad.push('no label');sl.forEach(function(e){var p=e.closest('[data-sw-twin],[data-sw-sbox]'),pb=p&&p.getBoundingClientRect(),b=e.getBoundingClientRect(),t=(e.getAttribute('data-sw-sl8')||e.textContent||'').trim();if(!t)bad.push('label empty');if(wl.indexOf(t.replace(/[.\u2026]$/,''))!==0)bad.push('label text '+t+' not from '+wl);if(pb&&(b.left<pb.left-1||b.right>pb.right+1))bad.push('label outside its panel');if(e.scrollWidth>e.clientWidth+1&&getComputedStyle(e).textOverflow!=='ellipsis')bad.push('label clipped without ellipsis')});}
+else if(SW.inn){if(!sl.length)bad.push('no label');sl.forEach(function(e){var p=e.closest('[data-sw-twin],[data-sw-sbox]'),pb=p&&p.getBoundingClientRect(),b=e.getBoundingClientRect(),t=(e.getAttribute('data-sw-lt')||e.textContent||'').trim();if(!t)bad.push('label empty');if(wl.indexOf(t.replace(/(\.\.\.|\u2026|\.)$/,''))!==0)bad.push('label text '+t+' not from '+wl);if(pb&&(b.left<pb.left-1||b.right>pb.right+1))bad.push('label outside its panel');});}
 if(wl)[].forEach.call(document.querySelectorAll('[data-sw-mlabel]'),function(e){if(e.textContent.toUpperCase().indexOf(wl.slice(0,3))>=0)bad.push('label in a meter row: '+e.textContent)});
 var twk=(SW.meters.filter(function(m){return m.tw})[0]||{}).key;[].forEach.call(document.querySelectorAll('[data-sw-part="loc"][data-sw-for]'),function(e){if(!vis(e))return;if(e.getAttribute('data-sw-for')!==twk)bad.push('mark on row '+e.getAttribute('data-sw-for')+' ('+e.getAttribute('data-sw-loc')+')')});
 return bad.join('; ');})()}.sub('WANT_MAIN', c['want_main'].to_s.to_json).sub('WANT_LABEL', c['want_label'].to_s.to_json))
         puts "B13 #{c['name']}: #{bm}" unless bm.empty?
         expect(bm).to eq('')
+      end
+      # Owner 2026-11-15 (B20, the readout label was fine print): the sensor label's caps are at least 0.38 of the house icon's ink height
+      # (the design is 0.40; want_whole cases must show the label uncut: UPSTAIRS on the OG, SCHLAFZIMMER on the X), and a long label is cut by the Framework Clamp: it ends in an ellipsis, whole inside its panel.
+      if c['want_label'].to_s != ''
+        b20 = s.evaluate(%q{(function(){var vis=function(e){var b=e.getBoundingClientRect();return b.width>0&&b.height>0},bad=[],info=[],cx=document.createElement('canvas').getContext('2d'),full=WANT_LABEL;
+[].filter.call(document.querySelectorAll('[data-sw-slab]'),vis).forEach(function(e){var n=e.querySelector('text')||e,cs=getComputedStyle(n),fs=parseFloat(cs.fontSize),wr=e.parentElement.hasAttribute('data-sw-lw')?e.parentElement:e,ic=wr.previousElementSibling,ib=ic&&ic.getBoundingClientRect();var kk=e.getBoundingClientRect().width/(e.offsetWidth||e.getBoundingClientRect().width||1);cx.font=cs.fontWeight+' '+fs+'px '+cs.fontFamily;var cap=cx.measureText('H').actualBoundingBoxAscent*kk;
+if(!ic||!ib||!ib.height){bad.push('no icon beside the label');return}var ik=((ic.querySelector('[data-sw-ink]')||ic).getAttribute('data-sw-ink')||'0,1').split(',').map(Number),ih=ik[1]*ib.height,q=cap/ih,t=(e.textContent||'').trim();
+info.push('cap '+cap.toFixed(1)+' icon '+ih.toFixed(1)+' ratio '+q.toFixed(2)+' text '+t);if(q<0.38)bad.push('label caps '+cap.toFixed(1)+' / icon ink '+ih.toFixed(1)+' = '+q.toFixed(2)+' under 0.38');if(WANT_WHOLE&&t!==full)bad.push('label '+t+' cut, must show whole');
+var p=e.closest('[data-sw-twin],[data-sw-sbox]'),pb=p&&p.getBoundingClientRect(),b=e.getBoundingClientRect();if(pb&&(b.right>pb.right+1||b.left<pb.left-1))bad.push('label outside its panel');
+var rg=document.createRange();rg.selectNodeContents(e);if(rg.getBoundingClientRect().right>wr.getBoundingClientRect().right+1)bad.push('label wider than its box');if(t!==full&&!/(…|\.\.\.)$/.test(t))bad.push('label '+t+' cut without an ellipsis')});
+return (bad.length?'RED ':'')+info.join(' | ')+(bad.length?' :: '+bad.join('; '):'');})()}.sub('WANT_LABEL', c['want_label'].to_s.to_json).sub('WANT_WHOLE', (c['want_whole'] ? true : false).to_s))
+        puts "B20 #{c['name']}: #{b20}"
+        expect(b20).not_to start_with('RED')
       end
       # Owner 2026-11-14 (B9): the CO2 meter is drawn exactly when the case says (co2 'yes'): a fresh reading of this screen's own
       # device, sensor_co2 not hidden, a place in the view's meter rows (a half vertical with a normal reading shows only two

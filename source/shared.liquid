@@ -85,7 +85,7 @@
 {% if view == 2 %}{% assign th_m = th_m | times: 1.15 %}{% endif %}{% comment %}B4: the half view has spare height; a taller temperature keeps the condition text in the full view's proportion (CONDRATIO og-hh-aq: the glyph 4 has less ink height){% endcomment %}<div class="flex {{ tr_cls }} {{ tr_gap | default: 'gap--small' }} lg:gap--medium h--[{{ th_m | times: hm | times: tm | round | at_most: 100 }}cqh]{% if thb > 0 %} landscape:h--[{{ thb | times: hm | times: tm | round | at_most: 100 }}cqh] lg:landscape:h--[{{ th_l | times: hl | times: tf | round | at_most: 100 }}cqh]{% endif %} lg:h--[{{ th_l | times: hl | times: tf | round | at_most: 100 }}cqh] {% if view == 2 %}lg:portrait:h--[17cqh]{% elsif inn %}lg:portrait:h--[11cqh]{% else %}lg:portrait:h--[8cqh]{% endif %}">{% if inn %}{% comment %} Indoor sensor (as live). Owner 2026-11-14: the indoor reading is the primary one (big digits, first), outdoor the smaller second readout with the clothing cue. {% endcomment %}{% assign tw_o = '2,1' | split: ',' %}{% if inm == false %}{% assign tw_o = '1,2' | split: ',' %}{% endif %}{% for tw_s in tw_o %}{% assign tw = tw_s | plus: 0 %}{% assign tw_k = 'in' %}{% if tw == 1 %}{% assign tw_k = 'out' %}{% endif %}{% if forloop.index == 2 %}<div class="border--v-60 h--full"></div>{% endif %}{% assign tw_dm = 13 %}{% assign tw_dl = 12 %}{% if view == 2 %}{% assign tw_dm = 15 %}{% assign tw_dl = 11 %}{% endif %}{% comment %} owner 2026-11-14: the two temperatures the same size {% endcomment %}
     <div class="flex flex--col flex--center gap--xsmall h--full shrink-0" data-sw-twin="{{ tw_k }}">
      {%- comment %} B10 (owner 2026-11-14, the readout icons were small): the icon is at least 1.4 times the unit font (script, swPaint); above the digits (small views: left of them). {% endcomment %}
-     <div class="flex flex--row flex--top gap--xsmall"><div class="flex flex--col flex--center gap--xsmall"><div class="{{ fcy }} gap--xsmall{% if tw == 2 and ph.lab %} w--full{% endif %}"><div class="shrink-0 h--[4cqh]" data-sw-part="loc" data-sw-sq data-sw-i="{{ tw | minus: 1 }}" data-sw-loc="{{ tw_k }}" data-sw-lz></div>{% if tw == 2 and ph.lab %}<span class="label label--small text--bold" style="contain:inline-size;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" data-sw-slab>{{ ph.lab }}</span>{% endif %}{% if tw == 1 %}{{ cbadge | replace: 'data-sw-part="cue"', 'data-sw-part="cue" data-sw-cb' }}{% endif %}</div><div class="h--[{{ tw_dm | times: hm | times: tm | round | at_most: 100 }}cqh] lg:h--[{{ tw_dl | times: hl | times: tf | round | at_most: 100 }}cqh] lg:portrait:h--[6cqh]" data-sw-part="{% if tw == 1 %}temp{% else %}itemp{% endif %}"></div></div><div class="flex flex--col gap--xsmall"><div class="shrink-0 h--[4cqh]" data-sw-lsp></div><span class="value value--small" data-sw-unit="{% if tw == 2 %}in{% endif %}">{{ ui.unit }}</span></div></div>
+     <div class="flex flex--row flex--top gap--xsmall"><div class="flex flex--col flex--center gap--xsmall"><div class="{{ fcy }} gap--xsmall{% if tw == 2 and ph.lab %} w--full{% endif %}"><div class="shrink-0 h--[4cqh]" data-sw-part="loc" data-sw-sq data-sw-i="{{ tw | minus: 1 }}" data-sw-loc="{{ tw_k }}" data-sw-lz></div>{% if tw == 2 and ph.lab %}<div style="contain:inline-size;flex:1;min-width:0" data-sw-lw><span class="label text--bold" style="line-height:1.1" data-clamp="1" data-sw-slab>{{ ph.lab }}</span></div>{% endif %}{% if tw == 1 %}{{ cbadge | replace: 'data-sw-part="cue"', 'data-sw-part="cue" data-sw-cb' }}{% endif %}</div><div class="h--[{{ tw_dm | times: hm | times: tm | round | at_most: 100 }}cqh] lg:h--[{{ tw_dl | times: hl | times: tf | round | at_most: 100 }}cqh] lg:portrait:h--[6cqh]" data-sw-part="{% if tw == 1 %}temp{% else %}itemp{% endif %}"></div></div><div class="flex flex--col gap--xsmall"><div class="shrink-0 h--[4cqh]" data-sw-lsp></div><span class="value value--small" data-sw-unit="{% if tw == 2 %}in{% endif %}">{{ ui.unit }}</span></div></div>
      {%- if tw == 2 %}<span class="label label--small flex flex--row flex--center-y gap--xsmall">{{ inn_hum }}</span>{% else %}<span class="label label--small">&nbsp;</span>{% endif %}{% comment %} an empty line under BUITEN keeps {% endcomment %}
     </div>{% endfor %}{% else %}
     <div class="flex flex--row flex--top gap--xsmall shrink-0 {{ tg_h }}"><div class="h--full" data-sw-part="temp"{% if view < 3 %} data-sw-tm{% endif %}></div><span class="value value--small" data-sw-unit>{{ ui.unit }}</span></div>{% if ui.cue and ui.cue.size > 0 %}<div data-sw-div class="border--v-60 shrink-0 h--full"></div>{% endif %}{% comment %} owner: the thin divider between the {% endcomment %}
@@ -121,10 +121,10 @@
   </div>
   <div class="{{ fcy }} flex--center-x w--full" data-sw-srow="main">
    {%- comment %} Owner 2026-11-14: with an indoor reading the big number is indoor (house icon in front), outdoor a small readout first in the side column where it fits. {% endcomment %}
-   {%- capture s_lab %}{% if ph.lab %}<span class="shrink-0" data-sw-slab data-sw-sl8="{{ ph.l8 }}"></span>{% endif %}{% endcapture %}{% assign lk_m = 'out' %}{% assign li_m = 0 %}{% assign lk_2 = 'in' %}{% assign li_2 = 1 %}{% assign t_m = 'temp' %}{% assign t_2 = 'itemp' %}{% if inn and inm %}{% assign lk_m = 'in' %}{% assign li_m = 1 %}{% assign lk_2 = 'out' %}{% assign li_2 = 0 %}{% assign t_m = 'itemp' %}{% assign t_2 = 'temp' %}{% endif %}
-   <div class="flex flex--row flex--top shrink-0" data-sw-sgrp="temp">{% if inn %}<div class="shrink-0" data-sw-part="loc" data-sw-sq data-sw-i="{{ li_m }}" data-sw-loc="{{ lk_m }}" data-sw-sloc></div>{% if inm %}{{ s_lab }}{% endif %}{% endif %}<div class="shrink-0" data-sw-part="{{ t_m }}"></div><span class="{{ tsb }} shrink-0" data-sw-unit data-sw-sunit>{{ ui.unit }}</span></div>
+   {%- capture s_lab %}{% if ph.lab %}<span class="label text--bold shrink-0" data-clamp="1" data-sw-slab data-sw-lt="{{ ph.lab }}">{{ ph.lab }}</span>{% endif %}{% endcapture %}{% assign lk_m = 'out' %}{% assign li_m = 0 %}{% assign lk_2 = 'in' %}{% assign li_2 = 1 %}{% assign t_m = 'temp' %}{% assign t_2 = 'itemp' %}{% if inn and inm %}{% assign lk_m = 'in' %}{% assign li_m = 1 %}{% assign lk_2 = 'out' %}{% assign li_2 = 0 %}{% assign t_m = 'itemp' %}{% assign t_2 = 'temp' %}{% endif %}
+   <div class="flex flex--row flex--top shrink-0 gap--none" data-sw-sgrp="temp">{% if inn %}<div class="shrink-0" data-sw-part="loc" data-sw-sq data-sw-i="{{ li_m }}" data-sw-loc="{{ lk_m }}" data-sw-sloc></div>{% if inm %}{{ s_lab }}{% endif %}{% endif %}<div class="shrink-0" data-sw-part="{{ t_m }}"></div><span class="{{ tsb }} shrink-0" data-sw-unit data-sw-sunit>{{ ui.unit }}</span></div>
    <div class="flex flex--col flex--center shrink-0" data-sw-sgrp="side">
-    {%- if inn %}<div class="flex flex--row flex--top shrink-0" data-sw-sout><div class="shrink-0 self--center" data-sw-part="loc" data-sw-sq data-sw-i="{{ li_2 }}" data-sw-loc="{{ lk_2 }}"></div>{% if inm %}{% if ui.cue and ui.cue.size > 0 %}<div class="shrink-0 self--center" data-sw-part="cue" data-sw-cb data-sw-socue data-sw-cue="{{ ui.cue | join: '+' }}"></div>{% endif %}{% else %}{{ s_lab }}{% endif %}<div class="shrink-0" data-sw-part="{{ t_2 }}" data-sw-tr></div><span class="{{ tsb }} shrink-0" data-sw-sounit>{{ ui.unit }}</span></div>{% endif %}
+    {%- if inn %}<div class="flex flex--row flex--top shrink-0 gap--none" data-sw-sout><div class="shrink-0 self--center" data-sw-part="loc" data-sw-sq data-sw-i="{{ li_2 }}" data-sw-loc="{{ lk_2 }}"></div>{% if inm %}{% if ui.cue and ui.cue.size > 0 %}<div class="shrink-0 self--center" data-sw-part="cue" data-sw-cb data-sw-socue data-sw-cue="{{ ui.cue | join: '+' }}"></div>{% endif %}{% else %}{{ s_lab }}{% endif %}<div class="shrink-0" data-sw-part="{{ t_2 }}" data-sw-tr></div><span class="{{ tsb }} shrink-0" data-sw-sounit>{{ ui.unit }}</span></div>{% endif %}
     {%- if ui.cue and ui.cue.size > 0 %}<div class="shrink-0" data-sw-part="cue" data-sw-cue="{{ ui.cue | join: '+' }}"></div>{% endif %}
     {%- if ui.rain %}<div class="{{ fcy }} shrink-0" data-sw-unit="rain"><img class="{{ iia }} shrink-0" src="{{ ui.rain.icon }}" alt="" data-sw-icon data-sw-sricon><div class="shrink-0" data-sw-part="rain" data-sw-rows="2,2"></div></div>
     {%- elsif ui.days[0] %}<span class="{{ tsb }} shrink-0" data-sw-slohi="{{ ui.days[0].lo }}|{{ ui.days[0].hi }}">{{ ui.days[0].lo }} {{ ui.days[0].hi }}</span>{% endif %}
@@ -206,6 +206,9 @@
 {%- if ui and ui.ok %}
 <script type="text/javascript">
 var SW = {{ ui | json }};
+function px(v, n) { return v.toFixed(n) + 'px'; }   /* B20 (size): a length written 45 times */
+/* B20: the Framework Clamp (data-clamp) measures once, when the page loads; the label's size and width are set by this script afterwards, so the clamp runs again whenever they change */
+function swLab() { var go; document.querySelectorAll('[data-sw-slab]').forEach(function (e) { var k = e.style.fontSize + e.parentElement.clientWidth + e.clientWidth; if (e.getAttribute('data-sw-ck') === k) return; e.setAttribute('data-sw-ck', k); e.textContent = e.getAttribute('data-clamp-original') || e.textContent; e.removeAttribute('data-clamp-cached'); go = 1; }); if (go) terminalize(); }
 // Indoor overlay (ph, only the parts of the view that differ with an indoor reading): merged into SW, then the real
 // reading from the merge variable replaces the stand-in's values: the BINNEN readout, the humidity under it and the twin
 // needle (the dial scale widens to hold it) and the humidity twin meter. The trend arrows, today's low and high and the
@@ -718,7 +721,7 @@ var cut = Math.max.apply(null, vis.map(function (sp) { return over(sp); }));
 if (!(cut > 0.5) || !ics.every(Boolean)) break;
 var ih = Math.min.apply(null, ics.map(function (e) { return e.getBoundingClientRect().height; })), k0 = (ics[0].offsetHeight && ics[0].getBoundingClientRect().height / ics[0].offsetHeight) || 1, nh = Math.max(0.45 * h0 / k0, (ih - 2 * cut - 1) / k0);
 if (nh * k0 >= ih - 0.1) break;
-ics.forEach(function (e) { e.style.setProperty('height', nh.toFixed(1) + 'px', 'important'); e.style.setProperty('width', nh.toFixed(1) + 'px', 'important'); });
+ics.forEach(function (e) { e.style.setProperty('height', px(nh, 1), 'important'); e.style.setProperty('width', px(nh, 1), 'important'); });
 }
 }
 function swDayIcons() {
@@ -743,7 +746,7 @@ var g = document.createRange(); g.selectNodeContents(lo); ks = (im.offsetWidth &
 ov = Math.max(ov, b.right - g.getBoundingClientRect().left);
 });
 var kd = SWS[3]; ov /= ks;   // in framework px; the gap in screen px by the device's own scale (B12: a 0.81 screen measured before its zoom)
-if (ov > -1 / kd) ims.forEach(function (im) { var c = im.parentElement, m = parseFloat(c.style.marginRight) || 0, nm = m + ov + 2 / kd; if (nm - m > 0.5) c.style.setProperty('margin-right', nm.toFixed(1) + 'px', 'important'); });
+if (ov > -1 / kd) ims.forEach(function (im) { var c = im.parentElement, m = parseFloat(c.style.marginRight) || 0, nm = m + ov + 2 / kd; if (nm - m > 0.5) c.style.setProperty('margin-right', px(nm, 1), 'important'); });
 }
 // B5: the low and high columns as wide as their widest number in any row (like swNames for the names), so no number spills into its
 // neighbour or the bar track (render check DAYPARTS).
@@ -756,7 +759,7 @@ if (t && m >= 0) { t.style.transform = ''; var g = document.createRange(); g.set
 // day bars start that much later, together, so they stay on one track (render check MARKGAP)
 var mk = swVis('[data-sw-part="tri"] svg polygon').pop(), lb = swVis('[data-sw-part="scale"] svg text')[0];
 if (mk && lb) { var A = mk.getBoundingClientRect(), B = lb.getBoundingClientRect(), sc = lb.closest('[data-sw-part]'), m = Math.max(0, (parseFloat(sc.style.marginLeft) || 0) + (A.right + 0.45 * A.height - B.left) / (sc.getBoundingClientRect().width / parseFloat(getComputedStyle(sc).width) || 1));
-if (B.top < A.bottom && B.bottom > A.top) [sc].concat([].slice.call(document.querySelectorAll('[data-sw-part="day"]'))).forEach(function (e) { e.style.marginLeft = m.toFixed(1) + 'px'; }); } }
+if (B.top < A.bottom && B.bottom > A.top) [sc].concat([].slice.call(document.querySelectorAll('[data-sw-part="day"]'))).forEach(function (e) { e.style.marginLeft = px(m, 1); }); } }
 function swNums() {
 var need = [0, 0], cols = [[], []];
 document.querySelectorAll('[data-sw-row="day"]').forEach(function (r) { swVis(r.querySelectorAll('span.title:not([data-sw-dname])')).slice(0, 2).forEach(function (q, j) { need[j] = Math.max(need[j], q.scrollWidth); cols[j].push(q.parentElement); }); });
@@ -774,7 +777,7 @@ function swSmall(cx) {
 var box = document.querySelector('[data-sw-sbox]'); if (!box) return;
 var bb = box.getBoundingClientRect(); if (!bb.width || !bb.height) return;
 var bs = getComputedStyle(box), W = box.clientWidth - parseFloat(bs.paddingLeft) - parseFloat(bs.paddingRight) - 1, H = box.clientHeight - parseFloat(bs.paddingTop) - parseFloat(bs.paddingBottom) - 1;
-var q = function (s) { return box.querySelector(s); }, cond = q('[data-sw-scond]'), ico = q('[data-sw-sicon]'), tg = q('[data-sw-sgrp="temp"]'), te = tg.querySelector('[data-sw-part="temp"],[data-sw-part="itemp"]'), un = q('[data-sw-sunit]'), sl = q('[data-sw-sloc]'), so = q('[data-sw-sout]'), soE = so, big = te.getAttribute('data-sw-part') === 'itemp' ? SW.inn.temp : SW.temp, slb = tg.querySelector('[data-sw-slab]'), olb = so && so.querySelector('[data-sw-slab]'), slT = slb ? slb.getAttribute('data-sw-sl8') : '', olT = olb ? olb.getAttribute('data-sw-sl8') : '', oTx = so && so.querySelector('[data-sw-part="itemp"]') ? SW.inn.temp : SW.temp;   /* B13: the label beside the sensor's house icon, the sensor readout in the side when it is the second reading */
+var q = function (s) { return box.querySelector(s); }, cond = q('[data-sw-scond]'), ico = q('[data-sw-sicon]'), tg = q('[data-sw-sgrp="temp"]'), te = tg.querySelector('[data-sw-part="temp"],[data-sw-part="itemp"]'), un = q('[data-sw-sunit]'), sl = q('[data-sw-sloc]'), so = q('[data-sw-sout]'), soE = so, big = te.getAttribute('data-sw-part') === 'itemp' ? SW.inn.temp : SW.temp, slb = tg.querySelector('[data-sw-slab]'), olb = so && so.querySelector('[data-sw-slab]'), slT = slb ? slb.getAttribute('data-sw-lt') : '', olT = olb ? olb.getAttribute('data-sw-lt') : '', oTx = so && so.querySelector('[data-sw-part="itemp"]') ? SW.inn.temp : SW.temp;   /* B13: the label beside the sensor's house icon, the sensor readout in the side when it is the second reading */
 // A tall quadrant (portrait screens, owner B3 "fill the screen like a real e-ink design") is limited by its width: no clothing badge (a
 // tiny view, owner), up to four meter rows with a readable label (11 px) even where 0.2 D is smaller; the spare height goes into the meter
 // rows and between the rows (no empty bands); of layouts with the same digit height the taller one wins.
@@ -801,9 +804,9 @@ var g = Math.max(4, 0.07 * D), fsC = SWR * D, ic = ico ? 2.3 * CK * fsC / IH : 0
 var ln = wrap(fsC, av), cw = Math.max.apply(null, ln.map(function (l) { return mw(l, fsC); }));
 var r = { D: D, g: g, fsC: fsC, ic: ic, ln: ln, ok: ln.length <= 2 && cw <= av };
 r.condH = Math.max(ic * IH, ln.length * 1.15 * fsC); r.condW = ic + (ico ? gc : 0) + cw;
-r.fsU = 0.3 * D; r.uW = mw(SW.unit || '', r.fsU) + 2; r.gU = 0.05 * D; r.lI = sl ? 0.42 * D : 0; r.lbW = slT ? mw(slT, 0.3 * D) + 2 : 0; r.tW = (sl ? r.lI + 1.5 * r.gU : 0) + (slT ? r.lbW + r.gU : 0) + at * D + r.gU + r.uW;
+r.fsU = 0.3 * D; r.uW = mw(SW.unit || '', r.fsU) + 2; r.gU = 0.05 * D; r.lI = sl ? 0.42 * D : 0; r.lbW = slT ? Math.min(mw(slT, 0.58 * r.lI) + 5, 5 * r.lI) : 0; r.tW = (sl ? r.lI + 1.5 * r.gU : 0) + (slT ? r.lbW + r.gU : 0) + at * D + r.gU + r.uW;
 var it = [];
-if (so) { r.oD = osz * D; r.oI = Math.min(0.42 * D, 0.8 * r.oD); r.ofU = 0.3 * r.oD; r.ouW = mw(SW.unit || '', r.ofU) + 2; r.olW = olT ? mw(olT, 0.3 * r.oD) + 2 : 0; it.push([r.oI + (olT ? r.olW + 0.15 * r.oD : 0) + (scue ? 1.6 * r.oI + 0.1 * r.oD : 0) + 0.3 * r.oD + ao * r.oD + 0.05 * r.oD + r.ouW, r.oD]); }
+if (so) { r.oD = osz * D; r.oI = Math.min(0.42 * D, 0.8 * r.oD); r.ofU = 0.3 * r.oD; r.ouW = mw(SW.unit || '', r.ofU) + 2; r.olW = olT ? Math.min(mw(olT, 0.58 * r.oI) + 5, 5 * r.oI) : 0; it.push([r.oI + (olT ? r.olW + 0.15 * r.oD : 0) + (scue ? 1.6 * r.oI + 0.1 * r.oD : 0) + 0.3 * r.oD + ao * r.oD + 0.05 * r.oD + r.ouW, r.oD]); }
 if (cue) { r.cueH = 0.55 * D; it.push([1.6 * r.cueH, r.cueH]); }
 if (ru) { r.calH = 0.55 * D; r.calW = 1.95 * r.calH; r.gR = 0.06 * D; it.push([r.calH + r.gR + r.calW, r.calH]); }
 else if (lh) { r.fsL = 0.3 * D; r.lW = mw(lht[0], r.fsL) + mw(lht[1], r.fsL) + 2.8 * r.fsL; it.push([r.lW, 1.2 * r.fsL]); }
@@ -829,32 +832,32 @@ for (var n = Math.min(tallQ ? 4 : 2, mrows.length); n > 0; n--) { var Rn = best(
 if (tallQ && R.n) { var ex = Math.min(0.5 * R.D - R.mh, Math.max(0, H - R.tH - 0.035 * H * (R.n + 1)) / R.n); if (ex > 0 && mlw * 0.5 * (R.mh + ex) + 5.3 * (R.mh + ex) <= W) { R.mh += ex; R.fsM = 0.5 * R.mh; R.tH += ex * R.n; } }
 // A console limited by its width (narrow columns) gives its spare height to the days or hours strip below it.
 var cw0 = box.closest('[data-sw-console]'), ds = document.querySelector('div[data-sw-dstrip]');
-if (cw0 && ds && H - R.tH > 0.06 * H) { var k1 = (cw0.offsetHeight && cw0.getBoundingClientRect().height / cw0.offsetHeight) || 1; cw0.style.setProperty('height', (cw0.getBoundingClientRect().height / k1 - (H - R.tH) + 2).toFixed(1) + 'px', 'important'); H = R.tH + 1; cw0.querySelectorAll('[data-sw-part="face"]').forEach(function (f) { if (swRepaint) swRepaint(f); }); }
+if (cw0 && ds && H - R.tH > 0.06 * H) { var k1 = (cw0.offsetHeight && cw0.getBoundingClientRect().height / cw0.offsetHeight) || 1; cw0.style.setProperty('height', px(cw0.getBoundingClientRect().height / k1 - (H - R.tH) + 2, 1), 'important'); H = R.tH + 1; cw0.querySelectorAll('[data-sw-part="face"]').forEach(function (f) { if (swRepaint) swRepaint(f); }); }
 var key = [W.toFixed(0), H.toFixed(0), R.D.toFixed(1), R.n, R.mainRow, R.sideCol, fam].join('|');
 if (box.getAttribute('data-sw-sk') === key) return; box.setAttribute('data-sw-sk', key);
-function sz(e, w, h) { if (!e) return; if (w !== null) e.style.setProperty('width', w.toFixed(1) + 'px', 'important'); if (h !== null) e.style.setProperty('height', h.toFixed(1) + 'px', 'important'); }
+function sz(e, w, h) { if (!e) return; if (w !== null) e.style.setProperty('width', px(w, 1), 'important'); if (h !== null) e.style.setProperty('height', px(h, 1), 'important'); }
 function stext(lines, fs, w) { var lh2 = 1.15 * fs, h = lh2 * (lines.length - 1) + 1.25 * fs, y1 = (h - lh2 * (lines.length - 1)) / 2 + CK * fs / 2; return { h: h, html: '<svg class="block" width="' + w.toFixed(1) + '" height="' + h.toFixed(1) + '" viewBox="0 0 ' + w.toFixed(1) + ' ' + h.toFixed(1) + '" role="img" aria-label="' + lines.join(' ').replace(/"/g, '&quot;') + '">' + lines.map(function (l, j) { return '<text x="0" y="' + (y1 + j * lh2).toFixed(2) + '" font-size="' + fs.toFixed(2) + '" font-family="' + fam.replace(/"/g, "'") + '" font-weight="' + wt + '" fill="currentColor">' + l.replace(/&/g, '&amp;').replace(/</g, '&lt;') + '</text>'; }).join('') + '</svg>' }; }
 box.style.rowGap = (R.g + (!ds && H - R.tH > 0.06 * H ? Math.min(tallQ ? H : 0.35 * R.D, 0.9 * (H - R.tH) / (R.n + 1)) : 0)).toFixed(1) + 'px';   // width-limited quadrant (a wide -13): the spare height goes between the rows, not into empty bands
-var cr = q('[data-sw-srow="cond"]'); cr.style.columnGap = (0.3 * R.fsC).toFixed(1) + 'px'; sz(cr, null, R.condH); cr.style.marginTop = (-0.62 * Math.max(0, R.condH - Math.max(R.ic * IH, (R.ln.length - 1) * 1.15 * R.fsC + CK * R.fsC)) / 2).toFixed(1) + 'px';   // the text block's own air above the first cap line does not count as top padding (render check HVPAD: ink equal above and below)
+var cr = q('[data-sw-srow="cond"]'); cr.style.columnGap = px(0.3 * R.fsC, 1); sz(cr, null, R.condH); cr.style.marginTop = (-0.62 * Math.max(0, R.condH - Math.max(R.ic * IH, (R.ln.length - 1) * 1.15 * R.fsC + CK * R.fsC)) / 2).toFixed(1) + 'px';   // the text block's own air above the first cap line does not count as top padding (render check HVPAD: ink equal above and below)
 sz(ico, R.ic, R.ic); if (ico) { ico.style.margin = (-(R.ic - R.ic * IH) / 2).toFixed(1) + 'px 0'; ico.style.transform = 'translateY(' + ((0.5 - IY - IH / 2) * R.ic).toFixed(1) + 'px)'; ico.setAttribute('data-sw-condicon', R.ln.length + ',' + R.ic.toFixed(1)); }
 var cwid = Math.max.apply(null, R.ln.map(function (l) { return mw(l, R.fsC); })) + 2, st = stext(R.ln, R.fsC, cwid);
 cond.innerHTML = st.html; cond.setAttribute('data-sw-fs', R.fsC.toFixed(2)); cond.setAttribute('data-sw-lines', R.ln.length);
-main.classList.toggle('flex--row', R.mainRow); main.classList.toggle('flex--col', !R.mainRow); main.style.gap = (R.mainRow ? 1.6 * R.g : R.g).toFixed(1) + 'px';
+main.classList.toggle('flex--row', R.mainRow); main.classList.toggle('flex--col', !R.mainRow); main.style.gap = px(R.mainRow ? 1.6 * R.g : R.g, 1);
 sz(te, at * R.D, R.D); te.setAttribute('data-sw-d', R.D.toFixed(1));
-var su = stext([SW.unit || ''], R.fsU, R.uW); un.innerHTML = su.html; un.style.marginLeft = R.gU.toFixed(1) + 'px'; sz(un, R.uW, su.h);
-[[slb, slT, R.D, R.lbW, R.gU, 0.05 * R.D], [olb, olT, R.oD, R.olW, 0.15 * R.oD, 0]].forEach(function (b) { if (b[0]) { var x = stext([b[1]], 0.3 * b[2], b[3]); b[0].innerHTML = x.html; sz(b[0], b[3], x.h); b[0].style.marginRight = b[4].toFixed(1) + 'px'; b[0].style.marginTop = b[5].toFixed(1) + 'px'; } });
-if (sl) { sz(sl, R.lI, R.lI); sl.style.marginRight = (1.5 * R.gU).toFixed(1) + 'px'; sl.style.marginTop = (0.05 * R.D).toFixed(1) + 'px'; }
-if (so) { var oL = so.querySelector('[data-sw-part="loc"]'), oT = so.querySelector('[data-sw-part="temp"],[data-sw-part="itemp"]'), oU = so.querySelector('[data-sw-sounit]'), ou = stext([SW.unit || ''], R.ofU, R.ouW); sz(oL, R.oI, R.oI); if (scue) { sz(scue, 1.6 * R.oI, R.oI); oL.style.marginRight = (0.1 * R.oD).toFixed(1) + 'px'; } (scue || oL).style.marginRight = (0.15 * R.oD).toFixed(1) + 'px'; [oL, scue].forEach(function (e) { if (e) e.style.transform = 'translateX(' + (/^1/.test(oTx) ? 0.4 * R.oD : 0).toFixed(1) + 'px)'; });   /* the 1 sits at the right of its cell: the icons move up to its ink */ sz(oT, ao * R.oD, R.oD); oU.innerHTML = ou.html; oU.style.marginLeft = (0.05 * R.oD).toFixed(1) + 'px'; sz(oU, R.ouW, ou.h); }
-if (side) { side.classList.toggle('flex--col', R.sideCol); side.classList.toggle('flex--row', !R.sideCol); side.style.gap = (R.sideCol ? R.g : 1.5 * R.g).toFixed(1) + 'px'; side.style.alignItems = R.sideCol && R.mainRow ? 'flex-start' : 'center'; }
+var su = stext([SW.unit || ''], R.fsU, R.uW); un.innerHTML = su.html; un.style.marginLeft = px(R.gU, 1); sz(un, R.uW, su.h);
+[[slb, slT, R.lI, R.lbW, R.gU, 0.05 * R.D], [olb, olT, R.oI, R.olW, 0.15 * R.oD, 0]].forEach(function (b) { if (b[0]) { sz(b[0], b[3], null); Object.assign(b[0].style, { fontSize: px(0.58 * b[2], 2), lineHeight: 1.25, marginRight: px(b[4], 1), marginTop: px(b[5], 1) }); } }); swLab();
+if (sl) { sz(sl, R.lI, R.lI); sl.style.marginRight = px(1.5 * R.gU, 1); sl.style.marginTop = px(0.05 * R.D, 1); }
+if (so) { var oL = so.querySelector('[data-sw-part="loc"]'), oT = so.querySelector('[data-sw-part="temp"],[data-sw-part="itemp"]'), oU = so.querySelector('[data-sw-sounit]'), ou = stext([SW.unit || ''], R.ofU, R.ouW); sz(oL, R.oI, R.oI); if (scue) { sz(scue, 1.6 * R.oI, R.oI); oL.style.marginRight = px(0.1 * R.oD, 1); } (scue || oL).style.marginRight = px(0.15 * R.oD, 1); [oL, scue].forEach(function (e) { if (e) e.style.transform = 'translateX(' + (/^1/.test(oTx) ? 0.4 * R.oD : 0).toFixed(1) + 'px)'; });   /* the 1 sits at the right of its cell: the icons move up to its ink */ sz(oT, ao * R.oD, R.oD); oU.innerHTML = ou.html; oU.style.marginLeft = px(0.05 * R.oD, 1); sz(oU, R.ouW, ou.h); }
+if (side) { side.classList.toggle('flex--col', R.sideCol); side.classList.toggle('flex--row', !R.sideCol); side.style.gap = px(R.sideCol ? R.g : 1.5 * R.g, 1); side.style.alignItems = R.sideCol && R.mainRow ? 'flex-start' : 'center'; }
 if (cue) sz(cue, 1.6 * R.cueH, R.cueH);
-if (ru) { ru.style.gap = R.gR.toFixed(1) + 'px'; sz(ru.firstElementChild, R.calH, R.calH); sz(cal, R.calW, R.calH); }
+if (ru) { ru.style.gap = px(R.gR, 1); sz(ru.firstElementChild, R.calH, R.calH); sz(cal, R.calW, R.calH); }
 if (lh) { var f = R.fsL, tw = f * 0.8, x = 0, b = ''; lht.forEach(function (v, i) { var y0 = 0.5 * f, P = i ? [[x, y0 + tw * 0.8], [x + tw, y0 + tw * 0.8], [x + tw / 2, y0]] : [[x, y0], [x + tw, y0], [x + tw / 2, y0 + tw * 0.8]];
 b += '<polygon points="' + P.map(function (p) { return p[0].toFixed(1) + ',' + p[1].toFixed(1); }).join(' ') + '" ' + (i ? 'fill="currentColor"' : 'fill="none" stroke="currentColor" stroke-width="' + (f * 0.08).toFixed(1) + '"') + '/>';
 x += tw + 0.2 * f; b += '<text x="' + x.toFixed(1) + '" y="' + (0.5 * f + CK * f).toFixed(1) + '" font-size="' + f.toFixed(1) + '" font-family="' + fam.replace(/"/g, "'") + '" font-weight="' + wt + '" fill="currentColor">' + v + '</text>'; x += mw(v, f) + 0.6 * f; });
 lh.innerHTML = '<svg class="block" width="' + R.lW.toFixed(1) + '" height="' + (1.2 * f + 0.5 * f).toFixed(1) + '" viewBox="0 0 ' + R.lW.toFixed(1) + ' ' + (1.7 * f).toFixed(1) + '" role="img" aria-label="' + lht.join(' ') + '">' + b + '</svg>'; }
 var mwid = Math.min(W, Math.max(R.condW, R.mainRow ? R.tW + 1.6 * R.g + R.sW : Math.max(R.tW, R.sW)));
-mrows.forEach(function (r, i) { var on = i < R.n; r.classList.toggle('hidden', !on); r.classList.toggle('flex', on); if (!on) return; sz(r, mwid, R.mh); r.style.gap = (0.3 * R.mh).toFixed(1) + 'px';
-var l = r.querySelector('[data-sw-mlabel]'), t = l.getAttribute('data-sw-t0'); if (t === null) { t = l.textContent.trim(); l.setAttribute('data-sw-t0', t); } var fsM = R.fsM, lw = Math.max.apply(null, mlabT.map(function (x) { return mw(x, fsM); })) + 2, sl = stext([t], fsM, lw); l.innerHTML = sl.html; sz(l, lw, sl.h); l.style.setProperty('font-size', fsM.toFixed(2) + 'px', 'important');
+mrows.forEach(function (r, i) { var on = i < R.n; r.classList.toggle('hidden', !on); r.classList.toggle('flex', on); if (!on) return; sz(r, mwid, R.mh); r.style.gap = px(0.3 * R.mh, 1);
+var l = r.querySelector('[data-sw-mlabel]'), t = l.getAttribute('data-sw-t0'); if (t === null) { t = l.textContent.trim(); l.setAttribute('data-sw-t0', t); } var fsM = R.fsM, lw = Math.max.apply(null, mlabT.map(function (x) { return mw(x, fsM); })) + 2, sl = stext([t], fsM, lw); l.innerHTML = sl.html; sz(l, lw, sl.h); l.style.setProperty('font-size', px(fsM, 2), 'important');
 sz(r.querySelector('[data-sw-part]'), null, R.mh * 0.75); });
 }
 // Day names never clip (owner 2026-11-13, remarkable 2 half vertical cut "SUN"): when a name is wider than its column, the name column of
@@ -874,9 +877,9 @@ var sb = sp.getBoundingClientRect(); if (!sb.height) return;
 var k = (sp.offsetWidth && sb.width / sp.offsetWidth) || 1, cs = getComputedStyle(sp);
 // md screens taller than the OG (over 500 framework px; lg over 800, the X is 780: Kobo Forma, Sage) grow the digits with the console; the label keeps its size (owner: no step down), so the digits stop
 // at the OG's share of the label (CONDRATIO, B12: Meta Portal, Paperwhite); portrait has its own label size (swOGPortrait)
-var D = 1.08 * parseFloat(cs.fontSize) / (SW.inn ? 0.396 : (SWS[4] ? SWR : 0.178));   /* B16: the md console's big digits (condition over digits 0.178) */ /* with an indoor reading the OG's twin readouts: 0.396 */ if (SWS[1] / SWS[3] > (SWS[4] ? 800 : 500) && !SWS[5]) sp.closest('[data-sw-console]').querySelectorAll('[data-sw-part$="temp"]').forEach(function (e) { if (e.hasAttribute('data-sw-dcap')) e.style.removeProperty('height'); e.removeAttribute('data-sw-dcap'); if (e.offsetHeight > D) { e.style.setProperty('height', D.toFixed(1) + 'px', 'important'); e.setAttribute('data-sw-dcap', ''); } });   // measured free of its own cap: an early pass must not hold a larger height
+var D = 1.08 * parseFloat(cs.fontSize) / (SW.inn ? 0.396 : (SWS[4] ? SWR : 0.178));   /* B16: the md console's big digits (condition over digits 0.178) */ /* with an indoor reading the OG's twin readouts: 0.396 */ if (SWS[1] / SWS[3] > (SWS[4] ? 800 : 500) && !SWS[5]) sp.closest('[data-sw-console]').querySelectorAll('[data-sw-part$="temp"]').forEach(function (e) { if (e.hasAttribute('data-sw-dcap')) e.style.removeProperty('height'); e.removeAttribute('data-sw-dcap'); if (e.offsetHeight > D) { e.style.setProperty('height', px(D, 1), 'important'); e.setAttribute('data-sw-dcap', ''); } });   // measured free of its own cap: an early pass must not hold a larger height
 cx.font = cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
-function size(v) { ic.style.setProperty('height', v.toFixed(1) + 'px', 'important'); ic.style.setProperty('width', v.toFixed(1) + 'px', 'important'); }
+function size(v) { ic.style.setProperty('height', px(v, 1), 'important'); ic.style.setProperty('width', px(v, 1), 'important'); }
 size(cx.measureText('H').actualBoundingBoxAscent); ic.style.transform = '';
 var n0 = 0, h, mid;
 for (var pass = 0; pass < 3; pass++) {
@@ -912,7 +915,7 @@ var hs = function (e) { var v = e && e.querySelector('svg'); return v ? h(v) : 0
 var tw = w(t.querySelector('svg')) * gr, bw = cu && !col ? w(cu) * gr : 0; need += tw - w(t.querySelector('svg')) + (bw ? bw - w(cu) : 0);
 if (!tw) return;
 var ex = w(g) - w(t.querySelector('svg')), f = col ? Math.min(1, Math.max(0.4, (avail - 1 - ex) / tw)) : Math.min(1, Math.max(0.4, (tw + bw - (need - avail) - 1) / (tw + bw)));
-function set(e, v, p) { if (Math.abs(h(e) - v) > 0.3) { e.style.setProperty('height', v.toFixed(1) + 'px', 'important'); if (swRepaint) swRepaint(p); } }
+function set(e, v, p) { if (Math.abs(h(e) - v) > 0.3) { e.style.setProperty('height', px(v, 1), 'important'); if (swRepaint) swRepaint(p); } }
 set(g, +g.getAttribute('data-sw-h0') * f, t);
 row.setAttribute('data-sw-fit', f.toFixed(3));
 });
@@ -920,7 +923,7 @@ row.setAttribute('data-sw-fit', f.toFixed(3));
 function swArrow(cx) {
 document.querySelectorAll('[data-sw-part="arrow"]').forEach(function (e) {
 var c = e.closest('.relative').querySelector('[data-sw-cap]'); if (!c) return; var cs = getComputedStyle(c); cx.font = cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
-var v = 1.5 * cx.measureText('H').actualBoundingBoxAscent; e.style.width = v.toFixed(1) + 'px'; e.style.height = v.toFixed(1) + 'px';
+var v = 1.5 * cx.measureText('H').actualBoundingBoxAscent; e.style.width = px(v, 1); e.style.height = px(v, 1);
 });
 }
 function swInk(e) { var r = e.getBoundingClientRect(), vb = e.viewBox.baseVal, b = e.getBBox(), kx = r.width / (vb.width || r.width), ky = r.height / (vb.height || r.height); return { l: r.left + (b.x - vb.x) * kx, r: r.left + (b.x - vb.x + b.width) * kx, t: r.top + (b.y - vb.y) * ky, h: b.height * ky }; }
@@ -929,7 +932,7 @@ document.querySelectorAll('[data-sw-part="cue"]:not([data-sw-cb])').forEach(func
 var cb = cu.getBoundingClientRect(), sv = cu.querySelector('svg'), g = cu.querySelector('g[data-sw-cloth]'), t = cu.parentElement.querySelector('[data-sw-part="temp"] svg');
 if (!cb.width || !sv || !g || !t || !t.getBoundingClientRect().height) return;
 var sc = (cu.offsetWidth && cb.width / (parseFloat(cu.style.width) || cu.offsetWidth)) || 1, ti = swInk(t)   /* the width set by this script, not the rounded offsetWidth (a small cue at scale 2.5 showed a 1.3 px divider error, Kindle Scribe) */, vb = sv.viewBox.baseVal, bx = g.getAttribute('data-sw-box').split(',').map(Number), kk = ((!document.querySelector('.screen--lg, .screen--portrait') && +cu.getAttribute('data-sw-cs')) || 1) * ti.h / bx[2];
-if (Math.abs(cb.height - vb.height * kk) > 0.3) { cu.style.setProperty('height', (vb.height * kk / sc).toFixed(2) + 'px', 'important'); cu.style.setProperty('width', (vb.width * kk / sc).toFixed(2) + 'px', 'important'); sv.setAttribute('preserveAspectRatio', 'xMinYMid slice'); }
+if (Math.abs(cb.height - vb.height * kk) > 0.3) { cu.style.setProperty('height', px(vb.height * kk / sc, 2), 'important'); cu.style.setProperty('width', px(vb.width * kk / sc, 2), 'important'); sv.setAttribute('preserveAspectRatio', 'xMinYMid slice'); }
 cu.style.transform = ''; cb = cu.getBoundingClientRect();
 var top = cb.top + (cb.height - vb.height * kk) / 2 + (bx[1] - vb.y) * kk;
 cu.style.transform = 'translateY(' + ((ti.t + (ti.h - bx[2] * kk) / 2 - top) / sc).toFixed(2) + 'px)';
@@ -938,7 +941,7 @@ var u = cu.parentElement.querySelector('[data-sw-unit]'); dv.style.transform = '
 if (!u || !dv.getBoundingClientRect().height) return;
 var cs = getComputedStyle(u); cx.font = cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
 var ub = u.getBoundingClientRect(), us = (u.offsetWidth && ub.width / u.offsetWidth) || 1, ur = ub.left + cx.measureText(u.textContent.trim()).actualBoundingBoxRight * us, bl = cu.getBoundingClientRect().left;
-dv.style.setProperty('height', (ti.h / sc).toFixed(2) + 'px', 'important'); var r = dv.getBoundingClientRect();
+dv.style.setProperty('height', px(ti.h / sc, 2), 'important'); var r = dv.getBoundingClientRect();
 dv.style.transform = 'translate(' + (((ur + bl) / 2 - (r.left + r.right) / 2) / sc).toFixed(2) + 'px,' + ((ti.t - r.top) / sc).toFixed(2) + 'px)';
 });
 }
@@ -948,14 +951,14 @@ document.querySelectorAll('[data-sw-part="baro"],[data-sw-part="tdial"]').forEac
 var w = d.parentElement, cap = w.querySelector('span[data-sw-cap]'), row = [].filter.call(w.querySelectorAll('div[data-sw-cap]:not([data-sw-dialin])'), function (e) { return e.getBoundingClientRect().width > 0; })[0], v = row && row.querySelector('.value');
 if (!cap || !v || !d.getBoundingClientRect().width) return;
 var k = (cap.offsetWidth && cap.getBoundingClientRect().width / cap.offsetWidth) || 1, dl = B(v) - B(cap);
-if (Math.abs(dl) > 0.2) cap.style.bottom = (parseFloat(getComputedStyle(cap).bottom) - dl / k).toFixed(2) + 'px';
+if (Math.abs(dl) > 0.2) cap.style.bottom = px(parseFloat(getComputedStyle(cap).bottom) - dl / k, 2);
 });
 }
 /* B15 (Kindle Scribe hv-port, pixel ratio 2.5: the 4th bar ended 1.7 px below its panel): the last day row sticking out of its panel by under 8 % of a row (it must stick out past the panel's edge, as the render check CLIP sees it) is not dropped, every row gets shorter by its share of the overshoot */
 function swRows() {
 document.querySelectorAll('[data-sw-dstrip] [data-sw-panel]').forEach(function (p) { var rs = [].filter.call(p.querySelectorAll('[data-sw-row="day"]'), function (r) { return r.getBoundingClientRect().height > 0; }); if (rs.length < 2) return;
 var k0 = (p.offsetHeight && p.getBoundingClientRect().height / p.offsetHeight) || 1, l = rs[rs.length - 1], lb = Math.max(l.firstElementChild.getBoundingClientRect().bottom, l.querySelector('[data-sw-part="day"]').getBoundingClientRect().bottom), ov = lb - (p.getBoundingClientRect().bottom - parseFloat(getComputedStyle(p).paddingBottom) * k0), rh = rs[0].firstElementChild.getBoundingClientRect().height;
-if (lb > p.getBoundingClientRect().bottom + 0.5 && ov < 0.08 * rh) rs.forEach(function (r) { var c = r.firstElementChild; c.style.setProperty('height', ((c.getBoundingClientRect().height - ov / rs.length) / k0).toFixed(2) + 'px', 'important'); }); });
+if (lb > p.getBoundingClientRect().bottom + 0.5 && ov < 0.08 * rh) rs.forEach(function (r) { var c = r.firstElementChild; c.style.setProperty('height', px((c.getBoundingClientRect().height - ov / rs.length) / k0, 2), 'important'); }); });
 }
 var swN = 0;
 function swAlign() {
@@ -1014,7 +1017,7 @@ document.querySelectorAll('[data-sw-part="scale"], [data-sw-part="day"]').forEac
 r.classList.add('flex--wrap'); r.style.rowGap = '2px'; e.classList.remove('grow', 'basis--0', 'h--full'); e.classList.add('w--full', 'shrink-0');
 e.style.setProperty('height', dr ? '45%' : '50%', 'important'); if (dr) e.setAttribute('data-sw-top', '');
 [].forEach.call(r.children, function (c, i) { if (c === e) return; c.style.setProperty('height', dr ? '50%' : '45%', 'important'); if (dr) c.style.setProperty('align-items', 'flex-end', 'important'); if (i === 2 || i === 3) c.style.setProperty('width', '13cqw', 'important'); });
-if (!dr) r.style.setProperty('height', (2 * r.offsetHeight).toFixed(1) + 'px', 'important'); });
+if (!dr) r.style.setProperty('height', px(2 * r.offsetHeight, 1), 'important'); });
 }
 swOGPortrait(); swOGPortraitDays();
 whenReady(function () {
@@ -1026,21 +1029,21 @@ document.querySelectorAll('[data-sw-dstrip] [data-sw-panel]').forEach(function (
 var lo = function (r) { return Math.max(r.getBoundingClientRect().bottom, r.querySelector('[data-sw-part="day"]').getBoundingClientRect().bottom); };   // the bar is the row's lowest part (two-line rows too)
 while (rs.length > 1 && lo(rs[rs.length - 1]) > b) rs.pop().style.setProperty('display', 'none', 'important'); });
 // Rain calendar cells at most twice as wide as high (B12, Palma's short wide half view: 43x21): the calendar narrows to 1.95, never flattens.
-document.querySelectorAll('[data-sw-part="rain"]').forEach(function (e) { var n = +(e.getAttribute('data-sw-rows') || '2,2').split(',')[SWS[4] ? 1 : 0], mw = 5.85 * e.offsetHeight / n; if (e.offsetWidth > 6 * e.offsetHeight / n) e.style.setProperty('width', mw.toFixed(1) + 'px', 'important'); });
+document.querySelectorAll('[data-sw-part="rain"]').forEach(function (e) { var n = +(e.getAttribute('data-sw-rows') || '2,2').split(',')[SWS[4] ? 1 : 0], mw = 5.85 * e.offsetHeight / n; if (e.offsetWidth > 6 * e.offsetHeight / n) e.style.setProperty('width', px(mw, 1), 'important'); });
 swArrow(document.createElement('canvas').getContext('2d')); swCapBase();
 document.querySelectorAll('[data-sw-part="gauge"]').forEach(function (el) {
 var un = el.previousElementSibling, cal = un && un.querySelector('[data-sw-part="rain"]'); if (!cal) return;
 var ml = swVis('[data-sw-mlabel]')[0], lp = ml ? parseFloat(getComputedStyle(ml).fontSize) * (ml.getBoundingClientRect().width / (ml.offsetWidth || 1)) : 0;
 var lab = ((SW.rain || {}).gauge || {}).label || '', rw = (cal.getAttribute('data-sw-rows') || '').split(','), rows = +(rw[SWS[4] ? 1 : 0]) || 2, cb = cal.getBoundingClientRect(), ub = un.getBoundingClientRect();
 var cw = cb.width / 3, ch = cb.height / rows, gp = Math.max(2, Math.min(cw, ch) * 0.06), fs = Math.min(lp * 0.7 || 12, (cb.left - ub.left) / (lab.length * 0.62 + 0.5));
-el.style.width = (cb.right - ub.left).toFixed(2) + 'px'; el.style.height = Math.max(4, ch * 0.3).toFixed(2) + 'px'; el.setAttribute('data-sw-gp', gp.toFixed(2)); el.setAttribute('data-sw-x0', (cb.left - ub.left).toFixed(2));
+el.style.width = px(cb.right - ub.left, 2); el.style.height = px(Math.max(4, ch * 0.3), 2); el.setAttribute('data-sw-gp', gp.toFixed(2)); el.setAttribute('data-sw-x0', (cb.left - ub.left).toFixed(2));
 var rc = el.closest('[data-sw-right]'), pn = rc && rc.closest('[data-sw-panel]'), pb = pn && pn.getBoundingClientRect(), ps = pn && getComputedStyle(pn), rb = rc && rc.getBoundingClientRect();
 if (!cb.width || cw / ch < 0.85 || cw * 0.7 < lp || fs < (lp * 0.7 || 12) * 0.6 || (rb && pb && (rb.bottom > pb.bottom - parseFloat(ps.paddingBottom) + 0.5 || rb.top < pb.top + parseFloat(ps.paddingTop) - 0.5))) el.classList.add('hidden');
 });
 var qvm = swVis('[data-sw-part^="meter"]'), qhv = qvm.filter(function (q) { return q.getAttribute('data-sw-part') === 'meterin'; })[0];
 if (qhv) { var qcol = qhv.parentElement.parentElement, qpn = qcol.closest('[data-sw-panel]') || qcol.parentElement, qcs = getComputedStyle(qpn), qin = qpn.getBoundingClientRect().height - (parseFloat(qcs.paddingTop) + parseFloat(qcs.paddingBottom)) * ((qpn.offsetHeight && qpn.getBoundingClientRect().height / qpn.offsetHeight) || 1);
 if (qcol.getBoundingClientRect().height > qin + 0.5 || qcol.scrollHeight > qcol.clientHeight + 1) document.querySelectorAll('[data-sw-hum2]').forEach(function (q) { q.classList.add('hidden'); q.classList.remove('flex', 'lg:flex', 'lg:block'); }); }
-document.querySelectorAll('[data-sw-for]').forEach(function (el) { var mt = swVis('[data-sw-part^="meter"][data-sw-key="' + el.getAttribute('data-sw-for') + '"]')[0]; if (!mt) return; var mk = (mt.offsetHeight && mt.getBoundingClientRect().height / mt.offsetHeight) || 1, mh = (mt.getBoundingClientRect().height / mk).toFixed(2) + 'px'; el.style.setProperty('height', mh, 'important'); el.style.setProperty('width', mh, 'important'); el.style.marginBottom = '3px'; });   /* the blocks sit SO (3 px) above the middle of their svg (the shadow takes the lower SO): the margin lifts the icon half of that, level with the blocks */
+document.querySelectorAll('[data-sw-for]').forEach(function (el) { var mt = swVis('[data-sw-part^="meter"][data-sw-key="' + el.getAttribute('data-sw-for') + '"]')[0]; if (!mt) return; var mk = (mt.offsetHeight && mt.getBoundingClientRect().height / mt.offsetHeight) || 1, mh = px(mt.getBoundingClientRect().height / mk, 2); el.style.setProperty('height', mh, 'important'); el.style.setProperty('width', mh, 'important'); el.style.marginBottom = '3px'; });   /* the blocks sit SO (3 px) above the middle of their svg (the shadow takes the lower SO): the margin lifts the icon half of that, level with the blocks */
 document.querySelectorAll('[data-sw-part]').forEach(function (el) {
 TRMNLPaint.watch(el, function () { swPaint(el); });
 });
@@ -1055,8 +1058,8 @@ SWDraw.mode = { color: cl, dark: sc.contains('screen--dark-mode'), bits: sc.cont
 SWDraw.font = (TRMNLPaint.type('title', { el: el }) || {}).fontFamily || null;
 var r = el.getBoundingClientRect();
 var lzt = el.hasAttribute('data-sw-lz') && el.closest('[data-sw-twin]'), lzu = lzt && lzt.querySelector('[data-sw-unit]');
-if (lzu && r.height) { var lzk = (el.offsetHeight && r.height / el.offsetHeight) || 1, lzh = Math.max(r.height / lzk, 1.4 * parseFloat(getComputedStyle(lzu).fontSize)), lzs = lzt.querySelector('[data-sw-lsp]'); el.style.setProperty('height', lzh.toFixed(2) + 'px', 'important'); var lzc = lzt.querySelector('[data-sw-cb]'); if (lzc) { lzc.style.setProperty('height', lzh.toFixed(2) + 'px', 'important'); lzc.style.setProperty('width', (1.6 * lzh).toFixed(2) + 'px', 'important'); } if (lzs) lzs.style.setProperty('height', lzh.toFixed(2) + 'px', 'important'); r = el.getBoundingClientRect(); }   /* B10: readout icon at least 1.4 unit fonts */
-if (el.hasAttribute('data-sw-sq') && r.height) { var k0 = (el.offsetHeight && r.height / el.offsetHeight) || 1, tf = el.getAttribute('data-sw-part') === 'tri' ? parseFloat(getComputedStyle(el.parentElement).fontSize) * 0.8 : 0; if (tf) el.style.setProperty('height', tf.toFixed(2) + 'px', 'important'); el.style.setProperty('width', (tf || r.height / k0).toFixed(2) + 'px', 'important'); r = el.getBoundingClientRect(); }
+if (lzu && r.height) { var lzk = (el.offsetHeight && r.height / el.offsetHeight) || 1, lzh = Math.max(r.height / lzk, 1.4 * parseFloat(getComputedStyle(lzu).fontSize)), lzs = lzt.querySelector('[data-sw-lsp]'); el.style.setProperty('height', px(lzh, 2), 'important'); var lzc = lzt.querySelector('[data-sw-cb]'); if (lzc) { lzc.style.setProperty('height', px(lzh, 2), 'important'); lzc.style.setProperty('width', px(1.6 * lzh, 2), 'important'); } if (lzs) lzs.style.setProperty('height', px(lzh, 2), 'important'); r = el.getBoundingClientRect(); }   /* B10: readout icon at least 1.4 unit fonts */
+if (el.hasAttribute('data-sw-sq') && r.height) { var k0 = (el.offsetHeight && r.height / el.offsetHeight) || 1, tf = el.getAttribute('data-sw-part') === 'tri' ? parseFloat(getComputedStyle(el.parentElement).fontSize) * 0.8 : 0; if (tf) el.style.setProperty('height', px(tf, 2), 'important'); el.style.setProperty('width', px(tf || r.height / k0, 2), 'important'); r = el.getBoundingClientRect(); }
 if (tf) swTri();   // the mark's own size settles here: centre it again
 if (!r.width && !r.height) return;
 SWDraw.tr = el.hasAttribute('data-sw-tr') || (el.hasAttribute('data-sw-tm') && !sc.contains('screen--lg') && !sc.contains('screen--portrait')); SWDraw.gp = +(el.getAttribute('data-sw-gp') || 0); SWDraw.gx0 = +(el.getAttribute('data-sw-x0') || 0); SWDraw.n = +(el.getAttribute('data-sw-n') || 0) || null; SWDraw.j = +(el.getAttribute('data-sw-j') || 0);
@@ -1071,6 +1074,8 @@ SWDraw.top = el.hasAttribute('data-sw-top');
 SWDraw.extD = k >= 0 && k + 1 < rows.length ? Math.max(0, rows[k + 1].getBoundingClientRect().top - r.bottom + 1) : 0;
 if (/^(baro|tdial)$/.test(el.getAttribute('data-sw-part'))) { SWDraw.caps = {}; document.querySelectorAll('[data-sw-part="baro"], [data-sw-part="tdial"]').forEach(function (d) { var b = d.getBoundingClientRect(); if (!b.width) return; SWDraw.caps[d.getAttribute('data-sw-part')] = [].map.call(d.parentElement.querySelectorAll('[data-sw-cap]'), function (c) { var rg = document.createRange(); rg.selectNodeContents(c); var q = rg.getBoundingClientRect(), l0 = q.left - b.left; return [l0, q.top - b.top, Math.max(q.right - b.left, l0 < b.width / 2 ? l0 + (d.getAttribute('data-sw-part') === 'baro' ? 0.264 : 0.311) * b.width : 0), q.bottom - b.top]; });   /* the left caption counts at least as wide as the English one, so the radius never depends on the language (DIALR, ja) */ }); }
 el.innerHTML = SWDraw.part(SW, el.getAttribute('data-sw-part'), +(el.getAttribute('data-sw-i') || 0), Math.floor(r.width), Math.floor(r.height));
+var lbs = el.hasAttribute('data-sw-lz') && el.nextElementSibling && el.nextElementSibling.querySelector('[data-sw-slab]'); if (lbs) { var lbk = (lbs.offsetHeight && lbs.getBoundingClientRect().height / lbs.offsetHeight) || 1, lbw = lbs.parentElement, lbb = lbw.parentElement.parentElement.nextElementSibling; if (lbb) lbw.style.marginRight = (-(lbb.getBoundingClientRect().width / lbk + (parseFloat(getComputedStyle(lbb.parentElement).columnGap) || 0))).toFixed(1) + 'px'; lbs.style.fontSize = px(0.555 * r.height / lbk, 2); }   /* B20: the label may use the unit column's room beside it (negative margin); its font is 0.55 of the icon height (caps 0.40, the icon is drawn full height), the Framework Clamp cuts what does not fit */
+swLab();
 if (el.getAttribute('data-sw-part') === 'cue') { var cs0 = el.firstElementChild; if (cs0) { cs0.setAttribute('width', '100%'); cs0.setAttribute('height', '100%'); cs0.setAttribute('preserveAspectRatio', 'xMinYMid meet'); } }
 el.querySelectorAll('text[data-sw-tick]').forEach(function (t) { var d = t.nextElementSibling; if (d) d.setAttribute('x', (+t.getAttribute('x') + t.getComputedTextLength() / 2 + 1).toFixed(1)); });
 swAlign();
