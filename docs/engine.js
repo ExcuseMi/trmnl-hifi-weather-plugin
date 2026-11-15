@@ -121,6 +121,14 @@
       if (o.clockMs) {
         clock = '<script>(function(){var R=Date,off=' + o.clockMs + '-R.now();function F(){if(!(this instanceof F))return new F().toString();return arguments.length?new (Function.prototype.bind.apply(R,[null].concat([].slice.call(arguments))))():new R(R.now()+off)}F.prototype=R.prototype;F.now=function(){return R.now()+off};F.parse=R.parse;F.UTC=R.UTC;window.Date=F;var p=Intl.DateTimeFormat.prototype,g=Object.getOwnPropertyDescriptor(p,"format").get,fp=p.formatToParts;Object.defineProperty(p,"format",{get:function(){var b=g.call(this);return function(d){return b(d===undefined?F.now():d)}}});p.formatToParts=function(d){return fp.call(this,d===undefined?F.now():d)}})();</script>';
       }
+      // Firefox crashes the tab when the framework's dither lines (1 px by 2 px tiles in ::before/::after) are drawn inside
+      // trmnl-frame (reproduced with TRMNL's own README markup, no plugin script). The site draws them as the average grey.
+      var dither = '<script>(function(){var st=document.createElement("style");st.textContent=".sw-nd0,.sw-nd1:before,.sw-nd2:after{background-image:linear-gradient(var(--sw-nd),var(--sw-nd))!important;background-size:auto!important;background-position:0 0!important}";document.head.appendChild(st);' +
+        'function run(){[].forEach.call(document.querySelectorAll("*"),function(e){["","::before","::after"].forEach(function(p,i){var c=getComputedStyle(e,p),b=c.backgroundSize;' +
+        'if(!/^(\\d+(\\.\\d+)?px \\d+(\\.\\d+)?px(, )?)+$/.test(b))return;var t=b.split(", ")[0].split(" ");if(parseFloat(t[0])>4&&parseFloat(t[1])>4)return;' +
+        'var m=c.backgroundImage.match(/rgba?\\([^)]*\\)/g)||[],r=0,g=0,u=0,k=0;m.forEach(function(x){var v=x.match(/[\\d.]+/g);r+=+v[0];g+=+v[1];u+=+v[2];k++});if(!k)return;' +
+        'e.style.setProperty("--sw-nd","rgb("+Math.round(r/k)+","+Math.round(g/k)+","+Math.round(u/k)+")");e.classList.add("sw-nd"+i)})})}' +
+        'run();setTimeout(run,300);setTimeout(run,1500)})();</script>';
       var scaled = o.device === 'x';   // the X is laid out at its CSS size (1040x780, TRMNL's own layout pass), then drawn 1.8 times larger
       var inner = '<!DOCTYPE html><html><head><meta charset="utf-8">' + (scaled ? '<style>.trmnl .screen{--pixel-ratio:1!important}</style>' : '') + clock +
         '<link rel="stylesheet" href="https://trmnl.com/css/3.4.6/plugins.css" /><script type="module" src="https://trmnl.com/js/3.4.6/plugins.js"></script>' +
@@ -128,7 +136,7 @@
         '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' +
         '<link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet"></head>' +
         '<body class="trmnl"><div class="screen ' + dev.classes + (o.dark ? ' screen--dark-mode dark-mode' : '') + ' screen--fonts-trmnl">' +
-        (mount ? '<div class="' + mount + '">' : '') + '<div class="view view--' + (o.view || 'full') + '">' + markup + '</div>' + (mount ? '</div>' : '') + '</div></body></html>';
+        (mount ? '<div class="' + mount + '">' : '') + '<div class="view view--' + (o.view || 'full') + '">' + markup + '</div>' + (mount ? '</div>' : '') + '</div>' + dither + '</body></html>';
       if (!scaled) return inner;
       return '<!DOCTYPE html><html><head><meta charset="utf-8"><style>html,body{margin:0;height:100%;overflow:hidden;background:#fff}iframe{border:0;width:1040px;height:780px;transform:scale(1.8);transform-origin:0 0}</style></head><body><iframe srcdoc="' +
         inner.replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '"></iframe></body></html>';

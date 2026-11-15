@@ -197,10 +197,10 @@ def autumn(id_, title, look, place, lat, lon, **extra):
 
 SCENARIOS = [
     calm(), rain(), storm(), snow(), heat(), pollen(),
-    autumn('sensor', 'With a TRMNL sensor on this screen', 'The indoor temperature is the big reading, outside moves beside it; humidity and the CO2 meter come from the sensor (CO2 is high here).',
+    autumn('sensor', 'With a TRMNL sensor on this screen', 'The indoor temperature comes first in black, outside beside it in grey; the CO2 and indoor humidity meters lead the list.',
            'Berlin', 52.52, 13.41, sensor={'device': 1, 'temperature': 21.4, 'humidity': 46, 'carbon_dioxide': 1180},
            settings={'sensor_show': 'show', 'sensor_co2': 'show', 'sensor_label': '', 'sensor_device_id': '', 'sensor_primary': 'auto'}),
-    autumn('sensor2', 'Sensor from another TRMNL, with a label', 'The sensor of a second TRMNL (a hallway upstairs) shows, labelled; outside stays the big reading.',
+    autumn('sensor2', 'Sensor from another TRMNL, with a label', 'The sensor of a second TRMNL (a hallway upstairs) shows with its label next to the house icon; outside comes first in black.',
            'Paris', 48.86, 2.35, sensor={'device': 2, 'temperature': 19.6, 'humidity': 52, 'carbon_dioxide': 640},
            settings={'sensor_show': 'show', 'sensor_co2': 'show', 'sensor_label': 'Upstairs', 'sensor_device_id': '2', 'sensor_primary': 'auto'}),
 ]

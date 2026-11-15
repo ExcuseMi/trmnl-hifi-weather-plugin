@@ -59,7 +59,7 @@ Regenerate the device file after TRMNL adds a model: `python3 tools/make_device_
 
 ## Try-it site (GitHub Pages, from main /docs)
 
-The real transform and markup run in the page (LiquidJS), inside TRMNL's `trmnl-frame`. Regenerate: `tools/site/build.sh` (writes `docs/`; `--check` fails when stale, also run by the model tests). Guard: `tools/site/check_fidelity.sh` compares the page's markup with trmnlp's Ruby Liquid for 12 cases (no browser).
+The real transform and markup run in the page (LiquidJS), inside TRMNL's `trmnl-frame`. Regenerate: `tools/site/build.sh` (writes `docs/`; `--check` fails when stale, also run by the model tests). Guard: `tools/site/check_fidelity.sh` compares the page's markup with trmnlp's Ruby Liquid for 12 cases (no browser). `node tools/site/smoke.cjs` loads every example x device x view in Chromium and Firefox and fails on a crash, a page error or an empty part (needs Playwright, see the file header; about 12 minutes; `--quick` for a few).
 
 ## Open items
 
