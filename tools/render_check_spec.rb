@@ -201,7 +201,7 @@ return rows.map(function(q){return q.map(function(v){return v===null?'-':v.toFix
       puts "DIV #{c['name']}: gapL,gapR,dH,dTop #{div}"
       div.split.each { |q| a = q.split(',').map(&:to_f); expect((a[0] - a[1]).abs).to be <= 1.5; expect(a[2].abs).to be <= 1.5; expect(a[3].abs).to be <= 1.5 }
       # Dial corners (owner 2026-11-13): caption and value corners equal inset (1 px) and one baseline (1 px); an arrow slot with no arrow takes no room (icon and value one normal gap apart).
-      dcn = s.evaluate(%q{(function(){var bad=[],R=function(e){var g=document.createRange();g.selectNodeContents(e);return g.getBoundingClientRect()},B=function(e){var p=document.createElement('span');p.style.cssText='display:inline-block;width:0;height:0';e.appendChild(p);var y=p.getBoundingClientRect().bottom;e.removeChild(p);return y};document.querySelectorAll('[data-sw-part="baro"],[data-sw-part="tdial"]').forEach(function(d){var P=d.closest('[data-sw-panel]').getBoundingClientRect(),w=d.parentElement,cap=w.querySelector('span[data-sw-cap]'),row=[].filter.call(w.querySelectorAll('div[data-sw-cap]:not([data-sw-dialin])'),function(e){return e.getBoundingClientRect().width>0})[0];if(!cap||!row||!P.width)return;var k=d.getAttribute('data-sw-part'),sp=row.querySelectorAll('span'),l=R(cap).left-P.left,r=P.right-R(sp[sp.length-1]).right;if(Math.abs(l-r)>1)bad.push(k+' caption inset '+l.toFixed(1)+' vs value inset '+r.toFixed(1));var bc=B(cap),bv=B(row.querySelector('.value'));if(Math.abs(bc-bv)>1)bad.push(k+' caption baseline '+bc.toFixed(1)+' vs value '+bv.toFixed(1))});document.querySelectorAll('[data-sw-cap]').forEach(function(r){if(r.tagName==='SPAN'||!r.getBoundingClientRect().width)return;var cg=parseFloat(getComputedStyle(r).columnGap)||0,k=r.getBoundingClientRect().width/(r.offsetWidth||1),it=[].filter.call(r.children,function(e){return e.getBoundingClientRect().width>0});for(var i=1;i<it.length;i++){var g=it[i].getBoundingClientRect().left-it[i-1].getBoundingClientRect().right;if(Math.abs(g-cg*k)>1.5)bad.push((it[i-1].getAttribute('data-sw-part')||it[i-1].tagName)+' to '+(it[i].getAttribute('data-sw-part')||it[i].tagName)+' gap '+g.toFixed(1)+' vs '+(cg*k).toFixed(1))}});document.querySelectorAll('[data-sw-part="arrow"]:not([data-sw-arrow])').forEach(function(e){if(e.getBoundingClientRect().width>0)bad.push('empty arrow slot '+e.getBoundingClientRect().width.toFixed(0)+' wide')});return bad.join('; ')})()})
+      dcn = s.evaluate(%q{(function(){var bad=[],R=function(e){var g=document.createRange();g.selectNodeContents(e);return g.getBoundingClientRect()},B=function(e){var p=document.createElement('span');p.style.cssText='display:inline-block;width:0;height:0';e.appendChild(p);var y=p.getBoundingClientRect().bottom;e.removeChild(p);return y};document.querySelectorAll('[data-sw-part="baro"],[data-sw-part="tdial"]').forEach(function(d){var P=d.closest('[data-sw-panel]').getBoundingClientRect(),w=d.parentElement,cap=w.querySelector('span[data-sw-cap]'),row=[].filter.call(w.querySelectorAll('div[data-sw-cap]:not([data-sw-dialin])'),function(e){return e.getBoundingClientRect().width>0})[0];if(!cap||!row||!P.width)return;var k=d.getAttribute('data-sw-part'),sp=row.querySelectorAll('span'),l=R(cap).left-P.left,r=P.right-R(sp[sp.length-1]).right;if(Math.abs(l-r)>1)bad.push(k+' caption inset '+l.toFixed(1)+' vs value inset '+r.toFixed(1));var bc=B(cap),bv=B(row.querySelector('.value'));if(Math.abs(bc-bv)>1)bad.push(k+' caption baseline '+bc.toFixed(1)+' vs value '+bv.toFixed(1))});document.querySelectorAll('[data-sw-cap]').forEach(function(r){if(r.tagName==='SPAN'||!r.getBoundingClientRect().width)return;var cg=parseFloat(getComputedStyle(r).columnGap)||0,k=r.getBoundingClientRect().width/(r.offsetWidth||1),it=[].filter.call(r.children,function(e){return e.getBoundingClientRect().width>0});for(var i=1;i<it.length;i++){var g=it[i].getBoundingClientRect().left-it[i-1].getBoundingClientRect().right;if(Math.abs(g-cg*k)>1.5)bad.push((it[i-1].getAttribute('data-sw-part')||it[i-1].tagName)+' to '+(it[i].getAttribute('data-sw-part')||it[i].tagName)+' gap '+g.toFixed(1)+' vs '+(cg*k).toFixed(1))}/* B27 (owner 2026-11-16): a temperature unit's top meets its number's cap top, 1 px (hPa and other units stay on the baseline) */var un=it[it.length-1],nm=it[it.length-2];if(un&&nm&&un.tagName==='SPAN'&&nm.tagName==='SPAN'&&/^°/.test(un.textContent.trim())){var cx2=document.createElement('canvas').getContext('2d'),cp=function(x,ch){var cs=getComputedStyle(x),rg=document.createRange();cx2.font=cs.fontWeight+' '+parseFloat(cs.fontSize)+'px '+cs.fontFamily;var m=cx2.measureText(ch),kk=(x.offsetWidth&&x.getBoundingClientRect().width/x.offsetWidth)||1;rg.selectNodeContents(x);return rg.getClientRects()[0].top+(m.fontBoundingBoxAscent-m.actualBoundingBoxAscent)*kk},dd=cp(nm,'0')-cp(un,'°');if(Math.abs(dd)>1)bad.push('unit '+un.textContent.trim()+' top off the number cap top by '+dd.toFixed(1))}});document.querySelectorAll('[data-sw-part="arrow"]:not([data-sw-arrow])').forEach(function(e){if(e.getBoundingClientRect().width>0)bad.push('empty arrow slot '+e.getBoundingClientRect().width.toFixed(0)+' wide')});return bad.join('; ')})()})
       puts "DIALCORNER #{c['name']}: #{dcn}" unless dcn.empty?
       expect(dcn).to eq('')
       # Half vertical (owner 2026-11-13): the console panel's ink starts as far below its top edge as it ends above its bottom edge (1 px, from the picture).
@@ -221,44 +221,55 @@ return rows.map(function(q){return q.map(function(v){return v===null?'-':v.toFix
           expect((top - bot).abs).to be <= 1
         end
       end
-      # B27 (owner 2026-11-16): on the X the panels are the page's own colour with a thin outline: gray 170 on light, gray 85 on dark (OG outline mechanism, 2 px).
-      # Seen red on 9715cc4: the light panel was a 238 backlit fill without an outline.
-      if c['device'] == 'v2' && !c['palette'] && !c['orientation']
-        pf = s.evaluate(%q{(function(){return [].filter.call(document.querySelectorAll('[data-sw-part="face"]'),function(e){var b=e.getBoundingClientRect();return b.width>40&&b.height>40}).map(function(e){var b=e.getBoundingClientRect();return [b.left,b.top,b.right,b.bottom].join(',')}).join(';')+'|'+innerWidth+'|'+(document.querySelector('.screen--dark-mode')||document.documentElement.classList.contains('dark')?'dark':'light')})()})
-        faces, iw2, mode = pf.split('|')
-        unless faces.to_s.empty?
-          require 'chunky_png'
-          png = ChunkyPNG::Image.from_file(s.png_path)
-          kk = png.width / iw2.to_f
-          lum = ->(v) { 0.3 * ChunkyPNG::Color.r(v) + 0.59 * ChunkyPNG::Color.g(v) + 0.11 * ChunkyPNG::Color.b(v) }
-          want = mode == 'dark' ? 85 : 170
-          bad = []
-          faces.split(';').each do |f|
-            fl, ft, fr, fbm = f.split(',').map(&:to_f)
-            ym = ((ft + fbm) / 2 * kk).to_i
-            xm = ((fl + fr) / 2 * kk).to_i
-            pout = lum.call(png[(fl * kk - 3).to_i, ym])
-            pins = lum.call(png[(fl * kk + 7).to_i, ym])
-            edge = ((fl * kk - 1).to_i..(fl * kk + 5).to_i).map { |x| lum.call(png[x, ym]) }
-            top_e = ((ft * kk - 1).to_i..(ft * kk + 5).to_i).map { |y| lum.call(png[xm, y]) }
-            ink = mode == 'dark' ? ->(a) { a.max } : ->(a) { a.min }
-            bad << "fill #{pins.round} vs page #{pout.round}" if (pins - pout).abs > 3
-            bad << "left outline #{ink.call(edge).round} want #{want}" if (ink.call(edge) - want).abs > 8
-            bad << "top outline #{ink.call(top_e).round} want #{want}" if (ink.call(top_e) - want).abs > 8
-          end
-          puts "PANEL #{c['name']}: #{bad.first(3).join('; ')}" unless bad.empty?
-          expect(bad).to eq([])
+      # B27 (owner 2026-11-16): no panel fill, outline or rounded box on any screen; a divider line centred in the gap between each two adjacent sections, none at the outer edge
+      # (the X: gray 170 light / 85 dark +/- 8, the other screens: clearly darker than the page, in 1-bit dotted black). Seen red on 7836632 (outlined panels, no dividers).
+      pf = s.evaluate(%q{(function(){var F=[].filter.call(document.querySelectorAll('[data-sw-part="face"]'),function(e){var b=e.getBoundingClientRect();return b.width>40&&b.height>40}).map(function(e){return e.getBoundingClientRect()});return F.map(function(r){var o={l:r.left,t:r.top,r:r.right,b:r.bottom,gb:-1,gr:-1,ga:-1,gl:-1};F.forEach(function(q){if(q===r)return;var ox=Math.min(r.right,q.right)-Math.max(r.left,q.left),oy=Math.min(r.bottom,q.bottom)-Math.max(r.top,q.top);if(ox>10&&q.top-r.bottom>-1)o.gb=o.gb<0?q.top-r.bottom:Math.min(o.gb,q.top-r.bottom);if(oy>10&&q.left-r.right>-1)o.gr=o.gr<0?q.left-r.right:Math.min(o.gr,q.left-r.right);if(ox>10&&r.top-q.bottom>-1)o.ga=o.ga<0?r.top-q.bottom:Math.min(o.ga,r.top-q.bottom);if(oy>10&&r.left-q.right>-1)o.gl=o.gl<0?r.left-q.right:Math.min(o.gl,r.left-q.right)});return [o.l,o.t,o.r,o.b,o.gb,o.gr,o.ga,o.gl].join(',')}).join(';')+'|'+innerWidth+'|'+(document.querySelector('.screen--dark-mode')||document.documentElement.classList.contains('dark')?'dark':'light')+'|'+(document.querySelector('.screen--1bit')?1:(document.querySelector('.screen--2bit')?2:4))})()})
+      faces, iw2, pmode, pbits = pf.split('|')
+      unless faces.to_s.empty?
+        require 'chunky_png'
+        png = ChunkyPNG::Image.from_file(s.png_path)
+        kk = png.width / iw2.to_f
+        lum = ->(v) { 0.3 * ChunkyPNG::Color.r(v) + 0.59 * ChunkyPNG::Color.g(v) + 0.11 * ChunkyPNG::Color.b(v) }
+        page = pmode == 'dark' ? 0 : 255
+        want = pmode == 'dark' ? 85 : 170
+        bad = []
+        # the darkest (light) or lightest (dark) pixel of a 10 px wide band, along a 60 px stretch: the line, if there is one
+        line = lambda do |cx, cy, horiz|
+          vals = (-30..30).step(2).flat_map { |a| (-5..5).map { |d| x = horiz ? cx + a : cx + d; y = horiz ? cy + d : cy + a; lum.call(png[[[x.to_i, 0].max, png.width - 1].min, [[y.to_i, 0].max, png.height - 1].min]) } }
+          pmode == 'dark' ? vals.max : vals.min
         end
+        faces.split(';').each do |f|
+          fl, ft, fr, fbm, gb, gr, ga, gl = f.split(',').map(&:to_f)
+          xm = (fl + fr) / 2 * kk
+          ym = (ft + fbm) / 2 * kk
+          ins = lum.call(png[(fl * kk + 7).to_i, ym.to_i])
+          bad << "panel fill #{ins.round} is not the page #{page}" if (ins - page).abs > 3
+          [[:bottom, gb, xm, (fbm + gb / 2) * kk, true], [:right, gr, (fr + gr / 2) * kk, ym, false], [:top, ga, xm, (ft - ga / 2) * kk, true], [:left, gl, (fl - gl / 2) * kk, ym, false]].each do |name, g, cx, cy, horiz|
+            if g >= 0
+              v = line.call(cx, cy, horiz)
+              if pbits == '4' then bad << "#{name} divider #{v.round} want #{want}" if (v - want).abs > 8
+              else bad << "#{name} divider #{v.round} not clearly off the page #{page}" if (v - page).abs < 40 end
+            end
+          end
+          # no ring or line at an outer edge: the page colour within 6 px of the face edge, mid-side
+          [[:top, ga, xm, ft * kk, true], [:bottom, gb, xm, fbm * kk, true], [:left, gl, fl * kk, ym, false], [:right, gr, fr * kk, ym, false]].each do |name, g, cx, cy, horiz|
+            next if g >= 0
+            v = line.call(cx, cy, horiz)
+            bad << "#{name} edge has a line or ring (#{v.round} vs page #{page})" if (v - page).abs > 6
+          end
+        end
+        puts "DIVIDER #{c['name']}: #{bad.first(3).join('; ')}" unless bad.empty?
+        expect(bad).to eq([])
       end
       # B27 (owner 2026-11-16): every unit after a number is the shared unit grey on 2-bit and deeper screens (SWDraw.inc, 4.5:1 against the page), black on 1-bit;
-      # a temperature unit's top meets the number's cap top (1 px) at the readouts that have a number span; the rain amount's number is at least a meter label's size, its unit smaller.
+      # (a temperature unit's top meets the number's cap top: DIALCORNER); the rain amount's number is at least a meter label's size, its unit smaller.
       ug = s.evaluate(%q{(function(){var bad=[],b1=!!document.querySelector('.screen--1bit'),dk=!!document.querySelector('.screen--dark-mode')||document.documentElement.classList.contains('dark'),cx=document.createElement('canvas').getContext('2d'),
 col=function(c){var d=document.createElement('span');d.className=c;(document.querySelector('.screen')||document.body).appendChild(d);var v=getComputedStyle(d).color;d.remove();return v},rgb=function(c){return(c.match(/[\d.]+/g)||[]).slice(0,3).map(Number)},lum=function(a){var f=function(v){v/=255;return v<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4)};return 0.2126*f(a[0])+0.7152*f(a[1])+0.0722*f(a[2])},
-tok=SWDraw.inc?SWDraw.inc():'',want=tok?[col(tok),col('text--gray-30')]:[],page=dk?0:255,
-cap=function(x,ch){var cs=getComputedStyle(x),r=document.createRange();cx.font=cs.fontWeight+' '+parseFloat(cs.fontSize)+'px '+cs.fontFamily;var m=cx.measureText(ch),k=(x.offsetWidth&&x.getBoundingClientRect().width/x.offsetWidth)||1;r.selectNodeContents(x);return r.getClientRects()[0].top+(m.fontBoundingBoxAscent-m.actualBoundingBoxAscent)*k};
-[].filter.call(document.querySelectorAll('[data-sw-uu]'),function(e){var b=e.getBoundingClientRect();return b.width>0&&b.height>0}).forEach(function(e){var cc=getComputedStyle(e).color,nm=e.previousElementSibling,u=e.textContent.trim();
+tok=SWDraw.inc?SWDraw.inc():'',want=tok?[col(tok),col('text--gray-30')]:[],page=dk?0:255;
+
+[].filter.call(document.querySelectorAll('[data-sw-uu], div[data-sw-cap] > span:last-child, span[data-sw-unit=""]'),function(e){var b=e.getBoundingClientRect();return b.width>0&&b.height>0}).forEach(function(e){var cc=getComputedStyle(e).color,nm=e.previousElementSibling,u=e.textContent.trim();
 if(b1){if(cc!==(dk?'rgb(255, 255, 255)':'rgb(0, 0, 0)'))bad.push('unit '+u+' '+cc+' on 1-bit, want plain')}else{if(want.indexOf(cc)<0)bad.push('unit '+u+' '+cc+' not the unit grey '+want.join('/'));var q=lum(rgb(cc)),p=lum([page,page,page]),cr=(Math.max(q,p)+0.05)/(Math.min(q,p)+0.05);if(cr<4.5)bad.push('unit '+u+' contrast '+cr.toFixed(1))}
-if(nm&&nm.tagName==='SPAN'&&/^°/.test(u)&&nm.getBoundingClientRect().width>0){var d=cap(nm,'0')-cap(e,'°');if(Math.abs(d)>1)bad.push('unit '+u+' top off by '+d.toFixed(1))}});
+});
 var gl=[].filter.call(document.querySelectorAll('[data-sw-glabel]'),function(e){return e.getBoundingClientRect().width>0}),ml=[].filter.call(document.querySelectorAll('[data-sw-mlabel]'),function(e){return e.getBoundingClientRect().width>0})[0];
 gl.forEach(function(e){var sv=e.ownerSVGElement,ks=sv.getBoundingClientRect().width/(+sv.getAttribute('width')||1),fs=parseFloat(e.getAttribute('font-size'))*ks,ts=e.querySelector('tspan');
 if(ml){var lf=parseFloat(getComputedStyle(ml).fontSize)*(ml.getBoundingClientRect().width/(ml.offsetWidth||1));if(fs<lf-0.5)bad.push('rain amount '+fs.toFixed(1)+' px under the meter label '+lf.toFixed(1))}

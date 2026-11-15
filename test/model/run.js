@@ -347,12 +347,17 @@ test('days strip: 5-degree lines faint, other days thin mid-grey bars (at least 
   ok(hOf(s, 'text--gray-45') >= 16, 'other days: mid-grey block height ' + hOf(s, 'text--gray-45') + ' of 40');
   ok(hOf(day(true), 'text--gray-10') >= 20, 'today: dark block at least half the row');
 });
-test('panel face (owner 2026-11-12): a plain fill on 4-bit light, no backlight lamps; none on 2-bit, in dark or 1-bit', () => {
-  const f = (m, W, H) => { D.mode = m; const s = D.part({}, 'face', 0, W, H); D.mode = null; return s; };
-  ok(/data-sw-outline/.test(f({ dark: false, bits: 4 }, 1200, 400)) && /color="#aaa"/.test(f({ dark: false, bits: 4 }, 1200, 400)) && !/data-sw-fill|ellipse|<pattern|data-sw-backlight/.test(f({ dark: false, bits: 4 }, 1200, 400)), '4-bit light: no fill, a gray 170 outline (owner 2026-11-16 replaces the 2026-11-12 plain fill)');
-  ok(/color="#555"/.test(f({ dark: true, bits: 4 }, 1200, 400)), '4-bit dark: gray 85 outline (owner 2026-11-16)');
-  ok(!/ellipse|<pattern/.test(f({ dark: false, bits: 2 }, 1200, 400)), '2-bit: no face (borderless: a single native band leaves grey corner pieces)');
-  ok(!/ellipse/.test(f({ dark: true, bits: 4 }, 1200, 400)) && !/ellipse/.test(f({ dark: false, bits: 1 }, 1200, 400)), 'dark and 1-bit: none');
+test('panel face (owner 2026-11-16, replaces the 2026-11-12 plain fill): no fill, outline or box on any screen; a divider only toward a neighbour, none at an outer edge', () => {
+  const f = (m, W, H, nb) => { D.mode = m; Object.assign(D, { fdb: 0, fdr: 0, fdl: 0 }, nb || {}); const s = D.part({}, 'face', 0, W, H); D.mode = null; Object.assign(D, { fdb: 0, fdr: 0, fdl: 0 }); return s; };
+  const bad = /data-sw-outline|data-sw-fill|ellipse|<pattern|data-sw-backlight|<rect/;
+  [{ dark: false, bits: 4 }, { dark: true, bits: 4 }, { dark: false, bits: 2 }, { dark: true, bits: 2 }, { dark: false, bits: 1 }].forEach((m) => {
+    ok(f(m, 1200, 400) === '', 'no neighbour: nothing drawn ' + JSON.stringify(m));
+    const s = f(m, 1200, 400, { fdb: 20, fdr: 20 });
+    ok(/data-sw-divider/.test(s) && !bad.test(s), 'neighbours: dividers only ' + JSON.stringify(m));
+  });
+  ok(/color="#aaa"/.test(f({ dark: false, bits: 4 }, 1200, 400, { fdb: 20 })) && /color="#555"/.test(f({ dark: true, bits: 4 }, 1200, 400, { fdb: 20 })), 'X: gray 170 light, gray 85 dark');
+  ok(/stroke-dasharray/.test(f({ dark: false, bits: 1 }, 1200, 400, { fdb: 20 })) && !/stroke-dasharray/.test(f({ dark: false, bits: 2 }, 1200, 400, { fdb: 20 })), '1-bit dotted, 2-bit solid');
+  ok(/y1="410"/.test(f({ dark: false, bits: 4 }, 1200, 400, { fdb: 20 })) && (f({ dark: false, bits: 4 }, 1200, 400, { fdr: 20 }).match(/x1="1210"/g) || []).length === 1, 'centred in the gap: 400 + 10, 1200 + 10');
 });
 test('dial light: backlight in light mode (2-bit up), glow in dark (blur 4-bit, halo 2-bit, none 1-bit)', () => {
   const t = (m) => { D.mode = m; const s = D.dial({ now: 5, lo: 1, hi: 9, a: 0, b: 15, step: 5 }, 900, 380, false); D.mode = null; return s; };
