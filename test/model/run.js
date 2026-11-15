@@ -312,7 +312,7 @@ test('dark glow on the lit parts: blur halo on 4-bit, crisp halo on 2-bit, none 
   D.mode = { dark: true, bits: 4 }; const r = D.rain([{ h: '14', wet: true }], 120, 40); D.mode = null;
   ok(r.indexOf('data-sw-glow') < r.lastIndexOf('<rect'), 'halo under the lit cell, not over it');
   D.mode = { dark: true, bits: 4 }; ok(!/text--gray-40/.test(D.meter({ frac: 0.5 }, 200, 30, 10)), 'dark: lit meter cells in full ink, as live'); D.mode = null;
-  ok((sh.match(/<img [^>]*data-sw-icon>/g) || []).length === 5, 'weather (full and small console), rain and sun rise/set icons marked to glow');
+  ok((sh.match(/<img [^>]*data-sw-icon>/g) || []).length === 4, 'weather (full and small console), rain and the sun rise/set icon (one loop, drawn twice) marked to glow');
 });
 test('moon glow outside the disk in dark mode, none in light or 1-bit (owner 2026-11-12)', () => {
   const at = (m) => { D.mode = m; const v = D.moon(0.3, 100); D.mode = null; return v; };
@@ -358,7 +358,7 @@ test('rain unit: icon left of the grid on every size (owner 2026-11-12, later de
   eq([T.rainRows(c), T.rainRows(c.map((q, i) => ({ h: q.h, wet: i >= 2 && i <= 5 })))], [3, 2], 'rows: 3 when the rain runs past the sixth hour');
 });
 test('sun/moon unit: moon left of the sun rows on every size, grey ink (owner 2026-11-12, later decision)', () => {
-  const u = sh.indexOf('data-sw-unit="sun"'), rows = sh.indexOf('ui.sun.rise', u);
+  const u = sh.indexOf('data-sw-unit="sun"'), rows = sh.indexOf('ui.sun[sk]', u);
   ok(u > 0 && /\{\{ su_cls \}\} \{% if ui.rain %\}flex--left[^%]*\{% else %\}flex--center/.test(sh.slice(sh.lastIndexOf('<div', u), u)) && /assign su_cls = 'flex--row'/.test(sh) && !/assign su_cls = '[^']*portrait:flex--col/.test(sh), 'row on md and lg; centred when dry, on the rain icon\'s left edge when it rains');
   const m = sh.indexOf('data-sw-part="moon"', u); ok(m > u && m < rows, 'moon before the sun rows');
   ok(!/<img[^>]*ui.sun.moon/.test(sh), 'no moon icon image');

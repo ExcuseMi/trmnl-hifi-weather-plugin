@@ -29,6 +29,8 @@
 {%- if view == 3 %}{% assign rw_m = 8 %}{% assign nd_md = 3 %}{% assign rh_l = 6 %}{% assign nd_lg = 6 %}{% assign row_p = ' portrait:h--[11cqh] lg:portrait:h--[6cqh]' %}{% endif %}
 {%- assign nd_mp = nd_md %}{% if view == 1 %}{% assign nd_mp = 4 %}{% elsif view == 3 %}{% assign nd_mp = 5 %}{% endif %}{% comment %} native portrait md screens (OG): one or two more day rows, no empty bands {% endcomment %}{% comment %} Calm half view (owner) {% endcomment %}
 {%- if view == 1 %}{% assign rw_m = 9 %}{% assign rh_l = 6 %}{% assign nd_md = 3 %}{% assign nd_lg = 4 %}{% endif %}{% comment %} Calm (owner): airier day rows {% endcomment %}
+{%- assign dev_r = 0 %}{% if trmnl.device.height > 0 %}{% assign dev_r = trmnl.device.width | times: 10 | divided_by: trmnl.device.height %}{% endif %}{% assign dev_tall = false %}{% if dev_r >= 19 or dev_r > 0 and dev_r <= 5 %}{% assign dev_tall = true %}{% endif %}{% comment %} a very tall portrait screen (Palma, 2:1; from the device size, never measured): a 5th day row on the full view, rows 6 cqh instead of 8 (Palma is a md screen) {% endcomment %}
+{%- if dev_tall and view == 1 %}{% assign nd_mp = 5 %}{% assign row_p = row_p | replace: 'portrait:h--[8cqh]', 'portrait:h--[6cqh]' %}{% assign icon_x = icon_x | replace: ' portrait:h--[7cqh]', ' portrait:h--[6cqh]' %}{% assign icon_w = icon_w | replace: 'portrait:w--[8cqw]', 'portrait:w--[7cqw]' %}{% endif %}
 {%- if mr_m == nil %}{% assign mr_m = 9 %}{% assign mb_m = 7 %}{% endif %}
 {%- if view == 1 %}{% for m in ml %}{% if m.tw or m.key == ph_tw %}{% assign mr_m = 7.4 %}{% endif %}{% endfor %}{% endif %}
 {%- if mh_l == nil %}{% assign mh_l = hl %}{% endif %}
@@ -99,8 +101,9 @@
    <div class="flex {{ su_cls }} {% if ui.rain %}flex--left flex--center-y w--full gap--xsmall lg:gap--small{% else %}flex--center gap--xsmall lg:gap--medium{% endif %} shrink-0" data-sw-unit="sun">{% if ui.rain %}<div class="{{ ib_cls }}" data-sw-part="moon"></div>{% else %}{% assign mo_m = si_m | times: 2 | plus: 1 | times: hm | round | at_most: 100 %}<div class="w--[{{ mo_m }}cqh] h--[{{ mo_m }}cqh] lg:hidden" data-sw-part="moon"></div>
     {% assign mo_l = 13 | times: mh_l | round | at_most: 100 %}<div class="hidden lg:block h--[{{ mo_l }}cqh] lg:portrait:h--[12cqh]" data-sw-part="moon"></div>{% comment %} half vertical (owner step 12) {% endcomment %}{% endif %}
     <div class="flex flex--col{% if ui.rain %}{% else %} gap--small{% endif %}">
-     <div class="{{ fcy }} gap--small"><img class="{{ iia }} h--[{{ si_m | times: hm | round }}cqh] lg:h--[{{ si_l | times: hl | times: si_k | round }}cqh] lg:portrait:h--[{% if view == 1 %}3{% else %}4{% endif %}cqh]" src="{{ ui.sun.riseIcon }}" alt="" data-sw-icon>{% assign st = ui.sun.rise | split: ' ' %}<span class="flex flex--row flex--bottom gap--xsmall shrink-0" data-sw-suntime><span class="title title--base{% unless ui.rain %} lg:title--large{% endunless %} text--bold">{{ st[0] }}</span>{% if st[1] %}<span class="label label--small text--bold">{{ st[1] }}</span>{% comment %} 12 h (owner step 12) {% endcomment %}{% endif %}</span></div>
-     <div class="{{ fcy }} gap--small"><img class="{{ iia }} h--[{{ si_m | times: hm | round }}cqh] lg:h--[{{ si_l | times: hl | times: si_k | round }}cqh] lg:portrait:h--[{% if view == 1 %}3{% else %}4{% endif %}cqh]" src="{{ ui.sun.setIcon }}" alt="" data-sw-icon>{% assign st = ui.sun.set | split: ' ' %}<span class="flex flex--row flex--bottom gap--xsmall shrink-0" data-sw-suntime><span class="title title--base{% unless ui.rain %} lg:title--large{% endunless %} text--bold">{{ st[0] }}</span>{% if st[1] %}<span class="label label--small text--bold">{{ st[1] }}</span>{% comment %} 12 h (owner step 12) {% endcomment %}{% endif %}</span></div>
+     {%- assign sks = 'rise,set' | split: ',' %}{% for sk in sks %}{% assign sk_i = sk | append: 'Icon' %}
+     <div class="{{ fcy }} gap--small"><img class="{{ iia }} h--[{{ si_m | times: hm | round }}cqh] lg:h--[{{ si_l | times: hl | times: si_k | round }}cqh] lg:portrait:h--[{% if view == 1 %}3{% else %}4{% endif %}cqh]" src="{{ ui.sun[sk_i] }}" alt="" data-sw-icon>{% assign st = ui.sun[sk] | split: ' ' %}<span class="flex flex--row flex--bottom gap--xsmall shrink-0" data-sw-suntime><span class="title title--base{% unless ui.rain %} lg:title--large{% endunless %} text--bold">{{ st[0] }}</span>{% if st[1] %}<span class="label label--small text--bold">{{ st[1] }}</span>{% comment %} 12 h (owner step 12) {% endcomment %}{% endif %}</span></div>
+     {%- endfor %}
     </div>
    </div>{% if ui.rain %}</div>{% endif %}
   </div>{% endcapture %}
@@ -164,8 +167,7 @@
   <div class="relative z--2 flex flex--row flex--center-y w--full {{ dgap | default: 'gap--small' }} h--[{{ hh_m | times: hm | round | at_most: 100 }}cqh] lg:h--[{{ 4 | times: hl | round }}cqh]">
    {%- assign dcue_on = false %}{% if view != 2 and view != 4 %}{% assign dcue_on = true %}{% endif %}{% capture dcue_w %}{{ badge_w }}{% if view == 3 %} hidden lg:block lg:portrait:hidden{% endif %}{% endcapture %}{% comment %} Calm (owner) {% endcomment %}
    <div class="shrink-0 {{ name_w }}"></div><div class="shrink-0 {{ icon_w }}"></div>
-   <div class="shrink-0 {{ num_w }} flex flex--center h--full{{ num_cls }}"><div class="h--[{{ 4 | times: hm | round }}cqh] lg:h--[{{ 3 | times: hl | round }}cqh] w--[{{ 2 | times: wm | round }}cqw]" data-sw-part="tri" data-sw-i="0"></div></div>
-   <div class="shrink-0 {{ num_w }} flex flex--center h--full{{ num_cls }}"><div class="h--[{{ 4 | times: hm | round }}cqh] lg:h--[{{ 3 | times: hl | round }}cqh] w--[{{ 2 | times: wm | round }}cqw]" data-sw-part="tri" data-sw-i="1"></div></div>
+   {%- for ti in (0..1) %}<div class="shrink-0 {{ num_w }} flex flex--center h--full{{ num_cls }}"><div class="h--[{{ 4 | times: hm | round }}cqh] lg:h--[{{ 3 | times: hl | round }}cqh] w--[{{ 2 | times: wm | round }}cqw]" data-sw-part="tri" data-sw-i="{{ ti }}"></div></div>{% endfor %}
    <div class="grow basis--0 h--full" data-sw-part="scale"></div>{% if dcue_on %}<div class="shrink-0 {{ dcue_w }}"></div>{% endif %}
   </div>
   {%- assign nd_last = nd_lg | minus: 1 %}
@@ -527,9 +529,10 @@ var id = 'swgl' + (K++), f = m.bits === 2
 return '<defs><filter id="' + id + '" x="-30%" y="-30%" width="160%" height="160%">' + f + '</filter></defs><g filter="url(#' + id + ')" data-sw-glow="' + m.bits + '">' + s + '</g>';
 }
 var GPX = 4;
+function swFilt(id) { return '<defs><filter id="' + id + '" x="0" y="0" width="1" height="1"><feFlood flood-color="currentColor"/><feComposite in2="SourceAlpha" operator="in"/></filter></defs>'; }
 function icon(href, W, H) {
 var id = 'swink' + (K++);
-return svg(W, H, '<defs><filter id="' + id + '" x="0" y="0" width="1" height="1"><feFlood flood-color="currentColor"/><feComposite in2="SourceAlpha" operator="in"/></filter></defs>' + glow('<image href="' + href + '" x="0" y="0" width="' + n1(W) + '" height="' + n1(H) + '" filter="url(#' + id + ')"/>', GPX));
+return svg(W, H, swFilt(id) + glow('<image href="' + href + '" x="0" y="0" width="' + n1(W) + '" height="' + n1(H) + '" filter="url(#' + id + ')"/>', GPX));
 }
 function cl(f) { return Math.max(-0.03, Math.min(1.03, f)); }
 function dm(H) { return [Math.max(2, H * 0.026), H * 0.045, H * 0.08, H * 0.1, Math.max(2.5, H * 0.008), Math.max(4, H * 0.03), 75 * Math.PI / 180]; }   /* the dial sizes every dial function shares: line, band, mark height, mark font, mark gap, gap, half sweep */
@@ -579,7 +582,7 @@ if (!dialClash(D, W, H, r, yy, cm, k0) && !(O && dialClash(O, W, H, r, yy, baro,
 var F = (v) => (v - D.a) / (D.b - D.a);
 function at(f, rad) { var an = -A + 2 * A * cl(f); return [cx + rad * Math.sin(an), py - rad * Math.cos(an)]; }
 function arc(rad, f0, f1) { var p0 = at(f0, rad), p1 = at(f1, rad); return 'M' + n1(p0[0]) + ' ' + n1(p0[1]) + ' A' + n1(rad) + ' ' + n1(rad) + ' 0 0 1 ' + n1(p1[0]) + ' ' + n1(p1[1]); }
-var id = 'swink' + (K++), body = '<defs><filter id="' + id + '" x="0" y="0" width="1" height="1"><feFlood flood-color="currentColor"/><feComposite in2="SourceAlpha" operator="in"/></filter></defs>';
+var id = 'swink' + (K++), body = swFilt(id);
 body += '<g data-sw-arc="' + n1(r) + ',' + n1(W) + '"></g>';
 var path = (d, sw, extra) => '<path d="' + d + '" fill="none" ' + SK + n1(sw) + '"' + (extra || '') + '/>';
 if (baro) {
