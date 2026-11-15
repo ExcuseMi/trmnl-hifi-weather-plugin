@@ -15,12 +15,17 @@ function alias(js) {
   const dom = Object.keys(DOM_ALIAS).filter(hit);
   dom.forEach((k) => { js = js.replace(new RegExp('\\.' + k + '\\b', 'g'), '.' + DOM_ALIAS[k]); });
   js = js.replace(/\.parentElement\b/g, '.$p').replace(/\bgetComputedStyle\(/g, '$C(').replace(/\bdocument\./g, '$d.');
+  js = js.replace(/Math\.(min|max)\.apply\(null, /g, 'Math.$1(...');   // size: Math.max.apply(null, a) -> Math.max(...a); the call's closing paren stays
+  let hw = 0;   // size: element.style.setProperty('height'|'width', v, 'important') -> element.$H(v) / element.$W(v): two Element prototype methods
+  js = js.replace(/\.style\.setProperty\('(height|width)', ([^;]*?), 'important'\)/g, (m, k, a) => { if (a.includes('.setProperty(')) throw new Error('size alias swallowed a second call'); hw |= k === 'height' ? 1 : 2; return '.$' + (k === 'height' ? 'H' : 'W') + '(' + a + ')'; });
+  const tr = (js.match(/\.style\.transform = /g) || []).length;   // size: element.style.transform = v -> element.$T = v (setter on Element.prototype)
+  js = js.replace(/\.style\.transform = /g, '.$T = ');
   let imp = 0;   // setProperty(k, v, 'important') -> $I(k, v): one prototype method, the third argument written once
   js = js.replace(/\.setProperty\(([^;]*?), 'important'\)/g, (m, a) => { if (a.includes('.setProperty(')) throw new Error('important alias swallowed a second call'); imp++; return '.$I(' + a + ')'; });
   js = js.replace(/\.setProperty\(/g, '.$P(').replace(/\.toFixed\(/g, '.$f(');
   const on = (P, ks) => ks.filter((k) => dom.includes(k)).map((k) => P + '.' + DOM_ALIAS[k] + '=' + P + '.' + k + ';').join('');
   const domPre = 'var $sp=\'[data-sw-part="\',$sb=\'[data-sw-\',$sd=\'data-sw-\',$d=document,$C=getComputedStyle,$F=parseFloat;(function(){Object.defineProperty(Node.prototype,"$p",{get(){return this.parentElement}});var E=Element.prototype,D=Document.prototype;' + on('E', ['getBoundingClientRect', 'querySelectorAll', 'querySelector', 'getAttribute', 'setAttribute', 'hasAttribute', 'removeAttribute', 'closest'])
-    + on('D', ['querySelectorAll', 'querySelector']) + (dom.includes('getBoundingClientRect') ? 'Range.prototype.$b=Range.prototype.getBoundingClientRect;' : '') + 'CSSStyleDeclaration.prototype.$P=CSSStyleDeclaration.prototype.setProperty;Object.defineProperty(E,"$ow",{get(){return this.offsetWidth}});Object.defineProperty(E,"$oh",{get(){return this.offsetHeight}});Object.defineProperty(E,"$L",{get(){return this.classList}});Object.defineProperty(E,"$1",{get(){return this.firstElementChild}});Array.prototype.$e=Array.prototype.forEach;NodeList.prototype.$e=NodeList.prototype.forEach;DOMTokenList.prototype.$k=DOMTokenList.prototype.contains;Node.prototype.$k=Node.prototype.contains;' + (imp ? 'CSSStyleDeclaration.prototype.$I=function(a,b){this.setProperty(a,b,"important")};' : '') + '})();';
+    + on('D', ['querySelectorAll', 'querySelector']) + (dom.includes('getBoundingClientRect') ? 'Range.prototype.$b=Range.prototype.getBoundingClientRect;' : '') + 'CSSStyleDeclaration.prototype.$P=CSSStyleDeclaration.prototype.setProperty;' + (hw & 1 ? 'E.$H=function(v){this.style.setProperty("height",v,"important")};' : '') + (hw & 2 ? 'E.$W=function(v){this.style.setProperty("width",v,"important")};' : '') + '' + (tr ? 'Object.defineProperty(E,"$T",{set(v){this.style.transform=v}});' : '') + '[["$ow","offsetWidth"],["$oh","offsetHeight"],["$L","classList"],["$1","firstElementChild"]].forEach(function(a){Object.defineProperty(E,a[0],{get(){return this[a[1]]}})});Array.prototype.$e=Array.prototype.forEach;NodeList.prototype.$e=NodeList.prototype.forEach;DOMTokenList.prototype.$k=DOMTokenList.prototype.contains;Node.prototype.$k=Node.prototype.contains;' + (imp ? 'CSSStyleDeclaration.prototype.$I=function(a,b){this.setProperty(a,b,"important")};' : '') + '})();';
   // parseFloat, the offset sizes, classList, firstElementChild and contains (owner budget, B12): aliased outside the DRAW block only (the same functions and getters)
   const da = js.indexOf('// ==== DRAW_BEGIN ===='), db = js.indexOf('// ==== DRAW_END ====');
   if (da < 0 || db < da) throw new Error('DRAW markers missing');
@@ -51,8 +56,8 @@ async function build(src) {
   s = s.slice(0, sa).replace(/^[ \t]+/gm, '').replace(/[ \t]+$/gm, '').replace(/\{\{[^}]*\}\}|\{%(?:[^%'"]|'[^']*'|"[^"]*")*%\}/g, tight) + s.slice(sa);   // size: no indentation in the markup (whitespace there only separates tags)
   { const k = s.indexOf('<script'); s = s.slice(0, k).replace(/([>}])\n+(?=[<{])/g, '$1') + s.slice(k); }   // size: a line break between two tags is only whitespace in a flex layout
   { const k = s.indexOf('<script'), tm = '{%template main%}';   // size: the attribute written 30+ times in the markup is one Liquid variable (outside tags; the rendered HTML is identical)
-    let mk = s.slice(0, k).split(/(\{\{[\s\S]*?\}\}|\{%[\s\S]*?%\})/).map((q, i) => i % 2 ? q : q.replace(/ data-sw-part=/g, ' {{dsp}}=')).join('');
-    if (mk.startsWith(tm)) mk = tm + "{%-assign dsp='data-sw-part'-%}" + mk.slice(tm.length); else throw new Error('template start not found');
+    let mk = s.slice(0, k).split(/(\{\{[\s\S]*?\}\}|\{%[\s\S]*?%\})/).map((q, i) => i % 2 ? q : q.replace(/ data-sw-part=/g, ' {{dsp}}=').replace(/data-sw-/g, '{{D}}')).join('');
+    if (mk.startsWith(tm)) mk = tm + "{%-assign dsp='data-sw-part'-%}{%-assign D='data-sw-'-%}" + mk.slice(tm.length); else throw new Error('template start not found');
     s = mk + s.slice(k); }
   const a = s.indexOf('<script'), b = s.indexOf('</script>');
   if (a < 0 || b < a) throw new Error('page script not found in shared.liquid');

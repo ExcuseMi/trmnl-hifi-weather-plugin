@@ -243,7 +243,7 @@ if (SWP && SWI[0] !== null && SWP.inn) {
   if (is.split('.')[0].length >= 3) is = String(Math.round(iv));
   I.temp = is; D.twin = iv;
   var iq = [D.lo, D.hi, D.now, iv].filter(function (v) { return v !== null; });
-  D.a = Math.floor(Math.min.apply(null, iq) / D.step) * D.step; D.b = Math.ceil(Math.max.apply(null, iq) / D.step) * D.step;
+  D.a = Math.floor(Math.min(...iq) / D.step) * D.step; D.b = Math.ceil(Math.max(...iq) / D.step) * D.step;
   if (D.b - D.a < 3 * D.step) D.b = D.a + 3 * D.step;
   if (SWI[1] !== null) {
     I.hum = I.hum.replace(/\d+(?= %$)/, Math.round(SWI[1]));
@@ -287,7 +287,7 @@ var API = { paint: null };
 function ko(k, fs, b) { return '<g data-sw-' + k + ' stroke="' + ((API.paint && (API.paint('white') || {}).color) || '#fff') + '" stroke-width="' + n1(fs * 0.22) + '" paint-order="stroke" stroke-linejoin="round">' + b + '</g>'; }   /* the panel-coloured knock-out round text (the day strip's axis, the dial's scale numbers) */
 var GLYPH = { '0': 'abcdef', '1': 'bc', '2': 'abdeg', '3': 'abcdg', '4': 'bcfg', '5': 'acdfg', '6': 'acdefg', '7': 'abc', '8': 'abcdefg', '9': 'abcdfg', '-': 'g', ' ': '' };
 var SHADOW = 'dark:hidden 1bit:hidden', SO = 3, K = 0;
-var SK = 'stroke="currentColor" stroke-width="';   // size: the stroke attributes most shapes share
+var SK = 'stroke="currentColor" stroke-width="', FS = ' fill="none" ' + SK;   // size: the stroke attributes most shapes share
 function n1(v) { return String(Math.round(v * 10) / 10); }
 function pts(p) { return p.map((q) => n1(q[0]) + ',' + n1(q[1])).join(' '); }
 function poly(p, extra) { return '<polygon points="' + pts(p) + '"' + (extra || '') + '/>'; }
@@ -394,12 +394,12 @@ var DK = DKM() && API.mode.bits >= 2;
 for (var i = 0; i < n; i++) {
 var x = i * cw + gp / 2, w = cw - gp, s = CS.st[i];
 var zi = zones ? ((i + 0.5) / n >= zones[1] ? 2 : ((i + 0.5) / n >= zones[0] ? 1 : 0)) : 0;
-if (i === CS.peak && s === 'e') { var sw = Math.max(3, Math.min(w, ch) * 0.14), gr = rect(x + sw / 2, sw / 2, w - sw, ch - sw, 2, ' fill="none" ' + SK + n1(sw) + '" data-sw-gust="' + i + '"'); gk = ZT[zi] ? hg(ZT[zi], gr) : gr; sh += rect(x + sw / 2 + SO, sw / 2 + SO, w - sw, ch - sw, 2, ' fill="none" ' + SK + n1(sw) + '"'); }
+if (i === CS.peak && s === 'e') { var sw = Math.max(3, Math.min(w, ch) * 0.14), gr = rect(x + sw / 2, sw / 2, w - sw, ch - sw, 2, FS + n1(sw) + '" data-sw-gust="' + i + '"'); gk = ZT[zi] ? hg(ZT[zi], gr) : gr; sh += rect(x + sw / 2 + SO, sw / 2 + SO, w - sw, ch - sw, 2, FS + n1(sw) + '"'); }
 if (s === 'a' && ZT[zi]) { zc[zi] += rect(x, 0, w, ch, 2, ' data-sw-c="' + i + '"'); sh += rect(x + SO, SO, w, ch, 2); }
 else if (s === 'a') { on += rect(x, 0, w, ch, 2, ' data-sw-c="' + i + '"'); sh += rect(x + SO, SO, w, ch, 2); }
 else if (s === 'p') pv += rect(x, 0, w, ch, 2, ' data-sw-c="' + i + '"');
-else if (s === 'l') { lt += rect(x, 0, w, ch, 2, ' data-sw-c="' + i + '"'); if (!DK) lo += rect(x + 1, 1, w - 2, ch - 2, 2, ' fill="none" ' + SK + '2" data-sw-lo="' + i + '"'); }   // light forecast fill keeps the empty-cell outline (owner 2026-11-14)
-else off += DK ? rect(x, 0, w, ch, 2, ' data-sw-c="' + i + '"') : rect(x + 1, 1, w - 2, ch - 2, 2, ' fill="none" ' + SK + '2" data-sw-c="' + i + '"');
+else if (s === 'l') { lt += rect(x, 0, w, ch, 2, ' data-sw-c="' + i + '"'); if (!DK) lo += rect(x + 1, 1, w - 2, ch - 2, 2, FS + '2" data-sw-lo="' + i + '"'); }   // light forecast fill keeps the empty-cell outline (owner 2026-11-14)
+else off += DK ? rect(x, 0, w, ch, 2, ' data-sw-c="' + i + '"') : rect(x + 1, 1, w - 2, ch - 2, 2, FS + '2" data-sw-c="' + i + '"');
 }
 var PV = DKM() ? 'text--gray-45' : (b1() ? 'text--gray-75' : 'text--gray-' + (B2() ? 65 : 40));   /* B26: the X's empty outline is gray-50 (153, 85 from the panel's 238), the forecast fill gray-40 (119); owner 2026-11-14: lighter grey for the forecast cells; B18: gray-75 equals the X's panel grey (238), the OG's 170 shows */
 return ('<g data-sw-lit="' + lit + '" data-sw-ncell="' + n + '"></g>' + (lc ? '' : g(SHADOW + ' text--gray-65', sh)) + '<g data-sw-st="e">' + g(OC(), off) + '</g>' + '<g data-sw-st="p">' + g(PV, pv) + '</g><g data-sw-st="l">' + g(PV, lt) + (lo ? g(OC(), lo) : '') + '</g><g data-sw-on data-sw-st="a">' + (lc ? g(lc, on) : API.mode && !DKM() && !b1() ? '<g data-sw-dg>' + g(act(), on) + '</g>' : glow(on, GPX)) +   /* owner: 2-bit+ light dark grey, 1-bit black, dark white */ (zc[1] ? hg('yellow', zc[1]) : '') + (zc[2] ? hg('red', zc[2]) : '') + '</g>' + gk);
@@ -410,7 +410,7 @@ var lab = String(gq.label), x0 = API.gx0 || 0, bw = W - x0, fs = Math.min((API.l
 for (var i = 0; i < n; i++) {
 var x = x0 + i * cw + gp / 2, w = cw - gp;
 if (i < gq.segs) { on += rect(x, 0, w, H, 2, ' data-sw-c="' + i + '"'); sh += rect(x + SO, SO, w, H, 2); }
-else off += DK ? rect(x, 0, w, H, 2, ' data-sw-c="' + i + '"') : rect(x + 1, 1, w - 2, H - 2, 2, ' fill="none" ' + SK + '2" data-sw-c="' + i + '"');
+else off += DK ? rect(x, 0, w, H, 2, ' data-sw-c="' + i + '"') : rect(x + 1, 1, w - 2, H - 2, 2, FS + '2" data-sw-c="' + i + '"');
 }
 return svg(W, H, '<g data-sw-gauge="' + gq.segs + '"></g>' + g(SHADOW + ' text--gray-65', sh) + '<g data-sw-st="e">' + g(OC(), off) + '</g><g data-sw-on data-sw-st="a">' + (API.mode && !DKM() && !b1() ? '<g data-sw-dg>' + g(act(), on) + '</g>' : glow(on, GPX)) + '</g>' + text(x0 / 2, H / 2, lab, fs, 'middle', 'central', ' data-sw-glabel'));
 }
@@ -451,7 +451,7 @@ return svg(W, H, body);
 }
 function hscale(all, nc) {
 var ts = (all || []).slice(0, nc || (all || []).length).map((q) => q && q.tV).filter((v) => v !== null && v !== undefined).map(Math.round);
-return ts.length ? { a: Math.min.apply(null, ts) - 1, b: Math.max.apply(null, ts) } : null;
+return ts.length ? { a: Math.min(...ts) - 1, b: Math.max(...ts) } : null;
 }
 function hper(hs, cap) { return Math.max(1, Math.ceil(Math.max(1, hs.b - hs.a) / cap)); }
 function hlevels(hs, C) {
@@ -504,7 +504,7 @@ var r = H * 0.27, cx = H / 2, f = (1 - Math.cos(2 * Math.PI * p)) / 2, lit = '';
 var dk = DKM(), bits = API.mode ? API.mode.bits : 4, sw = Math.max(bits <= 2 ? 2.5 : 1.5, H * 0.03),
 ri = bits <= 1 && !dk ? r - sw * 1.6 : r;
 if (f > 0.01) lit = '<path d="' + moonLit(p, cx, cx, ri) + '" data-sw-moon="lit"' + (lb == null ? '' : ' transform="rotate(' + n1(-(lb - (p < 0.5 ? 270 : 90))) + ' ' + n1(cx) + ' ' + n1(cx) + ')"') + '/>';   // lb: the bright limb as the observer sees it (transform moonLimb, owner 2026-11-14: true tilt)
-var limb = circ(cx, cx, r, ' fill="none" ' + SK + n1(sw) + '"');
+var limb = circ(cx, cx, r, FS + n1(sw) + '"');
 var h = dk ? halo(circ(cx, cx, r), GPX) : '';
 if (h) { var mid = 'swmk' + (K++); h = '<defs><mask id="' + mid + '" maskUnits="userSpaceOnUse" x="' + n1(-H) + '" y="' + n1(-H) + '" width="' + n1(3 * H) + '" height="' + n1(3 * H) + '"><rect x="' + n1(-H) + '" y="' + n1(-H) + '" width="' + n1(3 * H) + '" height="' + n1(3 * H) + '" fill="#fff"/><circle cx="' + n1(cx) + '" cy="' + n1(cx) + '" r="' + n1(r + sw / 2) + '" fill="#000"/></mask></defs><g mask="url(#' + mid + ')" data-sw-moonhalo>' + h + '</g>'; }
 var disk = circ(cx, cx, r, ' data-sw-moon="disk"');
@@ -621,7 +621,7 @@ var r0 = r + lw + bw + 2, r1 = r0 + mh;
 var f = F(m[0]), q = 0.022, t = [at(f, r0), at(f - q, r1), at(f + q, r1)];
 if (cm) { var lt = String(Math.round(m[0]) === 0 ? 0 : Math.round(m[0])) + '°', lp = mlp(f, r1, lt, W, H, py, !!m[1], baro ? 'baro' : 'tdial');
 body += so(text(lp[0], lp[1], lt, mfs, 'middle', 'central', ' data-sw-mark="' + (m[1] ? 'lo' : 'hi') + '"' + (lp[2] ? ' data-sw-beside' : '')), 1); }
-body += so(poly(t, ' data-sw-markt="' + (m[1] ? 'lo' : 'hi') + '"' + (m[1] ? ' fill="none" ' + SK + n1(Math.max(1.5, lw * 0.5)) + '" stroke-linejoin="round"' : '')));
+body += so(poly(t, ' data-sw-markt="' + (m[1] ? 'lo' : 'hi') + '"' + (m[1] ? FS + n1(Math.max(1.5, lw * 0.5)) + '" stroke-linejoin="round"' : '')));
 });
 }
 if (D.now != null) {
@@ -641,7 +641,7 @@ return svg(W, H, body);
 }
 function tri(down, W, H, c) {
 var s = Math.min(W, H), x0 = (W - s) / 2, y0 = (H - s) / 2, p = down ? [[x0 + s * 0.1, y0 + s * 0.12], [x0 + s * 0.9, y0 + s * 0.12], [x0 + s / 2, y0 + s * 0.9]] : [[x0 + s * 0.1, y0 + s * 0.9], [x0 + s * 0.9, y0 + s * 0.9], [x0 + s / 2, y0 + s * 0.12]];
-var pl = poly(p, down ? ' fill="none" ' + SK + n1(Math.max(2, s * 0.1)) + '" stroke-linejoin="round"' : '');
+var pl = poly(p, down ? FS + n1(Math.max(2, s * 0.1)) + '" stroke-linejoin="round"' : '');
 return svg(W, H, c ? g(c, pl) : pl);
 }
 function arrow(dir, W, H) {
@@ -674,7 +674,7 @@ case 'tdial': return dial(SW.inn && SW.sim !== false && SW.tdial.twin != null ? 
 case 'icon': return icon(API.src, W, H);
 case 'face': { var n = Math.max(1, Math.round(W / H)), w = W / n, two = B2();
 if (API.mode && !API.mode.dark && API.mode.bits <= 2) { var ow = API.mode.bits === 2 ? 2 : 1;
-return svg(W, H, g(API.mode.bits === 2 ? 'text--gray-55' : '', rect(ow / 2, ow / 2, W - ow, H - ow, Math.min(24, Math.min(W, H) * 0.08), ' fill="none" ' + SK + ow + '" data-sw-outline'))); }
+return svg(W, H, g(API.mode.bits === 2 ? 'text--gray-55' : '', rect(ow / 2, ow / 2, W - ow, H - ow, Math.min(24, Math.min(W, H) * 0.08), FS + ow + '" data-sw-outline'))); }
 if (two) return '';
 var rx = Math.min(24, Math.min(W, H) * 0.08), cp = 'swfc' + (K++);
 return svg(W, H, '<defs><clipPath id="' + cp + '">' + rect(0, 0, W, H, rx) + '</clipPath></defs><g clip-path="url(#' + cp + ')">' + (two ? backlight(W, H, W / 2, H / 2, W * 0.6 / 0.8, H * 0.78 / (W * 0.6), rx) : backlight(W, H, Array.from({ length: n }, (_, j) => w * (j + 0.5)), H / 2, Math.max(w, H) * 0.62, 0.8, rx)) + '</g>').replace('overflow="visible"', 'overflow="hidden"'); }
@@ -1077,7 +1077,7 @@ var rw = (el.getAttribute('data-sw-rows') || '').split(','); SWDraw.rows = +(rw[
 var rows = swVis('[data-sw-part="scale"], [data-sw-part="day"]'), k = rows.indexOf(el);
 SWDraw.nRows = rows.filter(function (q) { return q.getAttribute('data-sw-part') === 'day'; }).length;
 SWDraw.scaleH = rows.length && rows[0].getAttribute('data-sw-part') === 'scale' ? Math.round(rows[0].getBoundingClientRect().height) : null;
-var hb = [].map.call(document.querySelectorAll('[data-sw-part="hbar"]'), function (q) { return q.getBoundingClientRect().height; }).filter(function (h) { return h > 0; }); SWDraw.hbarH = hb.length ? Math.floor(Math.min.apply(null, hb)) : null; SWDraw.hcols = hb.length || null;
+var hb = [].map.call(document.querySelectorAll('[data-sw-part="hbar"]'), function (q) { return q.getBoundingClientRect().height; }).filter(function (h) { return h > 0; }); SWDraw.hbarH = hb.length ? Math.floor(Math.min(...hb)) : null; SWDraw.hcols = hb.length || null;
 SWDraw.top = el.hasAttribute('data-sw-top');
 SWDraw.extD = k >= 0 && k + 1 < rows.length ? Math.max(0, rows[k + 1].getBoundingClientRect().top - r.bottom + 1) : 0;
 if (/^(baro|tdial)$/.test(el.getAttribute('data-sw-part'))) { SWDraw.caps = {}; document.querySelectorAll('[data-sw-part="baro"], [data-sw-part="tdial"]').forEach(function (d) { var b = d.getBoundingClientRect(); if (!b.width) return; SWDraw.caps[d.getAttribute('data-sw-part')] = [].map.call(d.parentElement.querySelectorAll('[data-sw-cap]'), function (c) { var rg = document.createRange(); rg.selectNodeContents(c); var q = rg.getBoundingClientRect(), l0 = q.left - b.left; return [l0, q.top - b.top, Math.max(q.right - b.left, l0 < b.width / 2 ? l0 + (d.getAttribute('data-sw-part') === 'baro' ? 0.264 : 0.311) * b.width : 0), q.bottom - b.top]; });   /* the left caption counts at least as wide as the English one, so the radius never depends on the language (DIALR, ja) */ }); }
