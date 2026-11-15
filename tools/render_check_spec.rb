@@ -746,7 +746,7 @@ var rows=[].filter.call(document.querySelectorAll('[data-sw-row="day"]'),vis),n=
 if(n&&n!==rows.length)bad.push('rows '+n+'/'+rows.length);if(ws.length&&Math.max.apply(null,ws)-Math.min.apply(null,ws)>1)bad.push('widths '+ws.map(Math.round).join(','));return cn+','+n+'|'+bad.join('; ');})()})
       puts "CLOTH #{c['name']}: console,dayrows|bad #{co}"
       expect(co.split('|', 2)[1]).to eq('')
-      expect(co.split(',')[1].to_i).to be_positive if (c['view'] || 'full') == 'full' && (c['fields'] || {})['bottom'] != 'hours'
+      expect(co.split(',')[1].to_i).to be_positive if (c['view'] || 'full') == 'full' && (c['fields'] || {})['bottom'] != 'hours' && !c['hcols']   # B25: Hours, then days shows hours (hcols) before its switch hour
       # Portrait day rows and console (owner, step 19 on x-port-hv; OG half vertical portrait the model): the console badge
       # beside the temperature (full and half views; quadrants are tiny views without a badge, owner B3 2026-11-14), every day row keeps its low and high, the header its two markers, and the scale labels
       # no larger than 1.3 x the low/high digits.

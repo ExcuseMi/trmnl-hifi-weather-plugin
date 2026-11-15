@@ -134,10 +134,10 @@ test('time format: the setting decides, 24 h when missing, the TIME constant ove
   eq([T.timeIs12('24', '12'), T.timeIs12('12', '24')], [false, true], 'constant wins');
   const y = fs.readFileSync(path.join(__dirname, '../../plugin/src/settings.yml'), 'utf-8');
   const fields = y.split(/^- keyname: /m).slice(1).map((part) => ({ key: part.split('\n')[0], group: (/^  group: (.+)$/m.exec(part) || [])[1] || null }));
-  const OLD = ['author_info', 'lat_lon', 'unit', 'time_format', 'bottom', 'hide_title_bar', 'sensor_label', 'sensor_primary', 'legend'];
+  const OLD = ['author_info', 'lat_lon', 'unit', 'time_format', 'bottom', 'bottom_switch', 'hide_title_bar', 'sensor_label', 'sensor_primary', 'legend'];
   const keys = fields.map((f) => f.key), GRP = 'Sensor';
   eq(keys.filter((k) => OLD.includes(k)), OLD, 'B22: the live setting keys that stay (label, main reading) keep their name and order; sensor_show is merged into sensor_source and sensor_co2 is removed (owner 2026-11-15: the CO2 meter follows the source) (owner 2026-11-15)');
-  eq(fields.filter((f) => OLD.includes(f.key)).map((f) => f.group), [null, null, 'Display', 'Display', 'Display', 'Display', GRP, GRP, 'Legend'], 'settings groups (the legend is the last, collapsed group)');
+  eq(fields.filter((f) => OLD.includes(f.key)).map((f) => f.group), [null, null, 'Display', 'Display', 'Display', 'Display', 'Display', GRP, GRP, 'Legend'], 'settings groups (the legend is the last, collapsed group)');
   ok(!keys.includes('sensor_show'), 'sensor_show is gone: "None" in the Sensor select is the hide');
   ok(fields.filter((f) => !OLD.includes(f.key)).every((f) => f.group === GRP && /^sensor_/.test(f.key)), 'B22: the new source settings are all in the Sensor group');
   const grp = keys.slice(keys.indexOf('sensor_source'), keys.indexOf('legend'));
@@ -180,7 +180,7 @@ test('time format: the setting decides, 24 h when missing, the TIME constant ove
   ok(/trmnl\.com/.test(part('sensor_device_id')), 'the device id description says where the number is');
   ok(!/big/i.test(part('sensor_primary').split('\n').find((l) => l.startsWith('  description: '))) && !/found automatically/.test(part('sensor_source')), 'sensor texts match the layout: no "big" reading (both temperatures are one size), no automatic-only sensor');
   ok(/- Automatic: auto\n  - Sensor: sensor\n  - Outside: outside\n  default: auto\n/.test(part('sensor_primary')), 'main reading: Automatic (default), Sensor, Outside');
-  ok(/- 24 hours \(17:00\): '24'\n  - 12 hours \(5:00 PM\): '12'\n  default: '24'\n/.test(y) && /- Days: days\n  - Hours: hours\n  - Hours, days after 18:00: auto\n  default: auto\n/.test(y), 'time format 24 by default, bottom strip hours then days after 18:00 by default');
+  ok(/- 24 hours \(17:00\): '24'\n  - 12 hours \(5:00 PM\): '12'\n  default: '24'\n/.test(y) && /- Days: days\n  - Hours: hours\n  - Hours, then days: auto\n  default: auto\n/.test(y), 'time format 24 by default, bottom strip hours then days after 18:00 by default');
 });
 
 test('temperature trend arrow: +3 h against now, 1 degree C or 2 degrees F', () => {
@@ -200,6 +200,21 @@ test('air quality: the current index at any hour (no evening mode)', () => {
   const aq = { current: { time: '2026-11-08T19:00', european_aqi: 30 }, hourly: { time: ['2026-11-08T20:00', '2026-11-09T09:00', '2026-11-09T10:00'], european_aqi: [30, 55, 75] } };
   eq(SWModel.build(Object.assign({}, e, { aq }), {}).now.aqi, 30);
 });
+  // B25 (owner 2026-11-15): the switch hour is a setting (12 to 23, default 18; anything else is 18)
+  const at = (sw, h) => T.bottomHours('auto', '2026-11-13T' + h + ':00', sw);
+  eq([at('21', '20'), at('21', '21'), at('21', '22'), at('12', '11'), at('12', '12'), at('23', '22'), at('23', '23')], [true, false, false, true, false, true, false], 'hours before the set hour, days at it and after');
+  eq([at(undefined, '17'), at(undefined, '18'), at('', '18'), at('18', '17'), at('18', '18')], [true, false, false, true, false], 'unset or empty: 18');
+  eq([at('11', '17'), at('11', '18'), at('24', '17'), at('24', '18'), at('abc', '17'), at('abc', '18'), at(null, '18'), at('21.7', '20'), at('21.7', '21')], [true, false, true, false, true, false, false, true, false], 'an invalid hour is 18; a fraction counts as its whole hour');
+  eq([T.bottomHours('hours', '2026-11-13T23:00', '12'), T.bottomHours('days', '2026-11-13T12:00', '23')], [true, false], 'the hour only matters for Hours, then days');
+  {
+    const y = fs.readFileSync(path.join(__dirname, '../../plugin/src/settings.yml'), 'utf-8'), blocks = y.split(/^- keyname: /m).slice(1), blk = (k) => blocks.find((q) => q.startsWith(k + '\n'));
+    const bs = blk('bottom_switch'), bt = blk('bottom');
+    ok(bs && /^  optional: true$/m.test(bs) && /^  default: '18'$/m.test(bs) && /^  group: Display$/m.test(bs), 'B25: bottom_switch is optional with default 18, in Display');
+    eq([...bs.matchAll(/^  - '(\d\d):00': '(\d\d)'$/gm)].map((m) => [m[1], m[2]]), Array.from({ length: 12 }, (_, i) => [String(12 + i), String(12 + i)]), 'B25: the hours 12 to 23, labelled 12:00 to 23:00');
+    ok(/^  - Hours, then days: auto$/m.test(bt) && !/after 18:00/.test(bt), 'B25: the auto option is labelled Hours, then days (value auto)');
+    ok(/- when: 'days'\n    hidden:\n    - bottom_switch\n  - when: 'hours'\n    hidden:\n    - bottom_switch/.test(bt), 'B25: the hour shows only for Hours, then days');
+    ['name', 'description'].forEach((w) => ['', '-de', '-fr', '-es-ES', '-nl', '-ja'].forEach((l) => ok(new RegExp('^  ' + w + l + ': .{4,}', 'm').test(bs), 'B25: bottom_switch has ' + w + l)));
+  }
 
 // removed 'indoor sensor: latest reading, dropped when older than 3 hours': the input never carries sensor_readings on TRMNL (owner's live payload), so the transform no longer parses readings; the markup path is the render cases x-sens* (x-sens-stale: over 3 h shows nothing)
 test('indoor sensor in the view: BUITEN/BINNEN twin readout, twin needle, CO2 meter and the indoor meters first (owner 2026-11-14)', () => {

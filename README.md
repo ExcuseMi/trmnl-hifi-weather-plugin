@@ -21,7 +21,8 @@ Every view (full, half horizontal, half vertical, quadrant), 1-bit, greyscale an
 | Location | City, postal code or latitude,longitude |
 | Temperature unit | Celsius or Fahrenheit |
 | Time format | 24 hours (17:00) or 12 hours (5:00 PM) |
-| Bottom strip | Days, hours, or hours with days after 18:00 |
+| Bottom strip | Days, hours, or hours then days |
+| Switch to days at | With Hours, then days: the hour the hours give way to the days, 12:00 to 23:00, default 18:00. |
 | Hide title bar | Hides the title bar on the full view |
 | Sensor | None (outside weather only), This TRMNL (this screen's own sensor), Another TRMNL, or a provider: Home Assistant, Awair, AirGradient, Sensibo, Ecowitt, Adafruit IO, Custom link (JSON). The fields of the chosen option show; see Indoor sensor sources below. |
 | Sensor from another TRMNL | Shows for Another TRMNL only: the digits in the address of its page on trmnl.com. Empty or not found: this TRMNL's own sensor. |

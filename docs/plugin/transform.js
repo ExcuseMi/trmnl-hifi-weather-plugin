@@ -159,7 +159,7 @@ function sunTimes(w) {
 }
 
 // Bottom strip (owner step 13): 'hours', 'days', or 'auto' = hours from 00:00 to 17:59 local, days from 18:00.
-function bottomHours(v, localTime) { v = String(v); if (v !== 'auto') return v === 'hours'; var m = /T(\d{2}):/.exec(String(localTime || '')); return !!m && +m[1] < 18; }
+function bottomHours(v, localTime, sw) { v = String(v); if (v !== 'auto') return v === 'hours'; var m = /T(\d{2}):/.exec(String(localTime || '')), h = Math.floor(+sw); return !!m && +m[1] < (h >= 12 && h <= 23 ? h : 18); }   // B25: the hour the hours strip gives way to the days (12 to 23, anything else 18)
 function field(input, key, fallback) {
   var cf = (((input || {}).trmnl || {}).plugin_settings || {}).custom_fields_values || {};
   var v = cf[key];
@@ -788,7 +788,7 @@ async function run(input) {
     renderedAt: ((input || {}).trmnl && input.trmnl.system && input.trmnl.system.timestamp_utc) || 0 };
   var model = SWModel.build(raw, { unit: fahrenheit ? 'fahrenheit' : 'celsius' }), moon = moonIcon(weather && weather.current && weather.current.time), phase = moonPhase(weather && weather.current && weather.current.time, w.utc_offset_seconds);
   var pc = stObj(st0.cue), pmt = stObj(st0.mt);
-  var vo = { prevCue: pc && typeof pc.top === 'string' ? pc : null, prevMt: pmt, pressAgo: past.ago, prevHour: past.prev, hourly: w.hourly, hours: bottomHours(field(input, 'bottom', 'auto'), w.current && w.current.time), limb: moonLimb(Date.parse(((w.current || {}).time || '') + 'Z') - (w.utc_offset_seconds || 0) * 1000, w.latitude, w.longitude) };
+  var vo = { prevCue: pc && typeof pc.top === 'string' ? pc : null, prevMt: pmt, pressAgo: past.ago, prevHour: past.prev, hourly: w.hourly, hours: bottomHours(field(input, 'bottom', 'auto'), w.current && w.current.time, field(input, 'bottom_switch', '18')), limb: moonLimb(Date.parse(((w.current || {}).time || '') + 'Z') - (w.utc_offset_seconds || 0) * 1000, w.latitude, w.longitude) };
   var ui = buildView(model, i18n, w.daily, moon, phase, vo);
   if (fb && fb.asOf) ui.stale = i18n.ours.asof + ' ' + clk(fb.asOf.slice(0, 2), fb.asOf.slice(3, 5));
   var st = { v: 1, cue: ui.keep.cue, mt: ui.keep.mt }, keep = snap || stObj(st0.snap); delete ui.keep;
