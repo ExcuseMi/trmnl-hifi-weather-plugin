@@ -95,13 +95,15 @@ ol.legend li{padding:5px 0;font-size:.92rem}
     <fieldset><legend>Plugin settings</legend>
       <div class="row"><label>Temperature unit</label><div class="seg2" id="unit"><button data-v="celsius">Celsius</button><button data-v="fahrenheit">Fahrenheit</button></div></div>
       <div class="row"><label>Time format</label><div class="seg2" id="time_format"><button data-v="24">24 h</button><button data-v="12">12 h</button></div></div>
-      <div class="row"><label for="bottom">Bottom strip</label><select id="bottom"><option value="days">Days</option><option value="hours">Hours</option><option value="auto">Hours, days after 18:00</option></select></div>
+      <div class="row"><label for="bottom">Bottom strip</label><select id="bottom"><option value="days">Days</option><option value="hours">Hours</option><option value="auto">Hours, then days</option></select></div>
+      <div class="row"><label for="bottom_switch">Switch to days at</label><select id="bottom_switch"><option value="12">12:00</option><option value="13">13:00</option><option value="14">14:00</option><option value="15">15:00</option><option value="16">16:00</option><option value="17">17:00</option><option value="18" selected>18:00</option><option value="19">19:00</option><option value="20">20:00</option><option value="21">21:00</option><option value="22">22:00</option><option value="23">23:00</option></select></div>
       <div class="row"><label for="hide_title_bar">Hide title bar</label><label class="chk"><input type="checkbox" id="hide_title_bar"> on</label></div>
     </fieldset>
     <fieldset><legend>Sensor</legend>
       <div class="row"><label for="hw">Sensor on</label><select id="hw"><option value="none">No sensor</option><option value="own">This TRMNL</option><option value="other">Another TRMNL</option></select></div>
       <div class="row"><label>Sensor</label><div class="seg2" id="sensor_show"><button data-v="show">Show</button><button data-v="hide">Hide</button></div></div>
-      <div class="row"><label for="sensor_label">Sensor label</label><input type="text" id="sensor_label" maxlength="20" placeholder="Upstairs" autocomplete="off"></div>
+      <div class="row"><label for="sensor_label">Sensor name</label><input type="text" id="sensor_label" maxlength="20" placeholder="Upstairs" autocomplete="off"></div>
+      <div class="row"><label for="sensor_icon">Sensor icon</label><select id="sensor_icon"><option value="house">House</option><option value="anemometer">Anemometer</option></select></div>
       <div class="row"><label for="sensor_primary">Main reading</label><select id="sensor_primary"><option value="auto">Automatic</option><option value="sensor">Sensor</option><option value="outside">Outside</option></select></div>
     </fieldset>
   </aside>
@@ -159,7 +161,7 @@ ol.legend li{padding:5px 0;font-size:.92rem}
   <div class="fig">
     <div class="pic"><div class="im"><img src="guide/g3.png" alt="Radio Weather with an indoor sensor, with numbered parts" width="758" height="614" loading="lazy"><b class="bd" style="left:34.6%;top:42.7%">1</b><b class="bd" style="left:54.1%;top:40.2%">2</b><b class="bd" style="left:62.0%;top:20.8%">3</b><b class="bd" style="left:11.1%;top:37.1%">4</b><b class="bd" style="left:89.2%;top:15.0%">5</b></div></div>
     <ol class="legend">
-      <li data-guide="sensor"><b>Indoor sensor</b>: the house icon marks the sensor's reading (your own TRMNL's or another one's), the tree icon the outside weather. One of them is the big black reading (setting Main reading), the other is grey beside it. An optional short label (for example Upstairs) shows beside the house icon and on the dial.</li>
+      <li data-guide="sensor"><b>Indoor sensor</b>: the house icon (an anemometer, a mast with cups, with Sensor icon Anemometer) marks the sensor's reading (your own TRMNL's or another one's), the tree icon the outside weather. One of them is the big black reading (setting Main reading), the other is grey beside it. An optional short label (for example Upstairs) shows beside the house icon and on the dial.</li>
       <li data-guide="outside"><b>Outside reading with its cues</b>: the garment and umbrella always belong to the outside weather.</li>
       <li data-guide="twin"><b>Second needle</b>: the grey needle is the other reading. The marks and range on the dial belong to the outside temperature.</li>
       <li data-guide="m-co2"><b>CO2</b> (sensor with CO2): comes first with the sensor, and moves up the list past 1400 ppm. Indoor humidity is a second block row next to the outside one, marked with the house and the tree.</li>
@@ -206,11 +208,13 @@ ol.legend li{padding:5px 0;font-size:.92rem}
     <tr><th>Location</th><td>City, postal code or latitude,longitude.</td></tr>
     <tr><th>Temperature unit</th><td>Celsius or Fahrenheit. Wind, rain and pressure follow.</td></tr>
     <tr><th>Time format</th><td>24 hours (17:00) or 12 hours (5:00 PM).</td></tr>
-    <tr><th>Bottom strip</th><td>Days, hours, or hours with days after 18:00.</td></tr>
+    <tr><th>Bottom strip</th><td>Days, hours, or hours then days.</td></tr>
+    <tr><th>Switch to days at</th><td>With Hours, then days: the hour (12:00 to 23:00, default 18:00) the hours give way to the days.</td></tr>
+    <tr><th>Sensor icon</th><td>The icon in front of the sensor's reading: a house (default) or an anemometer, a mast with cups, for a sensor outside. Only the icon changes.</td></tr>
     <tr><th>Hide title bar</th><td>Hides the bar with the plugin name and update time on the full view.</td></tr>
     <tr><th>Sensor</th><td>None (outside weather only), This TRMNL, Another TRMNL, or a provider: Home Assistant, Awair, AirGradient, Sensibo, Ecowitt, Adafruit IO or a JSON link. Readings older than 3 hours are ignored. See Indoor sensor sources below. On this page: "Sensor on" and "Sensor".</td></tr>
     <tr><th>Sensor from another TRMNL</th><td>Shows for Another TRMNL only: the digits in the address of its page on trmnl.com. Empty or not found: this TRMNL's own sensor.</td></tr>
-    <tr><th>Sensor label</th><td>Optional short name, for example Upstairs, next to the house icon and on the temperature dial.</td></tr>
+    <tr><th>Sensor name</th><td>Optional short name, for example Upstairs, next to the sensor's icon and on the temperature dial.</td></tr>
     <tr><th>Main reading</th><td>Which reading comes first, in black: Automatic, Sensor or Outside. The other follows in grey.</td></tr>
   </table>
   <p class="note">The language follows your TRMNL account language (English, German, French, Spanish, Dutch, Japanese and the languages TRMNL translates).</p>

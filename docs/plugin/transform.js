@@ -809,6 +809,7 @@ async function run(input) {
   if ((showIn || showCo) && phTemp !== null && phTemp !== undefined) {
     var stand = (co2, hum) => buildView(Object.assign({}, model, { inn: { temp: phTemp, hum: hum === undefined ? 50 : hum, co2: co2, press: null, main: sIm } }), i18n, w.daily, moon, phase, vo);
     ph = showIn ? phOverlay(stand(null)) : {}; ph.id = sId; ph.im = sIm; ph.lab = sLab || null;
+    if (field(input, 'sensor_icon', 'house') === 'anemometer') ph.out = 1;   // B24: only the icon of the sensor's reading: the anemometer instead of the house
     if (sres) ph.sx = { t: sx ? sx.t : null, h: sx ? sx.h : null, c: sx ? sx.c : null };   // the markup takes these in place of sensor_readings (never empty, so the markup can tell)
     if (showIn) ph.hn = slimL(stand(null));   // the indoor order without CO2 (indoor humidity first)
     if (showCo) {   // the CO2 meter (B9): the meter list with a normal and with a high reading (key, label, idx, rank), the markup picks one by the real reading

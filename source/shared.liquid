@@ -222,6 +222,7 @@ function swLab() { var go; document.querySelectorAll('[data-sw-slab]').forEach(f
 // same list the markup used (ml).
 var SWP = {% assign swp = false %}{% if ph.inn and i_t != nil %}{% assign swp = true %}{% endif %}{% if ph.mn and i_c != nil %}{% assign swp = true %}{% endif %}{% if swp %}{{ ph | json }}{% else %}null{% endif %};
 if (SWP) {
+  SW.po = SWP.out;   /* B24: the sensor is outside: its icon is the weather station (mast with cups), nothing else changes */
   SW.sim = SWP.im !== false;   /* B13: false = the outside reading is the main one, the sensor the second */
   var SWI = [{{ i_t | default: 'null' }}, {{ i_h | default: 'null' }}, {{ i_c | default: 'null' }}];
   var cL = SWI[2] !== null && SWP.mn ? SWP.mn : SWI[0] !== null && SWI[1] !== null && SWP.hn ? SWP.hn : 0;   /* the indoor order (owner 2026-11-14): the list for this reading, key, label, idx and rank */
@@ -369,10 +370,10 @@ x += adv(c);
 var vw = x - G, k = cap * 1.25 / HH;
 return { html: svg(vw * k, HH * k, glow(body, GPX / k), '0 0 ' + vw + ' ' + HH).replace('<svg ', '<svg class="block" '), key: s + '|' + n1(cap) };
 }
-var LOC = { out: "<path d='M8 17a4.5 4.5 0 0 1 .5-8.8A5.5 5.5 0 0 1 19.5 8.2 4.5 4.5 0 0 1 20 17z'/><path d='M14 17v8M10.5 25h7'/>", in: "<path d='M3 14L14 4l11 10'/><path d='M6 12v12h16V12'/><path d='M12 24v-7h4v7'/>" };
+var LOC = { out: "<path d='M8 17a4.5 4.5 0 0 1 .5-8.8A5.5 5.5 0 0 1 19.5 8.2 4.5 4.5 0 0 1 20 17z'/><path d='M14 17v8M10.5 25h7'/>", st: "<path fill='currentColor' stroke='none' d='M12.8 12.5h2.4V21l2.3 4H10.5l2.3-4zM11.3 9.2h5.4v3.3h-5.4zM8 7.6h12v1.8H8zM9 4.2a4.3 4.3 0 0 0 0 8.6zM19 4.2a4.3 4.2 0 0 1 0 8.6zM13.3.8a2.4 3.4 0 0 1 0 6.8z'/>", in: "<path d='M3 14L14 4l11 10'/><path d='M6 12v12h16V12'/><path d='M12 24v-7h4v7'/>" };
 function loc(k, W, H) { return svg(W, H, locAt(k, (W - Math.min(W, H)) / 2, (H - Math.min(W, H)) / 2, Math.min(W, H))); }
 var swSec = () => typeof SW !== 'undefined' && SW.sim === false;   /* B13: the sensor is the second reading */
-function locAt(k, x, y, s) { return g(!API.mk && (swSec() ? k === 'in' : k === 'out') ? inc() : '', '<svg x="' + n1(x) + '" y="' + n1(y) + '" width="' + n1(s) + '" height="' + n1(s) + '" viewBox="0 0 28 28" overflow="visible"><g fill="none" ' + SK + n1(Math.max(1.8, 1.5 * 28 / Math.max(1, s)) * 100) / 100 + '" stroke-linecap="round" stroke-linejoin="round" data-sw-loc="' + k + '">' + LOC[k] + '</g></svg>'); }
+function locAt(k, x, y, s) { return g(!API.mk && (swSec() ? k === 'in' : k === 'out') ? inc() : '', '<svg x="' + n1(x) + '" y="' + n1(y) + '" width="' + n1(s) + '" height="' + n1(s) + '" viewBox="0 0 28 28" overflow="visible"><g fill="none" ' + SK + n1(Math.max(1.8, 1.5 * 28 / Math.max(1, s)) * 100) / 100 + '" stroke-linecap="round" stroke-linejoin="round" data-sw-loc="' + k + '">' + LOC[k === 'in' && typeof SW !== 'undefined' && SW.po ? 'st' : k] + '</g></svg>'); }
 var inc = () => b1() ? '' : (B2() ? 'text--gray-30' : dgr()), dgr = () => 'text--gray-' + (b1() || B2() ? (DKM() ? 45 : 50) : (DKM() ? 40 : 35));   /* B18 owner 2026-11-15: the dial's outdoor grey (arc, marks, needle) on the greyscale X: gray-35 (102, 5.7:1 on white) light, gray-40 (136, 5.9:1 on black) dark; still far from the black main needle; 1-bit and 2-bit keep inb() */
 function cells(frac, n) { return frac === null || frac === undefined || !(frac > 0) ? 0 : Math.max(1, Math.round(Math.min(1, frac) * n)); }
 function cellStates(m, n) {

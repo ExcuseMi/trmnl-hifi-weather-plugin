@@ -253,6 +253,15 @@ return rows.map(function(q){return q.map(function(v){return v===null?'-':v.toFix
         puts "INDOOR #{c['name']}: #{inr}" unless inr == c['want_in']
         expect(inr).to eq(c['want_in'])
       end
+      # B24 (owner 2026-11-15): Sensor icon only sets the icon of the sensor's reading. c['icon'] 'out': the weather station glyph (a mast with cups) marks the sensor wherever the
+      # house did, and neither the house nor the forecast reading's tree is at the sensor; 'house': the house. (Layout and values are the Inside ones: the other checks of the case apply.)
+      if c['icon']
+        ic = s.evaluate(%q{(function(){var d=[].map.call(document.querySelectorAll('[data-sw-loc="in"] path'),function(p){return p.getAttribute('d')}),n=function(k){return d.filter(function(x){return x.indexOf(k)===0}).length};return n('M3 14')+','+n('M12.8 12.5h2.4')+','+n('M8 17a4.5')+','+(SW.po?1:0)})()})
+        hs, st, tr, po = ic.split(',').map(&:to_i)
+        okc = c['icon'] == 'out' ? (hs.zero? && st.positive? && tr.zero? && po == 1) : (hs.positive? && st.zero? && tr.zero? && po.zero?)
+        puts "ICON #{c['name']}: houses #{hs}, stations #{st}, trees at the sensor #{tr}, SW.po #{po}" unless okc
+        expect(okc).to be(true)
+      end
       # B13 (owner 2026-11-14): another TRMNL's sensor, its label, the main reading. want_main 'sensor' or 'outside': SW.sim agrees, the first
       # readout (left twin, or the big group of a small view) holds the main reading, the second the other one; want_label: the label shows at
       # the sensor's readout, whole inside its panel, and never in a meter row; outdoor rows never carry the sensor's mark (the house icon

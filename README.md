@@ -26,7 +26,8 @@ Every view (full, half horizontal, half vertical, quadrant), 1-bit, greyscale an
 | Hide title bar | Hides the title bar on the full view |
 | Sensor | None (outside weather only), This TRMNL (this screen's own sensor), Another TRMNL, or a provider: Home Assistant, Awair, AirGradient, Sensibo, Ecowitt, Adafruit IO, Custom link (JSON). The fields of the chosen option show; see Indoor sensor sources below. |
 | Sensor from another TRMNL | Shows for Another TRMNL only: the digits in the address of its page on trmnl.com. Empty or not found: this TRMNL's own sensor. |
-| Sensor label | Optional short name, for example Upstairs, shown beside the house icon and on the temperature dial. Empty: the icon alone. |
+| Sensor icon | The icon in front of the sensor's reading: House (default), or Anemometer (a mast with cups) for a sensor outside, such as a weather station or a balcony sensor. Only the icon changes; room for more icons later. |
+| Sensor name | Optional short name, for example Upstairs, shown beside the sensor's icon and on the temperature dial. Empty: the icon alone. |
 | Main reading | Which reading comes first, in black: Automatic (the sensor when it is this screen's own, outside when it comes from another TRMNL), Sensor, or Outside. The other one follows in grey, its meters after. Both temperatures are the same size. |
 
 ### Indoor sensor sources

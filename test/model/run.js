@@ -141,11 +141,18 @@ test('time format: the setting decides, 24 h when missing, the TIME constant ove
   ok(!keys.includes('sensor_show'), 'sensor_show is gone: "None" in the Sensor select is the hide');
   ok(fields.filter((f) => !OLD.includes(f.key)).every((f) => f.group === GRP && /^sensor_/.test(f.key)), 'B22: the new source settings are all in the Sensor group');
   const grp = keys.slice(keys.indexOf('sensor_source'), keys.indexOf('legend'));
-  eq([grp[0], grp[1], grp.slice(-2)], ['sensor_source', 'sensor_device_id', ['sensor_label', 'sensor_primary']], 'order in the group: source, provider fields, label, main reading');
+  eq([grp[0], grp[1], grp.slice(-3)], ['sensor_source', 'sensor_device_id', ['sensor_icon', 'sensor_label', 'sensor_primary']], 'order in the group: source, provider fields, place (B24), label, main reading');
   // B22 (coordinator, server copy 541930): TRMNL silently fails the form's required check for a field a rule hides unless it is optional: true; a provider's must-haves are required only when it is chosen
   const blocks = y.split(/^- keyname: /m).slice(1), blk = (k) => blocks.find((q) => q.startsWith(k + '\n'));
   const cv = blk('sensor_source').split(/^  - when: /m).slice(1).map((w) => ({ when: w.split('\n')[0].replace(/'/g, ''), hidden: [...w.matchAll(/^    - (\w+)$/gm)].map((m) => m[1]), required: ((/^    required: \[(.*)\]$/m.exec(w) || [])[1] || '').split(', ').filter(Boolean) }));
   const named = new Set(cv.flatMap((c) => c.hidden).concat(['sensor_label']));
+  // B24 (owner 2026-11-15): Sensor icon, House (default) or Anemometer, right after the provider fields; None hides it; it only sets the icon of the sensor's reading
+  const sp = blk('sensor_icon');
+  ok(sp && /^  group: Sensor$/m.test(sp) && /^  field_type: select$/m.test(sp) && /^  optional: true$/m.test(sp) && /- House: house\n  - Anemometer: anemometer\n  default: house\n/.test(sp), 'B24: sensor_icon is an optional select in the Sensor group, House by default');
+  ok(cv.find((c) => c.when === 'none').hidden.includes('sensor_icon') && cv.filter((c) => c.when !== 'none').every((c) => !c.hidden.includes('sensor_icon')), 'B24: only None hides the icon');
+  ok(/^  description: 'The icon in front of/m.test(sp) && /^  description-de: 'Das Symbol vor/m.test(sp) && /^  description-fr: 'L.{1,2}icône devant/m.test(sp) && /^  description-es-ES: 'El icono delante/m.test(sp) && /^  description-nl: 'Het icoon voor/m.test(sp) && /^  description-ja: 'センサーの値の前に/m.test(sp), 'B24: the description says in every language that it is the icon in front of the reading');
+  ok(!/conditional_validation/.test(sp), 'B24: the icon hides nothing (layout and values stay)');
+  ['name', 'description'].forEach((w) => ['', '-de', '-fr', '-es-ES', '-nl', '-ja'].forEach((l) => ok(new RegExp('^  ' + w + l + ': .{4,}', 'm').test(sp), 'B24: sensor_icon has ' + w + l)));
   eq([...named].filter((k) => !blk(k) || !/^  optional: true$/m.test(blk(k))), [], 'every field a rule hides is optional: true (else the form cannot be saved with it hidden)');
   // one naming pattern (owner 2026-11-15): option value = provider word, keys sensor_<prefix>_<field>, the same field words everywhere; a new provider adds one option and its prefixed keys
   const PREF = { home_assistant: 'hass', awair: 'awair', airgradient: 'airgradient', sensibo: 'sensibo', ecowitt: 'ecowitt', adafruit: 'adafruit', custom: 'custom' }, PROV = Object.keys(PREF);
@@ -157,7 +164,7 @@ test('time format: the setting decides, 24 h when missing, the TIME constant ove
   eq(['awair', 'airgradient', 'sensibo', 'ecowitt', 'adafruit', 'custom'].filter((v) => !/ \(beta\)$/.test(optLabels[v])), [], 'B23: the six untested providers are labelled (beta)');
   eq(['none', 'own', 'other', 'home_assistant'].filter((v) => /beta/i.test(optLabels[v])), [], 'B23: None, the TRMNL options and Home Assistant are not beta');
   ok(['description', 'description-de', 'description-fr', 'description-es-ES', 'description-nl', 'description-ja'].every((d) => new RegExp('^  ' + d + ": '.*(Beta|Bêta|ベータ)").test(blk('sensor_source').split('\n').find((l) => l.startsWith('  ' + d + ':')))), 'B23: the Sensor description explains beta in all six languages');
-  const all = [...new Set(cv.flatMap((c) => c.hidden))], FIELD = /^(token|key|app_key|temp|hum|co2|id|url|type|header|time|unit|user)$/;
+  const all = [...new Set(cv.flatMap((c) => c.hidden))].filter((k) => k !== 'sensor_icon'), FIELD = /^(token|key|app_key|temp|hum|co2|id|url|type|header|time|unit|user)$/;
   all.forEach((k) => { if (k === 'sensor_device_id') return; const m = /^sensor_(\w+?)_(app_key|\w+)$/.exec(k), pv = PROV.find((x) => k.startsWith('sensor_' + PREF[x] + '_')); ok(pv && FIELD.test(k.slice(('sensor_' + PREF[pv] + '_').length)), k + ' follows sensor_<provider>_<field>'); });
   const ownOf = (o) => all.filter((k) => !c_hidden(o).includes(k)), c_hidden = (o) => cv.find((q) => q.when === o).hidden;
   PROV.forEach((pv) => {
@@ -193,13 +200,6 @@ test('temperature trend arrow: +3 h against now, 1 degree C or 2 degrees F', () 
 test('bottom strip auto: hours until 17:59 local, days from 18:00', () => {
   eq([T.bottomHours('auto', '2026-11-13T17:59'), T.bottomHours('auto', '2026-11-13T18:00'), T.bottomHours('auto', '2026-11-13T00:00'), T.bottomHours('auto', null)], [true, false, true, false]);
   eq([T.bottomHours('hours', '2026-11-13T20:00'), T.bottomHours('days', '2026-11-13T09:00')], [true, false]);
-});
-
-test('air quality: the current index at any hour (no evening mode)', () => {
-  const e = fx('mixed'); e.current.time = '2026-11-08T19:00';
-  const aq = { current: { time: '2026-11-08T19:00', european_aqi: 30 }, hourly: { time: ['2026-11-08T20:00', '2026-11-09T09:00', '2026-11-09T10:00'], european_aqi: [30, 55, 75] } };
-  eq(SWModel.build(Object.assign({}, e, { aq }), {}).now.aqi, 30);
-});
   // B25 (owner 2026-11-15): the switch hour is a setting (12 to 23, default 18; anything else is 18)
   const at = (sw, h) => T.bottomHours('auto', '2026-11-13T' + h + ':00', sw);
   eq([at('21', '20'), at('21', '21'), at('21', '22'), at('12', '11'), at('12', '12'), at('23', '22'), at('23', '23')], [true, false, false, true, false, true, false], 'hours before the set hour, days at it and after');
@@ -215,6 +215,13 @@ test('air quality: the current index at any hour (no evening mode)', () => {
     ok(/- when: 'days'\n    hidden:\n    - bottom_switch\n  - when: 'hours'\n    hidden:\n    - bottom_switch/.test(bt), 'B25: the hour shows only for Hours, then days');
     ['name', 'description'].forEach((w) => ['', '-de', '-fr', '-es-ES', '-nl', '-ja'].forEach((l) => ok(new RegExp('^  ' + w + l + ': .{4,}', 'm').test(bs), 'B25: bottom_switch has ' + w + l)));
   }
+});
+
+test('air quality: the current index at any hour (no evening mode)', () => {
+  const e = fx('mixed'); e.current.time = '2026-11-08T19:00';
+  const aq = { current: { time: '2026-11-08T19:00', european_aqi: 30 }, hourly: { time: ['2026-11-08T20:00', '2026-11-09T09:00', '2026-11-09T10:00'], european_aqi: [30, 55, 75] } };
+  eq(SWModel.build(Object.assign({}, e, { aq }), {}).now.aqi, 30);
+});
 
 // removed 'indoor sensor: latest reading, dropped when older than 3 hours': the input never carries sensor_readings on TRMNL (owner's live payload), so the transform no longer parses readings; the markup path is the render cases x-sens* (x-sens-stale: over 3 h shows nothing)
 test('indoor sensor in the view: BUITEN/BINNEN twin readout, twin needle, CO2 meter and the indoor meters first (owner 2026-11-14)', () => {

@@ -49,6 +49,18 @@ module.exports = async function sensorSourceTests({ T, fx, check, eq, ok }) {
       const r = await run(Object.assign({}, HA, { sensor_hass_co2: '' }));
       eq(r.ph.sx, { t: 20, h: null, c: null });
     });
+    await check('B24 Sensor icon: Anemometer sets the outdoor-icon flag (ph.out) and changes nothing else in the payload; House, unset and unknown keep the house', async () => {
+      global.fetch = fake(haRoute());
+      const i = await run(HA), o = await run(Object.assign({}, HA, { sensor_icon: 'anemometer' }));
+      eq([o.ph.out, i.ph.out], [1, undefined]);
+      const strip = (p) => { const q = Object.assign({}, p); delete q.out; return q; };
+      eq(strip(o.ph), strip(i.ph), 'the same payload otherwise: same layout, same values, same rows');
+      eq((await run(Object.assign({}, HA, { sensor_icon: 'house' }))).ph.out, undefined, 'House is the same as no setting');
+      eq((await run(Object.assign({}, HA, { sensor_icon: 'nonsense' }))).ph.out, undefined, 'an unknown value is House');
+      eq((await run(Object.assign({}, HA, { sensor_source: 'none', sensor_icon: 'anemometer' }))).ph, null, 'None hides the sensor, whatever the icon says');
+      global.fetch = fake(() => ({ status: 500, body: {} }));
+      eq((await run(Object.assign({}, HA, { sensor_icon: 'anemometer' }))).ph.out, 1, 'a failing source keeps the flag for the kept reading');
+    });
     await check('B22 Awair (GET .../devices/{type}/{id}/air-data/latest?fahrenheit=false, Bearer): comp temp, humid, co2', async () => {
       calls = []; global.fetch = fake((url) => /air-data\/latest/.test(url)
         ? { status: 200, body: { data: [{ timestamp: iso(100), score: 90, sensors: [{ comp: 'temp', value: 24.499999618530273 }, { comp: 'humid', value: 49.999999618530273 }, { comp: 'co2', value: 419 }, { comp: 'voc', value: 399 }, { comp: 'pm25', value: 5 }], indices: [] }] } }
