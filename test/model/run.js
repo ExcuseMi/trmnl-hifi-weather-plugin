@@ -863,3 +863,23 @@ test('no shown label falls back to English in any locale (item 38.1)', () => {
   ['ja', 'ko', 'zh-CN', 'zh-HK'].forEach((l) => { const p = OURS[l].split('|'); KEYS.forEach((k, i) => { if (!p[i] && !['raining_now'].includes(k)) empty.push(l + ':' + k); }); });
   eq(empty, [], 'empty CJK slots');
 });
+
+test('About text (B17): HTML, 100+ words in English (TRMNL search), all six languages, learn-more URL; the site in docs/ is current', () => {
+  const y = fs.readFileSync(path.join(__dirname, '../../plugin/src/settings.yml'), 'utf-8');
+  const about = y.split(/^- keyname: /m).slice(1).find((q) => q.startsWith('author_info\n'));
+  const SITE = 'https://excusemi.github.io/trmnl-radio-weather-plugin/';
+  ok(about.includes('  learn_more_url: ' + SITE + '\n'), 'learn_more_url is the site');
+  const text = (k) => { const m = new RegExp('^  ' + k + ": '(.*)'$", 'm').exec(about); return m ? m[1].replace(/''/g, "'") : null; };
+  ['description', 'description-de', 'description-fr', 'description-es-ES', 'description-nl', 'description-ja'].forEach((k) => {
+    const t = text(k);
+    ok(t && t.length > 200, k + ' present');
+    ok(t.includes('<strong>') && t.includes('<br />'), k + ' has the markup');
+    ok(t.includes(SITE) && t.includes('open-meteo.com'), k + ' links the site and credits Open-Meteo');
+    ok(!/[—–]/.test(t), k + ' has no dashes');
+  });
+  const words = text('description').replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean).length;
+  ok(words >= 100, 'English about text is ' + words + ' words, needs 100');
+  // docs/ is built by tools/site/build.sh from plugin/src: a stale copy would show an old plugin on the site
+  const r = require('child_process').spawnSync('node', [path.join(__dirname, '../../tools/site/build.js'), '--check'], { encoding: 'utf-8' });
+  eq(r.status, 0, 'docs/ is up to date (run tools/site/build.sh): ' + r.stderr);
+});
