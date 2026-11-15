@@ -522,5 +522,121 @@
   "want_label": "BOVEN",
   "co2": "yes",
   "want_whole": true
+ },
+ {
+  "name": "b27-name-x-own",
+  "device": "v2",
+  "view": "full",
+  "locale": "en-US",
+  "vars": {
+   "sensor_readings": {
+    "device_1": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 21.6
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 48
+      }
+     ],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 1500
+      }
+     ],
+     "pressure": []
+    }
+   }
+  },
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days",
+   "sensor_label": "Boven"
+  },
+  "want_in": "21.6",
+  "want_main": "sensor",
+  "want_label": "BOVEN",
+  "co2": "yes",
+  "want_whole": true
+ },
+ {
+  "name": "b27-name-x-dark-own",
+  "device": "v2",
+  "view": "full",
+  "locale": "en-US",
+  "vars": {
+   "sensor_readings": {
+    "device_1": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 21.6
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 48
+      }
+     ],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 1500
+      }
+     ],
+     "pressure": []
+    }
+   }
+  },
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days",
+   "sensor_label": "Boven"
+  },
+  "want_in": "21.6",
+  "want_main": "sensor",
+  "want_label": "BOVEN",
+  "co2": "yes",
+  "want_whole": true,
+  "dark": true
+ },
+ {
+  "name": "b27-name-og-own",
+  "device": "og_plus",
+  "view": "full",
+  "locale": "en-US",
+  "vars": {
+   "sensor_readings": {
+    "device_1": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 21.6
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 48
+      }
+     ],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 1500
+      }
+     ],
+     "pressure": []
+    }
+   }
+  },
+  "palette": "gray-4",
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days",
+   "sensor_label": "Boven"
+  },
+  "want_in": "21.6",
+  "want_main": "sensor",
+  "want_label": "BOVEN",
+  "co2": "yes",
+  "want_whole": true
  }
 ]
