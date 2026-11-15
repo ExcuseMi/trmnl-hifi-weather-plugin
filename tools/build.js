@@ -48,7 +48,7 @@ async function build(src) {
   let nx = 0;
   const short = new Map(vars.map((n) => { let q; do q = 'v' + (nx++).toString(36); while (new RegExp('(?<![\\w.-])' + q + '(?![\\w-])').test(s)); return [n, q]; }));   // never a name the template already uses
   s = s.replace(tagRe, (tag) => tag.split(/('[^']*'|"[^"]*")/).map((q, i) => i % 2 ? q : q.replace(/(?<![\w-])(?<![^.]\.)[A-Za-z_]\w{2,}(?![\w-])/g, (w) => short.get(w) || w)).join(''));
-  s = s.slice(0, sa).replace(/^[ \t]+/gm, '').replace(/[ \t]+$/gm, '').replace(/\{\{[^}]*\}\}|\{%[^%]*%\}/g, tight) + s.slice(sa);   // size: no indentation in the markup (whitespace there only separates tags)
+  s = s.slice(0, sa).replace(/^[ \t]+/gm, '').replace(/[ \t]+$/gm, '').replace(/\{\{[^}]*\}\}|\{%(?:[^%'"]|'[^']*'|"[^"]*")*%\}/g, tight) + s.slice(sa);   // size: no indentation in the markup (whitespace there only separates tags)
   { const k = s.indexOf('<script'); s = s.slice(0, k).replace(/([>}])\n+(?=[<{])/g, '$1') + s.slice(k); }   // size: a line break between two tags is only whitespace in a flex layout
   { const k = s.indexOf('<script'), tm = '{%template main%}';   // size: the attribute written 30+ times in the markup is one Liquid variable (outside tags; the rendered HTML is identical)
     let mk = s.slice(0, k).split(/(\{\{[\s\S]*?\}\}|\{%[\s\S]*?%\})/).map((q, i) => i % 2 ? q : q.replace(/ data-sw-part=/g, ' {{dsp}}=')).join('');

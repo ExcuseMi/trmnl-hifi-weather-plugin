@@ -1,6 +1,6 @@
 {% template main %}
 {%- assign cf = trmnl.plugin_settings.custom_fields_values -%}{%- assign tsb = 'title title--small text--bold' %}{% assign vst = 'value value--small value--tnums' %}{% assign fcy = 'flex flex--row flex--center-y' %}{% assign iia = 'image image--adaptive' -%}
-{%- capture sw_stale_icon -%}<svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="14" cy="14" r="10" stroke="#000" stroke-width="2.2"/><path d="M14 8V14L18 16.5" stroke="#000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>{%- endcapture -%}
+{%- capture sw_stale_icon -%}<svg viewBox="0 0 28 28" fill="none" stroke="#000" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><circle cx="14" cy="14" r="10"/><path d="M14 8V14L18 16.5"/></svg>{%- endcapture -%}
 {%- capture sw_icon -%}<svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 16A10 10 0 0 1 24 16" stroke="#000" stroke-width="2.2" stroke-linecap="round"/><path d="M14 6V8.5M6.9 8.9L8.6 10.6M21.1 8.9L19.4 10.6" stroke="#000" stroke-width="1.6" stroke-linecap="round"/><path d="M14 16L18.6 9.6" stroke="#000" stroke-width="2" stroke-linecap="round"/><circle cx="14" cy="16" r="1.8" fill="#000"/><rect x="3" y="21" width="4" height="4" rx="0.8" fill="#000"/><rect x="8.5" y="21" width="4" height="4" rx="0.8" fill="#000"/><rect x="14" y="21" width="4" height="4" rx="0.8" fill="#000"/><rect x="19.5" y="21.5" width="4" height="3" rx="0.8" stroke="#000" stroke-width="1"/></svg>{%- endcapture -%}
 {%- comment -%} Panel (owner {%- endcomment -%}
 {%- capture p_open_g -%}<div class="relative h--full w--full"><div class="h--full w--full"><div class="relative h--full w--full p--1" data-sw-panel><div class="absolute inset--0" data-sw-part="face"></div>{%- endcapture -%}
@@ -252,6 +252,7 @@ if (SWP && SWI[0] !== null && SWP.inn) {
   if (iT) iT.textContent = is;
   if (iH && I.hum) iH.textContent = I.hum;
 }
+function asc(c) { return c.measureText('H').actualBoundingBoxAscent; }   /* size: the cap height of the context's font */
 function swVis(l) { return [].filter.call(l.split ? document.querySelectorAll(l) : l, function (q) { return q.getBoundingClientRect().width > 0; }); }   // the shown elements of a list
 // Size class from the device and the framework, never from a measurement (owner 2026-11-14: the same device always gets the
 // same layout; a measured .screen once gave the OG the small console): trmnl.device width/height (the viewport when TRMNL sends
@@ -322,7 +323,8 @@ var r = +m[1], q = +m[2], b = +m[3], ok = tok === 'red' ? r > 150 && q < 110 && 
 return ok ? f.color : null;
 }
 function hg(tok, body) { return '<g data-sw-hue="' + tok + '">' + g('text--' + tok, body) + '</g>'; }
-function text(x, y, s, fs, anc, extra) { return '<text x="' + n1(x) + '" y="' + n1(y) + '" font-size="' + n1(fs) + '" font-weight="700" text-anchor="' + (anc || 'middle') + '"' + (extra || '') + '>' + s + '</text>'; }
+function circ(x, y, r, ex) { return '<circle cx="' + n1(x) + '" cy="' + n1(y) + '" r="' + n1(r) + '"' + (ex || '') + '/>'; }
+function text(x, y, s, fs, anc, bl, extra) { return '<text x="' + n1(x) + '" y="' + n1(y) + '" font-size="' + n1(fs) + '" font-weight="700" text-anchor="' + (anc || 'middle') + '"' + (bl ? ' dominant-baseline="' + bl + '"' : '') + (extra || '') + '>' + s + '</text>'; }
 function svg(W, H, body, vb) { var d0 = DEFS; DEFS = ''; return svg0(W, H, body, vb, d0); }
 function svg0(W, H, body, vb, DEFS) { return '<svg xmlns="http://www.w3.org/2000/svg" width="' + n1(W) + '" height="' + n1(H) + '" viewBox="' + (vb || '0 0 ' + n1(W) + ' ' + n1(H)) + '" fill="currentColor" overflow="visible"' + (API.font ? ' font-family="' + API.font.replace(/"/g, "'") + '"' : '') + '>' + (DEFS ? '<defs>' + DEFS + '</defs>' : '') + body + '</svg>'; }
 function hseg(x0, x1, y, t) { var h = t / 2; return [[x0, y], [x0 + h, y - h], [x1 - h, y - h], [x1, y], [x1 - h, y + h], [x0 + h, y + h]]; }
@@ -409,7 +411,7 @@ var x = x0 + i * cw + gp / 2, w = cw - gp;
 if (i < gq.segs) { on += rect(x, 0, w, H, 2, ' data-sw-c="' + i + '"'); sh += rect(x + SO, SO, w, H, 2); }
 else off += DK ? rect(x, 0, w, H, 2, ' data-sw-c="' + i + '"') : rect(x + 1, 1, w - 2, H - 2, 2, ' fill="none" ' + SK + '2" data-sw-c="' + i + '"');
 }
-return svg(W, H, '<g data-sw-gauge="' + gq.segs + '"></g>' + g(SHADOW + ' text--gray-65', sh) + '<g data-sw-st="e">' + g(OC(), off) + '</g><g data-sw-on data-sw-st="a">' + (API.mode && !DKM() && !b1() ? '<g data-sw-dg>' + g(act(), on) + '</g>' : glow(on, GPX)) + '</g>' + text(x0 / 2, H / 2, lab, fs, 'middle', ' dominant-baseline="central" data-sw-glabel'));
+return svg(W, H, '<g data-sw-gauge="' + gq.segs + '"></g>' + g(SHADOW + ' text--gray-65', sh) + '<g data-sw-st="e">' + g(OC(), off) + '</g><g data-sw-on data-sw-st="a">' + (API.mode && !DKM() && !b1() ? '<g data-sw-dg>' + g(act(), on) + '</g>' : glow(on, GPX)) + '</g>' + text(x0 / 2, H / 2, lab, fs, 'middle', 'central', ' data-sw-glabel'));
 }
 function tick(v) { return String(v === 0 ? 0 : v); }
 function lfs(sc) { var f = API.nfs ? (API.lp && API.nfs > API.lp && API.ogfull ? API.lp : Math.max(API.nfs, API.lp || 0)) : Math.max((API.scaleH || 20) * 0.7, API.lp || 0); return API.lhf ? Math.min(f, 1.28 * API.lhf) : f; }   // B12: scale labels at most 1.28 x the low/high digits (render check PORT; Kobo Forma, Voyage, X portrait)
@@ -463,13 +465,13 @@ var C = Math.min(H, API.hbarH || H) - R, L = hlevels(hs, C), per = hper(hs, Math
 var n = Math.max(1, Math.min(L, per > 1 ? Math.ceil((Math.round(q.tV) - hs.a) / per) : Math.round((Math.round(q.tV) - hs.a) / (hs.b - hs.a) * L))), Hh = H - SO, lh = (C - SO) / L, gp = Math.max(2, lh * 0.2), bw = W - SO, cells = '', sh = '';
 for (var k = 0; k < n; k++) { var y = Hh - (k + 1) * lh + gp / 2; cells += rect(0, y, bw, lh - gp, 2); sh += rect(SO, y + SO, bw, lh - gp, 2); }
 var ty = Hh - n * lh + gp / 2 - 3 - fs * 0.36;
-return svg(W, H, g(SHADOW + ' text--gray-65', sh) + '<g data-sw-cells="' + n + '" data-sw-area="' + n1(C) + '">' + g(blk(hi), cells) + '</g>' + text(bw / 2, ty, q.t, fs, 'middle', ' data-sw-htemp'));
+return svg(W, H, g(SHADOW + ' text--gray-65', sh) + '<g data-sw-cells="' + n + '" data-sw-area="' + n1(C) + '">' + g(blk(hi), cells) + '</g>' + text(bw / 2, ty, q.t, fs, 'middle', 0, ' data-sw-htemp'));
 }
 function scale(sc, W, H) {
 var X = xmap(sc, W), fs = lfs(sc), body = '', rules = '', ty = Math.max(H * 0.62, fs * 0.3 * 1.4 + 2 + fs * 0.4), lb = ty + fs * 0.55, E = API.extD || 0, cross = false, xn = sc.now === null || sc.now === undefined ? null : X(sc.now);
 ticks(sc, W).forEach((v) => {
 var p = X(v), s = tick(v), tw = fs * 0.62 * s.length, l = p - tw / 2;
-body += text(p, ty, s, fs, 'middle', ' dominant-baseline="middle" data-sw-tick="' + s + '"') + text(p + tw / 2, ty, sc.deg, fs, 'start', ' dominant-baseline="middle"');
+body += text(p, ty, s, fs, 'middle', 'middle', ' data-sw-tick="' + s + '"') + text(p + tw / 2, ty, sc.deg, fs, 'start', 'middle');
 
 });
 body = '<g data-sw-track="' + n1(X(sc.a)) + ',' + n1(X(sc.b)) + '"></g>' + g('text--gray-70', rules) + ko('axis', fs, body);
@@ -485,7 +487,7 @@ hs.forEach((q, i) => {
 var x = (i % C) * cw, y = Math.floor(i / C) * rh;
 if (q.wet) { var gp = Math.max(2, Math.min(cw, rh) * 0.06), wr = rect(x + gp / 2, y + gp / 2, cw - gp, rh - gp, 2);
 body += hue('red') ? hg('red', wr) : (API.mode && API.mode.bits >= 4 ? g('text--gray-10 dark:text--gray-30', glow(wr, GPX)) : glow(wr, GPX)); }
-var hm = String(q.h).match(/^(\d+)(\D+)$/), tx = text(x + cw / 2, y + rh / 2, hm ? hm[1] + '<tspan font-size="' + n1(fs * 0.6) + '">' + hm[2] + '</tspan>' : q.h, fs, 'middle', ' dominant-baseline="central"'); body += q.wet ? g('text--white', tx) : tx;
+var hm = String(q.h).match(/^(\d+)(\D+)$/), tx = text(x + cw / 2, y + rh / 2, hm ? hm[1] + '<tspan font-size="' + n1(fs * 0.6) + '">' + hm[2] + '</tspan>' : q.h, fs, 'middle', 'central'); body += q.wet ? g('text--white', tx) : tx;
 });
 return svg(W, H, body);
 }
@@ -501,10 +503,10 @@ var r = H * 0.27, cx = H / 2, f = (1 - Math.cos(2 * Math.PI * p)) / 2, lit = '';
 var dk = DKM(), bits = API.mode ? API.mode.bits : 4, sw = Math.max(bits <= 2 ? 2.5 : 1.5, H * 0.03),
 ri = bits <= 1 && !dk ? r - sw * 1.6 : r;
 if (f > 0.01) lit = '<path d="' + moonLit(p, cx, cx, ri) + '" data-sw-moon="lit"' + (lb == null ? '' : ' transform="rotate(' + n1(-(lb - (p < 0.5 ? 270 : 90))) + ' ' + n1(cx) + ' ' + n1(cx) + ')"') + '/>';   // lb: the bright limb as the observer sees it (transform moonLimb, owner 2026-11-14: true tilt)
-var limb = '<circle cx="' + n1(cx) + '" cy="' + n1(cx) + '" r="' + n1(r) + '" fill="none" ' + SK + n1(sw) + '"/>';
-var h = dk ? halo('<circle cx="' + n1(cx) + '" cy="' + n1(cx) + '" r="' + n1(r) + '"/>', GPX) : '';
+var limb = circ(cx, cx, r, ' fill="none" ' + SK + n1(sw) + '"');
+var h = dk ? halo(circ(cx, cx, r), GPX) : '';
 if (h) { var mid = 'swmk' + (K++); h = '<defs><mask id="' + mid + '" maskUnits="userSpaceOnUse" x="' + n1(-H) + '" y="' + n1(-H) + '" width="' + n1(3 * H) + '" height="' + n1(3 * H) + '"><rect x="' + n1(-H) + '" y="' + n1(-H) + '" width="' + n1(3 * H) + '" height="' + n1(3 * H) + '" fill="#fff"/><circle cx="' + n1(cx) + '" cy="' + n1(cx) + '" r="' + n1(r + sw / 2) + '" fill="#000"/></mask></defs><g mask="url(#' + mid + ')" data-sw-moonhalo>' + h + '</g>'; }
-var disk = '<circle cx="' + n1(cx) + '" cy="' + n1(cx) + '" r="' + n1(r) + '" data-sw-moon="disk"/>';
+var disk = circ(cx, cx, r, ' data-sw-moon="disk"');
 if (dk) { if (f < 0.08) return svg(H, H, h + g('text--gray-45', disk.replace('r="' + n1(r) + '"', 'r="' + n1(ri) + '"').replace('"disk"', '"lit"')) + limb); return svg(H, H, h + lit + limb); }
 // Light (owner 2026-11-14, like a printed moon-phase icon): the shadow is a dark disc, the lit part paper white, the outline kept.
 return svg(H, H, g(bits <= 1 ? '' : (bits === 2 ? 'text--gray-10' : 'text--gray-20'), disk) + (lit ? g('text--white', lit) : '') + limb);
@@ -607,7 +609,7 @@ var step = baro ? 10 : D.step / 2, major = baro ? 20 : D.step, labs = '';
 for (var v = D.a; v <= D.b + 1e-9; v += step) {
 var mj = Math.abs((v - D.a) / major - Math.round((v - D.a) / major)) < 1e-6, p0 = at(F(v), r), p1 = at(F(v), r - (mj ? H * 0.07 : H * 0.035));
 body += '<line x1="' + n1(p0[0]) + '" y1="' + n1(p0[1]) + '" x2="' + n1(p1[0]) + '" y2="' + n1(p1[1]) + '" ' + SK + n1(mj ? lw : Math.max(1, lw * 0.6)) + '"/>';
-if (!baro && mj) { var fs = H * 0.1, pl = at(F(v), r - H * 0.07 - fs * 0.8); labs += text(pl[0], pl[1], String(v), fs, 'middle', ' dominant-baseline="central"'); }
+if (!baro && mj) { var fs = H * 0.1, pl = at(F(v), r - H * 0.07 - fs * 0.8); labs += text(pl[0], pl[1], String(v), fs, 'middle', 'central'); }
 }
 var lo = D.lo, hi = D.hi;
 if (lo != null && hi != null) {
@@ -617,7 +619,7 @@ var r0 = r + lw + bw + 2, r1 = r0 + mh;
 [[lo, true], [hi, false]].forEach((m) => {
 var f = F(m[0]), q = 0.022, t = [at(f, r0), at(f - q, r1), at(f + q, r1)];
 if (cm) { var lt = String(Math.round(m[0]) === 0 ? 0 : Math.round(m[0])) + '°', lp = mlp(f, r1, lt, W, H, py, !!m[1], baro ? 'baro' : 'tdial');
-body += so(text(lp[0], lp[1], lt, mfs, 'middle', ' dominant-baseline="central" data-sw-mark="' + (m[1] ? 'lo' : 'hi') + '"' + (lp[2] ? ' data-sw-beside' : '')), 1); }
+body += so(text(lp[0], lp[1], lt, mfs, 'middle', 'central', ' data-sw-mark="' + (m[1] ? 'lo' : 'hi') + '"' + (lp[2] ? ' data-sw-beside' : '')), 1); }
 body += so(poly(t, ' data-sw-markt="' + (m[1] ? 'lo' : 'hi') + '"' + (m[1] ? ' fill="none" ' + SK + n1(Math.max(1.5, lw * 0.5)) + '" stroke-linejoin="round"' : '')));
 });
 }
@@ -629,8 +631,8 @@ var hr = Math.max(6, H * 0.035), tw = '';
 if (D.twin != null) {
 tw = '<g data-sw-twin="1">' + g(dgr(), poly(np(0, 0, -A + 2 * A * cl(F(D.twin)), 0.86))) + '</g>';
 }
-body += '<g data-sw-needle>' + g(SHADOW + ' text--gray-55', poly(np(SO, SO)) + '<circle cx="' + n1(cx + SO) + '" cy="' + n1(py + SO) + '" r="' + n1(hr) + '"/>');
-body += glow(tw + poly(np(0, 0)) + '<circle cx="' + n1(cx) + '" cy="' + n1(py) + '" r="' + n1(hr) + '" data-sw-hub="' + n1(Math.max(hr, tailR + wb * 1.6)) + '"/>', lg) + g('text--white', '<circle cx="' + n1(cx) + '" cy="' + n1(py) + '" r="' + n1(hr * 0.4) + '"/>') + '</g>';
+body += '<g data-sw-needle>' + g(SHADOW + ' text--gray-55', poly(np(SO, SO)) + circ(cx + SO, py + SO, hr));
+body += glow(tw + poly(np(0, 0)) + circ(cx, py, hr, ' data-sw-hub="' + n1(Math.max(hr, tailR + wb * 1.6)) + '"'), lg) + g('text--white', circ(cx, py, hr * 0.4)) + '</g>';
 }
 /* B18: the scale numbers over both needles, a thin knock-out in the panel colour round each digit (paint-order stroke, as the day strip's axis) */
 if (labs) body += ko('dlab', H * 0.1, labs);
@@ -689,7 +691,7 @@ var sps = [].slice.call(document.querySelectorAll('[data-sw-suntime] > span.titl
 function seg(sp) {
 var t = sp.getAttribute('data-sw-t'); if (t === null) { t = sp.textContent.trim(); sp.setAttribute('data-sw-t', t); }
 var cs = getComputedStyle(sp); cx.font = cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
-var cap = cx.measureText('H').actualBoundingBoxAscent * (+sp.getAttribute('data-sw-sf') || 1), r = cap > 0 ? SWDraw.segtime(t, cap) : null;
+var cap = asc(cx) * (+sp.getAttribute('data-sw-sf') || 1), r = cap > 0 ? SWDraw.segtime(t, cap) : null;
 if (!r) { if (sp.hasAttribute('data-sw-segk')) { sp.textContent = t; sp.removeAttribute('data-sw-segk'); } return; }
 if (sp.getAttribute('data-sw-segk') !== r.key) { sp.innerHTML = r.html; sp.setAttribute('data-sw-segk', r.key); sp.setAttribute('aria-label', t); }
 if (cap * 1.25 * SWS[3] < 24 && sp.hasAttribute('data-sw-segk')) { sp.textContent = t; sp.removeAttribute('data-sw-segk'); }
@@ -795,7 +797,7 @@ var cs = getComputedStyle(cond), fam = cs.fontFamily, wt = cs.fontWeight;
 var ct = cond.getAttribute('data-sw-t0'); if (ct === null) { ct = cond.textContent.trim(); cond.setAttribute('data-sw-t0', ct); }
 var lht = lh ? lh.getAttribute('data-sw-slohi').split('|') : null;
 function mw(t, fs) { cx.font = wt + ' ' + fs.toFixed(2) + 'px ' + fam; return cx.measureText(t).width; }
-function capk() { cx.font = wt + ' 100px ' + fam; return (cx.measureText('H').actualBoundingBoxAscent || 72) / 100; }
+function capk() { cx.font = wt + ' 100px ' + fam; return (asc(cx) || 72) / 100; }
 var CK = capk(), at = 0.8, ik = ((ico && ico.querySelector('[data-sw-ink]')) || ico || { getAttribute: function () { return null; } }).getAttribute('data-sw-ink') || '0,1', IY = +ik.split(',')[0] || 0, IH = Math.max(0.3, +ik.split(',')[1] || 1);
 function dw(t, tr) { try { return parseFloat(SWDraw.digits(String(t), 100, tr).match(/width="([\d.]+)"/)[1]) / 100; } catch (e) { return 0.6 * String(t).length; } }
 at = dw(big); var ao = so ? dw(oTx, 1) : 0;
@@ -885,7 +887,7 @@ var k = (sp.offsetWidth && sb.width / sp.offsetWidth) || 1, cs = getComputedStyl
 var D = 1.08 * parseFloat(cs.fontSize) / (SW.inn ? 0.396 : (SWS[4] ? SWR : 0.178));   /* B16: the md console's big digits (condition over digits 0.178) */ /* with an indoor reading the OG's twin readouts: 0.396 */ if (SWS[1] / SWS[3] > (SWS[4] ? 800 : 500) && !SWS[5]) sp.closest('[data-sw-console]').querySelectorAll('[data-sw-part$="temp"]').forEach(function (e) { if (e.hasAttribute('data-sw-dcap')) e.style.removeProperty('height'); e.removeAttribute('data-sw-dcap'); if (e.offsetHeight > D) { e.style.setProperty('height', px(D, 1), 'important'); e.setAttribute('data-sw-dcap', ''); } });   // measured free of its own cap: an early pass must not hold a larger height
 cx.font = cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
 function size(v) { ic.style.setProperty('height', px(v, 1), 'important'); ic.style.setProperty('width', px(v, 1), 'important'); }
-size(cx.measureText('H').actualBoundingBoxAscent); ic.style.transform = '';
+size(asc(cx)); ic.style.transform = '';
 var n0 = 0, h, mid;
 for (var pass = 0; pass < 3; pass++) {
 var rg = document.createRange(); rg.selectNodeContents(sp); var lr = [].filter.call(rg.getClientRects(), function (q) { return q.width > 0; }), tops = [];
@@ -928,7 +930,7 @@ row.setAttribute('data-sw-fit', f.toFixed(3));
 function swArrow(cx) {
 document.querySelectorAll('[data-sw-part="arrow"]').forEach(function (e) {
 var c = e.closest('.relative').querySelector('[data-sw-cap]'); if (!c) return; var cs = getComputedStyle(c); cx.font = cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
-var v = 1.5 * cx.measureText('H').actualBoundingBoxAscent; e.style.width = px(v, 1); e.style.height = px(v, 1);
+var v = 1.5 * asc(cx); e.style.width = px(v, 1); e.style.height = px(v, 1);
 });
 }
 function swInk(e) { var r = e.getBoundingClientRect(), vb = e.viewBox.baseVal, b = e.getBBox(), kx = r.width / (vb.width || r.width), ky = r.height / (vb.height || r.height); return { l: r.left + (b.x - vb.x) * kx, r: r.left + (b.x - vb.x + b.width) * kx, t: r.top + (b.y - vb.y) * ky, h: b.height * ky }; }
