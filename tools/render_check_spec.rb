@@ -25,16 +25,20 @@ COND_R = Hash.new { |h, k| h[k] = [] }
 RSpec.describe 'renders' do
   after(:all) do
     # Condition text proportion (owner 2026-11-13, "the same size relative"): the condition label's font size over the big temperature
-    # digit height is, in every layout of one device (and orientation), within 15 % of the full view's ratio.
+    # digit height is, in every layout of one device (and orientation), within 15 % of the reference layout's ratio.
+    # Two groups of consoles (coordinator 2026-11-15, after the owner's "C it is"): the big-digit console (full and half horizontal,
+    # reference the full view) and the small console (half vertical and quadrant, reference the half vertical). C deliberately halved the
+    # full view's ratio on the md screens (digits 45 -> 120 px, condition text unchanged) and the small consoles cannot double their digits,
+    # so the two groups are not compared with each other; inside a group the 15 % limit stays.
     aggregate_failures do
       COND_R.each do |k, v|
-        ref = v.find { |q| q[2] == 'full' }
+        ref = k.last == 'small' ? (v.find { |q| q[2] == 'half_vertical' } || v.first) : v.find { |q| q[2] == 'full' }
         next unless ref
         v.each do |q|
           next if q.equal?(ref)
           rel = q[1] / ref[1]
-          puts "CONDRATIO #{q[0]}: #{q[1].round(3)} vs full #{ref[1].round(3)} = #{rel.round(2)}" if rel > 1.15 || rel < 1 / 1.15
-          expect(rel).to be_between(1 / 1.15, 1.15), "condition/temperature ratio differs across #{k.inspect}: #{q[0]} #{q[1].round(3)} vs full #{ref[1].round(3)}"
+          puts "CONDRATIO #{q[0]}: #{q[1].round(3)} vs #{ref[0]} #{ref[1].round(3)} = #{rel.round(2)}" if rel > 1.15 || rel < 1 / 1.15
+          expect(rel).to be_between(1 / 1.15, 1.15), "condition/temperature ratio differs across #{k.inspect}: #{q[0]} #{q[1].round(3)} vs #{ref[0]} #{ref[1].round(3)}"
         end
       end
     end
@@ -135,7 +139,8 @@ if(b.width>0&&b.height>0&&b.left<L.right-1&&b.right>L.left+1&&b.top<L.bottom-1&&
       # the main temperature: the largest digits (indoor with a sensor, owner 2026-11-14); cases with an indoor reading form their own group
       cr0 = s.evaluate(%q{(function(){var v=function(e){var b=e&&e.getBoundingClientRect();return b&&b.width>0&&b.height>0},c=[].filter.call(document.querySelectorAll('[data-sw-cond]'),v)[0],h=function(e){return e.getBBox().height*e.getBoundingClientRect().height/(e.viewBox.baseVal.height||1)},te=[].filter.call(document.querySelectorAll('[data-sw-part="temp"] svg,[data-sw-part="itemp"] svg'),v).sort(function(a,b){return h(b)-h(a)})[0];if(!c||!te)return '';var ti=h(te),fz=(+c.getAttribute('data-sw-fs')||parseFloat(getComputedStyle(c).fontSize))*(c.getBoundingClientRect().width/(c.offsetWidth||1));return String(fz/ti)})()})
       puts "CONDR #{c[%q(name)]}: #{cr0}"
-      COND_R[[dev.is_a?(Hash) ? dev[:model] : dev, c['orientation'], c['text_scale'], c['fixture'], c['dark'] ? 1 : 0, s.evaluate('!!SW.inn')]] << [c['name'], cr0.to_f, c['view'] || 'full'] unless cr0.empty? || (c['fields'] || {})['unit'] == 'fahrenheit' || c['name'].start_with?('wide-')   # wide numbers shrink their digits (fit rule), the ratio is for normal values
+      # group: the console that is on screen (a narrow full view, og-devsize, shows the small one)
+      COND_R[[dev.is_a?(Hash) ? dev[:model] : dev, c['orientation'], c['text_scale'], c['fixture'], c['dark'] ? 1 : 0, s.evaluate('!!SW.inn'), s.evaluate("[].some.call(document.querySelectorAll('[data-sw-console][data-sw-small]'),function(e){return e.getBoundingClientRect().width>0})") ? 'small' : 'big']] << [c['name'], cr0.to_f, c['view'] || 'full'] unless cr0.empty? || (c['fields'] || {})['unit'] == 'fahrenheit' || c['name'].start_with?('wide-')   # wide numbers shrink their digits (fit rule), the ratio is for normal values
       DIAL_R[[dev.is_a?(Hash) ? dev[:model] : dev, c['view'] || 'full', c['orientation'], c['text_scale']]] << [c['name'], rw.split.map(&:to_f).min] unless rw.empty?
       puts "DIALR #{c['name']}: #{rw}"
       puts "ARC #{c['name']}: #{arc}"

@@ -69,7 +69,6 @@ The real transform and markup run in the page (LiquidJS), inside TRMNL's `trmnl-
 | Palma full-port, empty band | Day rows are fixed at 6 cqh on a very tall screen and leave gaps over 12 % of the panel. Fix: a 5th day row on tall screens, chosen from the device size class or `trmnl.device` height, never a measurement. |
 | generic_16_9 hv | Day rows 65.2 px against the 67.2 floor (3 rows in 1080 px): give the days a larger share of the hv height on wide screens. |
 | Palma hh CONDRATIO | 1.2 against the full view: the half horizontal on md portrait goes through `swOGPortrait` (CSS label size, 21 cqh digits), not the small console. |
-| OG hv and quadrant CONDRATIO | B16 (big OG digits, owner 2026-11-15 "C it is"): the full view's condition/digit ratio fell from about 0.36 to 0.17 (the half horizontal follows, 0.21); the hv and quadrant consoles cannot grow their digits twice, so their ratio (0.36 to 0.39) is 2.1 to 2.3 times the full view's on every md-class screen with the OG layout. Known red until the owner decides: relative rule per console size, or larger digits there. |
 | Device tier, own-sensor cases | 8 of the 117 `-sens` cases are red at 202a477 and unchanged by B13: `avalue_epd_42s__full-sens`, `avalue_epd_42s__full-port-sens`, `generic_16_9__full-sens` (icon level with block row), `kobo_clara_2e__full-sens` (digit height), `kobo_libra_color__full-port-sens`, `onyx_boox_go_10_3_lumi__full-port-sens`, `tcl_nxtpaper_14__full-port-sens` (row 2 icon meets low), `palma__full-port-sens` (empty band under the days). |
 
 ## Licence
