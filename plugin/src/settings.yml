@@ -105,6 +105,271 @@ custom_fields:
   - Show: show
   - Hide: hide
   default: show
+- keyname: sensor_source
+  group: Sensor
+  field_type: select
+  name: Sensor source
+  description: 'Where the indoor reading comes from: a TRMNL sensor (this screen''s own, or another TRMNL by its number below), or a link to your own gear. The fields for the chosen source show below.'
+  options:
+  - This TRMNL: own
+  - Another TRMNL: other
+  - Home Assistant: ha
+  - Awair: awair
+  - AirGradient: airgradient
+  - Sensibo: sensibo
+  - Ecowitt: ecowitt
+  - Adafruit IO: adafruit
+  - Custom link (JSON): custom
+  default: own
+  conditional_validation:
+  - when: 'own'
+    hidden:
+    - sensor_ha_url
+    - sensor_ha_token
+    - sensor_ha_temp
+    - sensor_ha_hum
+    - sensor_ha_co2
+    - sensor_awair_token
+    - sensor_awair_type
+    - sensor_awair_id
+    - sensor_ag_token
+    - sensor_ag_location
+    - sensor_sb_key
+    - sensor_sb_id
+    - sensor_ew_app
+    - sensor_ew_key
+    - sensor_ew_mac
+    - sensor_ada_user
+    - sensor_ada_key
+    - sensor_ada_temp
+    - sensor_ada_hum
+    - sensor_ada_co2
+    - sensor_temp_unit
+    - sensor_cu_url
+    - sensor_cu_header
+    - sensor_cu_token
+    - sensor_cu_temp
+    - sensor_cu_hum
+    - sensor_cu_co2
+    - sensor_cu_time
+  - when: 'other'
+    hidden:
+    - sensor_ha_url
+    - sensor_ha_token
+    - sensor_ha_temp
+    - sensor_ha_hum
+    - sensor_ha_co2
+    - sensor_awair_token
+    - sensor_awair_type
+    - sensor_awair_id
+    - sensor_ag_token
+    - sensor_ag_location
+    - sensor_sb_key
+    - sensor_sb_id
+    - sensor_ew_app
+    - sensor_ew_key
+    - sensor_ew_mac
+    - sensor_ada_user
+    - sensor_ada_key
+    - sensor_ada_temp
+    - sensor_ada_hum
+    - sensor_ada_co2
+    - sensor_temp_unit
+    - sensor_cu_url
+    - sensor_cu_header
+    - sensor_cu_token
+    - sensor_cu_temp
+    - sensor_cu_hum
+    - sensor_cu_co2
+    - sensor_cu_time
+  - when: 'ha'
+    hidden:
+    - sensor_device_id
+    - sensor_awair_token
+    - sensor_awair_type
+    - sensor_awair_id
+    - sensor_ag_token
+    - sensor_ag_location
+    - sensor_sb_key
+    - sensor_sb_id
+    - sensor_ew_app
+    - sensor_ew_key
+    - sensor_ew_mac
+    - sensor_ada_user
+    - sensor_ada_key
+    - sensor_ada_temp
+    - sensor_ada_hum
+    - sensor_ada_co2
+    - sensor_temp_unit
+    - sensor_cu_url
+    - sensor_cu_header
+    - sensor_cu_token
+    - sensor_cu_temp
+    - sensor_cu_hum
+    - sensor_cu_co2
+    - sensor_cu_time
+  - when: 'awair'
+    hidden:
+    - sensor_device_id
+    - sensor_ha_url
+    - sensor_ha_token
+    - sensor_ha_temp
+    - sensor_ha_hum
+    - sensor_ha_co2
+    - sensor_ag_token
+    - sensor_ag_location
+    - sensor_sb_key
+    - sensor_sb_id
+    - sensor_ew_app
+    - sensor_ew_key
+    - sensor_ew_mac
+    - sensor_ada_user
+    - sensor_ada_key
+    - sensor_ada_temp
+    - sensor_ada_hum
+    - sensor_ada_co2
+    - sensor_temp_unit
+    - sensor_cu_url
+    - sensor_cu_header
+    - sensor_cu_token
+    - sensor_cu_temp
+    - sensor_cu_hum
+    - sensor_cu_co2
+    - sensor_cu_time
+  - when: 'airgradient'
+    hidden:
+    - sensor_device_id
+    - sensor_ha_url
+    - sensor_ha_token
+    - sensor_ha_temp
+    - sensor_ha_hum
+    - sensor_ha_co2
+    - sensor_awair_token
+    - sensor_awair_type
+    - sensor_awair_id
+    - sensor_sb_key
+    - sensor_sb_id
+    - sensor_ew_app
+    - sensor_ew_key
+    - sensor_ew_mac
+    - sensor_ada_user
+    - sensor_ada_key
+    - sensor_ada_temp
+    - sensor_ada_hum
+    - sensor_ada_co2
+    - sensor_temp_unit
+    - sensor_cu_url
+    - sensor_cu_header
+    - sensor_cu_token
+    - sensor_cu_temp
+    - sensor_cu_hum
+    - sensor_cu_co2
+    - sensor_cu_time
+  - when: 'sensibo'
+    hidden:
+    - sensor_device_id
+    - sensor_ha_url
+    - sensor_ha_token
+    - sensor_ha_temp
+    - sensor_ha_hum
+    - sensor_ha_co2
+    - sensor_awair_token
+    - sensor_awair_type
+    - sensor_awair_id
+    - sensor_ag_token
+    - sensor_ag_location
+    - sensor_ew_app
+    - sensor_ew_key
+    - sensor_ew_mac
+    - sensor_ada_user
+    - sensor_ada_key
+    - sensor_ada_temp
+    - sensor_ada_hum
+    - sensor_ada_co2
+    - sensor_temp_unit
+    - sensor_cu_url
+    - sensor_cu_header
+    - sensor_cu_token
+    - sensor_cu_temp
+    - sensor_cu_hum
+    - sensor_cu_co2
+    - sensor_cu_time
+  - when: 'ecowitt'
+    hidden:
+    - sensor_device_id
+    - sensor_ha_url
+    - sensor_ha_token
+    - sensor_ha_temp
+    - sensor_ha_hum
+    - sensor_ha_co2
+    - sensor_awair_token
+    - sensor_awair_type
+    - sensor_awair_id
+    - sensor_ag_token
+    - sensor_ag_location
+    - sensor_sb_key
+    - sensor_sb_id
+    - sensor_ada_user
+    - sensor_ada_key
+    - sensor_ada_temp
+    - sensor_ada_hum
+    - sensor_ada_co2
+    - sensor_temp_unit
+    - sensor_cu_url
+    - sensor_cu_header
+    - sensor_cu_token
+    - sensor_cu_temp
+    - sensor_cu_hum
+    - sensor_cu_co2
+    - sensor_cu_time
+  - when: 'adafruit'
+    hidden:
+    - sensor_device_id
+    - sensor_ha_url
+    - sensor_ha_token
+    - sensor_ha_temp
+    - sensor_ha_hum
+    - sensor_ha_co2
+    - sensor_awair_token
+    - sensor_awair_type
+    - sensor_awair_id
+    - sensor_ag_token
+    - sensor_ag_location
+    - sensor_sb_key
+    - sensor_sb_id
+    - sensor_ew_app
+    - sensor_ew_key
+    - sensor_ew_mac
+    - sensor_cu_url
+    - sensor_cu_header
+    - sensor_cu_token
+    - sensor_cu_temp
+    - sensor_cu_hum
+    - sensor_cu_co2
+    - sensor_cu_time
+  - when: 'custom'
+    hidden:
+    - sensor_device_id
+    - sensor_ha_url
+    - sensor_ha_token
+    - sensor_ha_temp
+    - sensor_ha_hum
+    - sensor_ha_co2
+    - sensor_awair_token
+    - sensor_awair_type
+    - sensor_awair_id
+    - sensor_ag_token
+    - sensor_ag_location
+    - sensor_sb_key
+    - sensor_sb_id
+    - sensor_ew_app
+    - sensor_ew_key
+    - sensor_ew_mac
+    - sensor_ada_user
+    - sensor_ada_key
+    - sensor_ada_temp
+    - sensor_ada_hum
+    - sensor_ada_co2
 - keyname: sensor_device_id
   group: Sensor
   field_type: string
@@ -116,6 +381,181 @@ custom_fields:
   description-nl: 'Optioneel. Om de sensor van een andere TRMNL te tonen, vul het nummer van dat apparaat in: de cijfers in het adres van zijn pagina op trmnl.com (.../devices/1234). Laat leeg voor de sensor van dit scherm.'
   description-ja: '任意。別のTRMNLのセンサーを表示するには、そのデバイスの番号（trmnl.comのデバイスページのアドレスにある数字、.../devices/1234）を入力します。空欄ならこの画面のセンサーを使います。'
   placeholder: '1234'
+- keyname: sensor_ha_url
+  group: Sensor
+  field_type: string
+  name: 'Home Assistant address'
+  description: 'The address of your Home Assistant from the internet, starting with https:// (for example a Cloudflare tunnel or Nabu Casa address). TRMNL fetches it from the cloud, so a local address does not work.'
+  placeholder: 'https://home.example.com'
+- keyname: sensor_ha_token
+  group: Sensor
+  field_type: password
+  name: 'Home Assistant token'
+  description: 'A long-lived access token: your profile in Home Assistant, Security, Long-lived access tokens.'
+- keyname: sensor_ha_temp
+  group: Sensor
+  field_type: string
+  name: 'Temperature entity'
+  description: 'Entity id of the temperature sensor, for example sensor.living_room_temperature. Fahrenheit is converted.'
+  placeholder: 'sensor.living_room_temperature'
+- keyname: sensor_ha_hum
+  group: Sensor
+  field_type: string
+  name: 'Humidity entity'
+  description: 'Optional. Entity id of the humidity sensor.'
+  placeholder: 'sensor.living_room_humidity'
+  optional: true
+- keyname: sensor_ha_co2
+  group: Sensor
+  field_type: string
+  name: 'CO2 entity'
+  description: 'Optional. Entity id of the CO2 sensor (ppm).'
+  placeholder: 'sensor.living_room_co2'
+  optional: true
+- keyname: sensor_awair_token
+  group: Sensor
+  field_type: password
+  name: 'Awair access token'
+  description: 'The access token from the Awair Developer Console (developer.getawair.com). The free tier allows 300 readings per device per day.'
+- keyname: sensor_awair_type
+  group: Sensor
+  field_type: string
+  name: 'Awair device type'
+  description: 'Optional. For example awair-element or awair-r2. Empty with an empty device id: your first Awair.'
+  placeholder: 'awair-element'
+  optional: true
+- keyname: sensor_awair_id
+  group: Sensor
+  field_type: string
+  name: 'Awair device id'
+  description: 'Optional. The number of the device (digits). Empty: your first Awair.'
+  placeholder: '12345'
+  optional: true
+- keyname: sensor_ag_token
+  group: Sensor
+  field_type: password
+  name: 'AirGradient token'
+  description: 'The token of your place: app.airgradient.com, Settings, Place.'
+- keyname: sensor_ag_location
+  group: Sensor
+  field_type: string
+  name: 'AirGradient location id'
+  description: 'Optional. The number of the monitor (digits). Empty: the first indoor monitor of the place.'
+  placeholder: '12345'
+  optional: true
+- keyname: sensor_sb_key
+  group: Sensor
+  field_type: password
+  name: 'Sensibo API key'
+  description: 'Your key: home.sensibo.com/me/api.'
+- keyname: sensor_sb_id
+  group: Sensor
+  field_type: string
+  name: 'Sensibo device id'
+  description: 'Optional. The id of the device. Empty: your first device with a reading.'
+  placeholder: 'AbCd1234'
+  optional: true
+- keyname: sensor_ew_app
+  group: Sensor
+  field_type: password
+  name: 'Ecowitt application key'
+  description: 'From your account on ecowitt.net, API management.'
+- keyname: sensor_ew_key
+  group: Sensor
+  field_type: password
+  name: 'Ecowitt API key'
+  description: 'From your account on ecowitt.net, API management.'
+- keyname: sensor_ew_mac
+  group: Sensor
+  field_type: string
+  name: 'Ecowitt MAC address'
+  description: 'The MAC of the weather station or gateway, for example FF:FF:FF:FF:FF:FF.'
+  placeholder: 'FF:FF:FF:FF:FF:FF'
+- keyname: sensor_ada_user
+  group: Sensor
+  field_type: string
+  name: 'Adafruit IO username'
+  description: 'Your Adafruit IO username.'
+- keyname: sensor_ada_key
+  group: Sensor
+  field_type: password
+  name: 'Adafruit IO key'
+  description: 'Your Adafruit IO key (the active key on your dashboard).'
+- keyname: sensor_ada_temp
+  group: Sensor
+  field_type: string
+  name: 'Temperature feed key'
+  description: 'The key of the feed that holds the temperature (the last value is used).'
+  placeholder: 'living-room-temperature'
+- keyname: sensor_ada_hum
+  group: Sensor
+  field_type: string
+  name: 'Humidity feed key'
+  description: 'Optional. The key of the humidity feed.'
+  placeholder: 'living-room-humidity'
+  optional: true
+- keyname: sensor_ada_co2
+  group: Sensor
+  field_type: string
+  name: 'CO2 feed key'
+  description: 'Optional. The key of the CO2 feed (ppm).'
+  placeholder: 'living-room-co2'
+  optional: true
+- keyname: sensor_temp_unit
+  group: Sensor
+  field_type: select
+  name: 'Temperature unit of the source'
+  description: 'Celsius or Fahrenheit, as the source reports it.'
+  options:
+  - Celsius: celsius
+  - Fahrenheit: fahrenheit
+  default: celsius
+- keyname: sensor_cu_url
+  group: Sensor
+  field_type: string
+  name: 'JSON link'
+  description: 'A link starting with https:// that answers JSON. Any key it needs can be part of the link or go in the header below.'
+  placeholder: 'https://example.com/api/room.json'
+- keyname: sensor_cu_header
+  group: Sensor
+  field_type: string
+  name: 'Header name'
+  description: 'Optional. The header that carries the token, for example X-Api-Key. Empty with a token: Authorization: Bearer.'
+  placeholder: 'X-Api-Key'
+  optional: true
+- keyname: sensor_cu_token
+  group: Sensor
+  field_type: password
+  name: 'Token'
+  description: 'Optional. The token sent in the header.'
+  optional: true
+- keyname: sensor_cu_temp
+  group: Sensor
+  field_type: string
+  name: 'Temperature path'
+  description: 'Where the temperature is in the answer, with dots: data.temperature, or readings.0.temp for a list.'
+  placeholder: 'data.temperature'
+- keyname: sensor_cu_hum
+  group: Sensor
+  field_type: string
+  name: 'Humidity path'
+  description: 'Optional. Where the humidity (percent) is.'
+  placeholder: 'data.humidity'
+  optional: true
+- keyname: sensor_cu_co2
+  group: Sensor
+  field_type: string
+  name: 'CO2 path'
+  description: 'Optional. Where the CO2 (ppm) is.'
+  placeholder: 'data.co2'
+  optional: true
+- keyname: sensor_cu_time
+  group: Sensor
+  field_type: string
+  name: 'Time path'
+  description: 'Optional. Where the time of the reading is (epoch seconds or an ISO date). Empty: the reading counts as new.'
+  placeholder: 'data.time'
+  optional: true
 - keyname: sensor_label
   group: Sensor
   field_type: string

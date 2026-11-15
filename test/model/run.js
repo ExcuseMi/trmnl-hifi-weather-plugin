@@ -134,8 +134,11 @@ test('time format: the setting decides, 24 h when missing, the TIME constant ove
   eq([T.timeIs12('24', '12'), T.timeIs12('12', '24')], [false, true], 'constant wins');
   const y = fs.readFileSync(path.join(__dirname, '../../plugin/src/settings.yml'), 'utf-8');
   const fields = y.split(/^- keyname: /m).slice(1).map((part) => ({ key: part.split('\n')[0], group: (/^  group: (.+)$/m.exec(part) || [])[1] || null }));
-  eq(fields.map((f) => f.key), ['author_info', 'lat_lon', 'unit', 'time_format', 'bottom', 'hide_title_bar', 'sensor_show', 'sensor_device_id', 'sensor_label', 'sensor_primary', 'sensor_co2', 'legend'], 'settings in owner order (owner 2026-11-15: the sensor group reads source, label, main reading, CO2)');
-  eq(fields.map((f) => f.group), [null, null, 'Display', 'Display', 'Display', 'Display', 'Sensor', 'Sensor', 'Sensor', 'Sensor', 'Sensor', 'Legend'], 'settings groups (the legend is the last, collapsed group)');
+  const OLD = ['author_info', 'lat_lon', 'unit', 'time_format', 'bottom', 'hide_title_bar', 'sensor_show', 'sensor_device_id', 'sensor_label', 'sensor_primary', 'sensor_co2', 'legend'];
+  eq(fields.map((f) => f.key).filter((k) => OLD.includes(k)), OLD, 'B22: every existing setting key is still there, in the same order (saved values keep working; owner 2026-11-15: the sensor group reads source, label, main reading, CO2)');
+  eq(fields.filter((f) => OLD.includes(f.key)).map((f) => f.group), [null, null, 'Display', 'Display', 'Display', 'Display', 'Sensor', 'Sensor', 'Sensor', 'Sensor', 'Sensor', 'Legend'], 'settings groups (the legend is the last, collapsed group)');
+  ok(fields.filter((f) => !OLD.includes(f.key)).every((f) => f.group === 'Sensor' && /^sensor_/.test(f.key)), 'B22: the new source settings are all in the Sensor group');
+  eq(fields.map((f) => f.key).indexOf('sensor_source'), fields.map((f) => f.key).indexOf('sensor_show') + 1, 'the source select follows the Sensor show/hide select');
   // B13 (owner 2026-11-14) overrides 'a screen shows only its own sensor': an optional setting picks another TRMNL's sensor; empty keeps the own one
   const part = (k) => y.split(/^- keyname: /m).slice(1).find((q) => q.startsWith(k + '\n'));
   ['sensor_device_id', 'sensor_label', 'sensor_primary'].forEach((k) => ['description', 'description-de', 'description-fr', 'description-es-ES', 'description-nl', 'description-ja'].forEach((d) => ok(new RegExp('^  ' + d + ': .{20,}', 'm').test(part(k)), k + ' has ' + d)));
@@ -835,7 +838,7 @@ test('location icons (owner 2026-11-14, B10): the outdoor icon is ink on 1-bit (
   ok(/data-sw-part="loc"[^>]*data-sw-lz/.test(sh) && /data-sw-lsp/.test(sh) && /1\.4 \* parseFloat\(getComputedStyle\(lzu\)\.fontSize\)/.test(sh), 'twin readout icons: marked, spacer marked, 1.4 unit fonts in swPaint');
 });
 async function aTest(name, fn) { try { await fn(); passed++; } catch (e) { failed++; console.log('FAIL ' + name + ': ' + e.message); } }
-sensorSettingsTests().then(stateTests).then(() => aTest('a hanging request ends within TRMNL\'s 5 s', hangTest)).then(() => aTest('a request deaf to its abort signal', deafTest)).then(() => aTest('no polling URLs; IDX data used when present', pollTest)).then(() => {
+sensorSettingsTests().then(() => require('./sensors.js')({ T, fx, check: aTest, eq, ok })).then(stateTests).then(() => aTest('a hanging request ends within TRMNL\'s 5 s', hangTest)).then(() => aTest('a request deaf to its abort signal', deafTest)).then(() => aTest('no polling URLs; IDX data used when present', pollTest)).then(() => {
   console.log(passed + ' passed, ' + failed + ' failed');
   process.exit(failed ? 1 : 0);
 });
