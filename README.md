@@ -32,15 +32,17 @@ Every view (full, half horizontal, half vertical, quadrant), 1-bit, greyscale an
 
 Set **Sensor** to a provider and fill in the fields that show. The reading takes the place of a TRMNL sensor (house icon, label, main reading, CO2 meter when the source gives CO2; None shows no CO2 meter). TRMNL fetches it from the cloud: the source must be reachable from the internet. Tokens sit in password fields and go only to the provider. Readings older than 3 hours are ignored; when the source fails the last good reading stays up to 3 hours and the bottom bar says SENSOR OFFLINE with its time.
 
+Beta = built from the provider's API docs, not yet confirmed with a real device; tell us if one fails.
+
 | Source | What you fill in | API docs |
 |---|---|---|
-| Home Assistant | Address of your Home Assistant from the internet (https://, for example Nabu Casa or a Cloudflare tunnel; a local address does not work), a long-lived access token (your profile, Security), the entity ids for temperature, humidity and CO2 (humidity and CO2 optional). Fahrenheit entities are converted. | https://developers.home-assistant.io/docs/api/rest/ |
-| Awair | Access token from the Awair Developer Console. Device type and id are optional (empty: your first Awair). The free tier allows 300 readings per device per day. | https://docs.developer.getawair.com/ |
-| AirGradient | Token of your place (app.airgradient.com, Settings, Place). Location id optional (empty: the first indoor monitor). | https://api.airgradient.com/public/docs/api/v1/ |
-| Sensibo | API key from home.sensibo.com/me/api. Device id optional (empty: your first device with a reading). Temperature and humidity only. Unit assumed Celsius. | https://sensibo.github.io/api/ |
-| Ecowitt | Application key and API key from ecowitt.net (API management) and the MAC of the station. Indoor temperature, humidity and, with a CO2 sensor, CO2. | https://doc.ecowitt.net/web/#/apiv3en?page_id=17 |
-| Adafruit IO | Username, active key, and the feed key for each reading (temperature required), plus the unit the temperature feed uses. | https://io.adafruit.com/api/docs/ |
-| Custom link (JSON) | Any https:// link that answers JSON: optional header name and token, a dot path for each reading (data.rooms.0.temp), optional time path, the temperature unit. | - |
+| Home Assistant | Tested. Address of your Home Assistant from the internet (https://, for example Nabu Casa or a Cloudflare tunnel; a local address does not work), a long-lived access token (your profile, Security), the entity ids for temperature, humidity and CO2 (humidity and CO2 optional). Fahrenheit entities are converted. | https://developers.home-assistant.io/docs/api/rest/ |
+| Awair | **Beta**. Access token from the Awair Developer Console. Device type and id are optional (empty: your first Awair). The free tier allows 300 readings per device per day. | https://docs.developer.getawair.com/ |
+| AirGradient | **Beta**. Token of your place (app.airgradient.com, Settings, Place). Location id optional (empty: the first indoor monitor). | https://api.airgradient.com/public/docs/api/v1/ |
+| Sensibo | **Beta**. API key from home.sensibo.com/me/api. Device id optional (empty: your first device with a reading). Temperature and humidity only. Unit assumed Celsius. | https://sensibo.github.io/api/ |
+| Ecowitt | **Beta**. Application key and API key from ecowitt.net (API management) and the MAC of the station. Indoor temperature, humidity and, with a CO2 sensor, CO2. | https://doc.ecowitt.net/web/#/apiv3en?page_id=17 |
+| Adafruit IO | **Beta**. Username, active key, and the feed key for each reading (temperature required), plus the unit the temperature feed uses. | https://io.adafruit.com/api/docs/ |
+| Custom link (JSON) | **Beta**. Any https:// link that answers JSON: optional header name and token, a dot path for each reading (data.rooms.0.temp), optional time path, the temperature unit. | - |
 
 ### Adding a provider
 

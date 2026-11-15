@@ -218,14 +218,15 @@ ol.legend li{padding:5px 0;font-size:.92rem}
 <section id="sources">
   <h2>Indoor sensor sources</h2>
   <p>Set <b>Sensor</b> to a provider and fill in the fields that show. The reading takes the place of a TRMNL sensor: same house icon, label, main reading and CO2 meter (shown when the source gives CO2). TRMNL fetches it from the cloud, so the source must be reachable from the internet. Tokens go in password fields and are only sent to the provider. A reading older than 3 hours is ignored; when the source fails, the last good reading stays for up to 3 hours and the bottom bar says SENSOR OFFLINE with its time.</p>
+  <p><b>Beta</b> = built from the provider's API docs, not yet confirmed with a real device; tell us if one fails.</p>
   <table>
-    <tr><th>Home Assistant</th><td>Address of your Home Assistant from the internet (https://, for example Nabu Casa or a Cloudflare tunnel; a local address does not work), a long-lived access token (your profile, Security), the entity ids for temperature, humidity and CO2 (humidity and CO2 optional). Fahrenheit entities are converted. <a href="https://developers.home-assistant.io/docs/api/rest/">API</a>.</td></tr>
-    <tr><th>Awair</th><td>Access token from the Awair Developer Console. Device type and id are optional (empty: your first Awair). The free tier allows 300 readings per device per day. <a href="https://docs.developer.getawair.com/">API</a>.</td></tr>
-    <tr><th>AirGradient</th><td>Token of your place (app.airgradient.com, Settings, Place). Location id optional (empty: the first indoor monitor). <a href="https://api.airgradient.com/public/docs/api/v1/">API</a>.</td></tr>
-    <tr><th>Sensibo</th><td>API key from home.sensibo.com/me/api. Device id optional (empty: your first device with a reading). Temperature and humidity only. Unit assumed Celsius. <a href="https://sensibo.github.io/api/">API</a>.</td></tr>
-    <tr><th>Ecowitt</th><td>Application key and API key from ecowitt.net (API management) and the MAC of the station. Indoor temperature, humidity and, with a CO2 sensor, CO2. <a href="https://doc.ecowitt.net/web/#/apiv3en?page_id=17">API</a>.</td></tr>
-    <tr><th>Adafruit IO</th><td>Username, active key, and the feed key for each reading (temperature required), plus the unit the temperature feed uses. <a href="https://io.adafruit.com/api/docs/">API</a>.</td></tr>
-    <tr><th>Custom link (JSON)</th><td>Any https:// link that answers JSON: optional header name and token, a dot path for each reading (data.rooms.0.temp), optional time path, the temperature unit.</td></tr>
+    <tr><th>Home Assistant</th><td><b>Tested.</b> Address of your Home Assistant from the internet (https://, for example Nabu Casa or a Cloudflare tunnel; a local address does not work), a long-lived access token (your profile, Security), the entity ids for temperature, humidity and CO2 (humidity and CO2 optional). Fahrenheit entities are converted. <a href="https://developers.home-assistant.io/docs/api/rest/">API</a>.</td></tr>
+    <tr><th>Awair</th><td><b>Beta.</b> Access token from the Awair Developer Console. Device type and id are optional (empty: your first Awair). The free tier allows 300 readings per device per day. <a href="https://docs.developer.getawair.com/">API</a>.</td></tr>
+    <tr><th>AirGradient</th><td><b>Beta.</b> Token of your place (app.airgradient.com, Settings, Place). Location id optional (empty: the first indoor monitor). <a href="https://api.airgradient.com/public/docs/api/v1/">API</a>.</td></tr>
+    <tr><th>Sensibo</th><td><b>Beta.</b> API key from home.sensibo.com/me/api. Device id optional (empty: your first device with a reading). Temperature and humidity only. Unit assumed Celsius. <a href="https://sensibo.github.io/api/">API</a>.</td></tr>
+    <tr><th>Ecowitt</th><td><b>Beta.</b> Application key and API key from ecowitt.net (API management) and the MAC of the station. Indoor temperature, humidity and, with a CO2 sensor, CO2. <a href="https://doc.ecowitt.net/web/#/apiv3en?page_id=17">API</a>.</td></tr>
+    <tr><th>Adafruit IO</th><td><b>Beta.</b> Username, active key, and the feed key for each reading (temperature required), plus the unit the temperature feed uses. <a href="https://io.adafruit.com/api/docs/">API</a>.</td></tr>
+    <tr><th>Custom link (JSON)</th><td><b>Beta.</b> Any https:// link that answers JSON: optional header name and token, a dot path for each reading (data.rooms.0.temp), optional time path, the temperature unit.</td></tr>
   </table>
 </section>
 

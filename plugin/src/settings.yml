@@ -100,23 +100,23 @@ custom_fields:
   name-es-ES: 'Sensor'
   name-nl: 'Sensor'
   name-ja: 'センサー'
-  description: 'Where the indoor reading comes from. None: outside weather only. This TRMNL: this screen''s own sensor. Another TRMNL: needs its device number. Home Assistant: address, token, entity ids. Awair: token. AirGradient: token. Sensibo: API key. Ecowitt: application key, API key, MAC. Adafruit IO: user, key, feeds. Custom link: a JSON link and where the readings are in it. The fields for the chosen option show below.'
-  description-de: 'Woher der Innenwert kommt. Keiner: nur das Außenwetter. Dieses TRMNL: der eigene Sensor dieses Bildschirms. Anderes TRMNL: braucht dessen Gerätenummer. Home Assistant: Adresse, Token, Entitäts-IDs. Awair: Token. AirGradient: Token. Sensibo: API-Schlüssel. Ecowitt: Application-Key, API-Schlüssel, MAC. Adafruit IO: Benutzer, Schlüssel, Feeds. Eigener Link: ein JSON-Link und die Fundstellen der Werte. Die Felder der gewählten Option erscheinen darunter.'
-  description-fr: 'D''où vient la mesure intérieure. Aucun : seulement la météo extérieure. Ce TRMNL : le capteur de cet écran. Autre TRMNL : demande son numéro d''appareil. Home Assistant : adresse, jeton, identifiants d''entités. Awair : jeton. AirGradient : jeton. Sensibo : clé API. Ecowitt : clé d''application, clé API, MAC. Adafruit IO : utilisateur, clé, flux. Lien perso : un lien JSON et l''emplacement des mesures. Les champs de l''option choisie s''affichent dessous.'
-  description-es-ES: 'De dónde viene la lectura interior. Ninguno: solo el tiempo exterior. Este TRMNL: el sensor de esta pantalla. Otro TRMNL: necesita su número de dispositivo. Home Assistant: dirección, token, ID de entidades. Awair: token. AirGradient: token. Sensibo: clave API. Ecowitt: clave de aplicación, clave API, MAC. Adafruit IO: usuario, clave, feeds. Enlace propio: un enlace JSON y dónde están las lecturas. Los campos de la opción elegida aparecen debajo.'
-  description-nl: 'Waar de binnenmeting vandaan komt. Geen: alleen het buitenweer. Deze TRMNL: de eigen sensor van dit scherm. Andere TRMNL: vraagt om het apparaatnummer. Home Assistant: adres, token, entiteit-id''s. Awair: token. AirGradient: token. Sensibo: API-sleutel. Ecowitt: applicatiesleutel, API-sleutel, MAC. Adafruit IO: gebruiker, sleutel, feeds. Eigen link: een JSON-link en waar de metingen erin staan. De velden van de gekozen optie verschijnen hieronder.'
-  description-ja: '室内の値の取得元。なし：屋外の天気のみ。このTRMNL：この画面のセンサー。別のTRMNL：そのデバイス番号が必要。Home Assistant：アドレス、トークン、エンティティID。Awair：トークン。AirGradient：トークン。Sensibo：APIキー。Ecowitt：アプリケーションキー、APIキー、MAC。Adafruit IO：ユーザー、キー、フィード。独自リンク：JSONリンクと値の場所。選んだ項目のフィールドが下に表示されます。'
+  description: 'Where the indoor reading comes from. None: outside weather only. This TRMNL: this screen''s own sensor. Another TRMNL: needs its device number. Home Assistant: address, token, entity ids. Awair: token. AirGradient: token. Sensibo: API key. Ecowitt: application key, API key, MAC. Adafruit IO: user, key, feeds. Custom link: a JSON link and where the readings are in it. The fields for the chosen option show below. Beta: built from the provider''s API docs, not yet confirmed with a real device; tell us if one fails.'
+  description-de: 'Woher der Innenwert kommt. Keiner: nur das Außenwetter. Dieses TRMNL: der eigene Sensor dieses Bildschirms. Anderes TRMNL: braucht dessen Gerätenummer. Home Assistant: Adresse, Token, Entitäts-IDs. Awair: Token. AirGradient: Token. Sensibo: API-Schlüssel. Ecowitt: Application-Key, API-Schlüssel, MAC. Adafruit IO: Benutzer, Schlüssel, Feeds. Eigener Link: ein JSON-Link und die Fundstellen der Werte. Die Felder der gewählten Option erscheinen darunter. Beta: nach der API-Dokumentation des Anbieters gebaut, noch nicht mit einem echten Gerät bestätigt; sag uns, wenn eines fehlschlägt.'
+  description-fr: 'D''où vient la mesure intérieure. Aucun : seulement la météo extérieure. Ce TRMNL : le capteur de cet écran. Autre TRMNL : demande son numéro d''appareil. Home Assistant : adresse, jeton, identifiants d''entités. Awair : jeton. AirGradient : jeton. Sensibo : clé API. Ecowitt : clé d''application, clé API, MAC. Adafruit IO : utilisateur, clé, flux. Lien perso : un lien JSON et l''emplacement des mesures. Les champs de l''option choisie s''affichent dessous. Bêta : conçu d''après la documentation de l''API du fournisseur, pas encore confirmé avec un vrai appareil ; dis-nous si un échoue.'
+  description-es-ES: 'De dónde viene la lectura interior. Ninguno: solo el tiempo exterior. Este TRMNL: el sensor de esta pantalla. Otro TRMNL: necesita su número de dispositivo. Home Assistant: dirección, token, ID de entidades. Awair: token. AirGradient: token. Sensibo: clave API. Ecowitt: clave de aplicación, clave API, MAC. Adafruit IO: usuario, clave, feeds. Enlace propio: un enlace JSON y dónde están las lecturas. Los campos de la opción elegida aparecen debajo. Beta: creado con la documentación de la API del proveedor, aún sin confirmar con un dispositivo real; avísanos si alguno falla.'
+  description-nl: 'Waar de binnenmeting vandaan komt. Geen: alleen het buitenweer. Deze TRMNL: de eigen sensor van dit scherm. Andere TRMNL: vraagt om het apparaatnummer. Home Assistant: adres, token, entiteit-id''s. Awair: token. AirGradient: token. Sensibo: API-sleutel. Ecowitt: applicatiesleutel, API-sleutel, MAC. Adafruit IO: gebruiker, sleutel, feeds. Eigen link: een JSON-link en waar de metingen erin staan. De velden van de gekozen optie verschijnen hieronder. Beta: gebouwd op basis van de API-documentatie van de aanbieder, nog niet bevestigd met een echt apparaat; laat het ons weten als er een faalt.'
+  description-ja: '室内の値の取得元。なし：屋外の天気のみ。このTRMNL：この画面のセンサー。別のTRMNL：そのデバイス番号が必要。Home Assistant：アドレス、トークン、エンティティID。Awair：トークン。AirGradient：トークン。Sensibo：APIキー。Ecowitt：アプリケーションキー、APIキー、MAC。Adafruit IO：ユーザー、キー、フィード。独自リンク：JSONリンクと値の場所。選んだ項目のフィールドが下に表示されます。 ベータ：提供元のAPI資料から作成。実機ではまだ未確認です。うまく動かない場合はお知らせください。'
   options:
   - None (hide): none
   - This TRMNL: own
   - Another TRMNL: other
   - Home Assistant: home_assistant
-  - Awair: awair
-  - AirGradient: airgradient
-  - Sensibo: sensibo
-  - Ecowitt: ecowitt
-  - Adafruit IO: adafruit
-  - Custom link (JSON): custom
+  - Awair (beta): awair
+  - AirGradient (beta): airgradient
+  - Sensibo (beta): sensibo
+  - Ecowitt (beta): ecowitt
+  - Adafruit IO (beta): adafruit
+  - Custom link (JSON) (beta): custom
   default: own
   conditional_validation:
   - when: 'none'

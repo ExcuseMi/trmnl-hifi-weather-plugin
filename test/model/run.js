@@ -152,6 +152,11 @@ test('time format: the setting decides, 24 h when missing, the TIME constant ove
   const optVals = [...blk('sensor_source').matchAll(/^  - [^:\n]+: (\w+)$/gm)].map((m) => m[1]);
   eq(optVals, ['none', 'own', 'other'].concat(PROV), 'Sensor options: None (hide), This TRMNL, Another TRMNL, then the providers');
   eq(cv.map((c) => c.when), optVals, 'one visibility rule per option');
+  // B23 (owner 2026-11-15): providers not yet tried against a real account say (beta) in the option label (the label is the same in every language); the tested ones do not
+  const optLabels = Object.fromEntries([...blk('sensor_source').matchAll(/^  - ([^\n]+): (\w+)$/gm)].map((m) => [m[2], m[1]]));
+  eq(['awair', 'airgradient', 'sensibo', 'ecowitt', 'adafruit', 'custom'].filter((v) => !/ \(beta\)$/.test(optLabels[v])), [], 'B23: the six untested providers are labelled (beta)');
+  eq(['none', 'own', 'other', 'home_assistant'].filter((v) => /beta/i.test(optLabels[v])), [], 'B23: None, the TRMNL options and Home Assistant are not beta');
+  ok(['description', 'description-de', 'description-fr', 'description-es-ES', 'description-nl', 'description-ja'].every((d) => new RegExp('^  ' + d + ": '.*(Beta|Bêta|ベータ)").test(blk('sensor_source').split('\n').find((l) => l.startsWith('  ' + d + ':')))), 'B23: the Sensor description explains beta in all six languages');
   const all = [...new Set(cv.flatMap((c) => c.hidden))], FIELD = /^(token|key|app_key|temp|hum|co2|id|url|type|header|time|unit|user)$/;
   all.forEach((k) => { if (k === 'sensor_device_id') return; const m = /^sensor_(\w+?)_(app_key|\w+)$/.exec(k), pv = PROV.find((x) => k.startsWith('sensor_' + PREF[x] + '_')); ok(pv && FIELD.test(k.slice(('sensor_' + PREF[pv] + '_').length)), k + ' follows sensor_<provider>_<field>'); });
   const ownOf = (o) => all.filter((k) => !c_hidden(o).includes(k)), c_hidden = (o) => cv.find((q) => q.when === o).hidden;
