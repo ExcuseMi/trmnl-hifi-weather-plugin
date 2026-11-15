@@ -66,7 +66,7 @@ The real transform and markup run in the page (LiquidJS), inside TRMNL's `trmnl-
 | Item | Detail |
 |---|---|
 | Palma hh CONDRATIO | Passes at 1.147 against the 1.15 limit (B19 re-measured; the old 1.2 and the full-sens 1.31 no longer show: full-sens has no sibling in its group). Margin is 0.003: a change to the md portrait half horizontal digits or `swOGPortrait` can tip it. |
-| Device tier, own-sensor cases | 7 of the 117 `-sens` cases are red at 202a477 and unchanged by B13: `avalue_epd_42s__full-sens`, `avalue_epd_42s__full-port-sens`, `generic_16_9__full-sens` (icon level with block row), `kobo_clara_2e__full-sens` (digit height), `kobo_libra_color__full-port-sens`, `onyx_boox_go_10_3_lumi__full-port-sens`, `tcl_nxtpaper_14__full-port-sens` (row 2 icon meets low). |
+| Device tier, own-sensor cases | 4 of the 117 `-sens` cases are red at 3a230e7, all on models with no framework CSS rules under trmnlp (the harness gap, see `tools/check_devices.sh` KNOWN): `kobo_clara_2e__full-sens` (digit height 22.4), `kobo_libra_color__full-port-sens`, `onyx_boox_go_10_3_lumi__full-port-sens`, `tcl_nxtpaper_14__full-port-sens` (row 2 icon meets low, gap 1 px). The avalue_epd_42s, generic_16_9 and palma `-sens` cases are green. |
 
 ## Licence
 
