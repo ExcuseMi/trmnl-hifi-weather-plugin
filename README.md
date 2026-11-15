@@ -32,7 +32,7 @@ Every view (full, half horizontal, half vertical, quadrant), 1-bit, greyscale an
 
 ### Indoor sensor sources
 
-Set **Sensor** to a provider and fill in the fields that show. The reading takes the place of a TRMNL sensor (house icon, label, main reading, CO2 meter when the source gives CO2; None shows no CO2 meter). TRMNL fetches it from the cloud: the source must be reachable from the internet. Tokens sit in password fields and go only to the provider. Readings older than 3 hours are ignored; when the source fails the last good reading stays up to 3 hours and the bottom bar says SENSOR OFFLINE with its time.
+Set **Sensor** to a provider and fill in the fields that show. The reading takes the place of a TRMNL sensor (icon from Sensor icon, name, main reading, CO2 meter when the source gives CO2; None shows no CO2 meter). TRMNL fetches it from the cloud: the source must be reachable from the internet. Tokens sit in password fields and go only to the provider. Readings older than 3 hours are ignored; when the source fails the last good reading stays up to 3 hours and the bottom bar says SENSOR OFFLINE with its time.
 
 Beta = built from the provider's API docs, not yet confirmed with a real device; tell us if one fails.
 

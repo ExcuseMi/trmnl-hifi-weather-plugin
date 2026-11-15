@@ -995,7 +995,7 @@ custom_fields:
   description-de: 'Optional. Ein kurzer Name für den Sensor, zum Beispiel Oben. Er steht neben dem Symbol des Sensors und am Thermometer. Leer zeigt nur das Symbol.'
   description-fr: 'Facultatif. Un nom court pour le capteur, par exemple Étage. Il s''affiche à côté de l''icône du capteur et sur le thermomètre. Vide : l''icône seule.'
   description-es-ES: 'Opcional. Un nombre corto para el sensor, por ejemplo Arriba. Se muestra junto al icono del sensor y en el termómetro. Vacío muestra solo el icono.'
-  description-nl: 'Optioneel. Een korte naam voor de sensor, bijvoorbeeld Boven. Hij staat naast het icoon van de sensor en bij de thermometer. Leeg toont alleen het huisje.'
+  description-nl: 'Optioneel. Een korte naam voor de sensor, bijvoorbeeld Boven. Hij staat naast het icoon van de sensor en bij de thermometer. Leeg toont alleen het icoon.'
   description-ja: '任意。センサーの短い名前（例：2階）。センサーのアイコンの横と温度計に表示されます。空欄ならアイコンだけを表示します。'
   placeholder: Upstairs
   optional: true
