@@ -270,7 +270,8 @@ test('rain calendar: 12 hours from the first wet hour, rain hours lit', () => {
 });
 test('dials: needle drawn last, low mark hollow, high mark solid, baro zone icons', () => {
   const t = D.dial({ now: 1.6, lo: 1.4, hi: 13.1, a: 0, b: 15, step: 5 }, 900, 380, false);
-  ok(/<circle[^>]*\/><\/g><\/g><\/svg>$/.test(t), 'hub (needle group) is the last thing drawn');
+  const nl = t.replace(/<g data-sw-dlab.*<\/g><\/svg>$/, '</svg>');   /* B18: only the scale numbers (knock-out group) come after the needle */
+  ok(/<circle[^>]*\/><\/g><\/g><\/svg>$/.test(nl) && nl !== t, 'hub (needle group) is the last thing drawn, then the scale numbers');
   ok(/fill="none" stroke="currentColor"[^>]*stroke-linejoin/.test(t), 'hollow low mark');
   const b = D.dial({ now: 1013, lo: 1008, hi: 1016, a: 970, b: 1050, icons: ['a.svg', 'b.svg', 'c.svg', 'd.svg'] }, 900, 380, true);
   eq((b.match(/<image /g) || []).length, 4, 'four zone icons');
@@ -300,7 +301,7 @@ test('dial light: backlight in light mode (2-bit up), glow in dark (blur 4-bit, 
   ok(/data-sw-glow="4"[\s\S]*feGaussianBlur|feGaussianBlur[\s\S]*data-sw-glow="4"/.test(t({ dark: true, bits: 4 })), 'dark 4-bit blur glow');
   ok(/feMorphology/.test(t({ dark: true, bits: 2 })) && !/feGaussianBlur/.test(t({ dark: true, bits: 2 })), 'dark 2-bit halo, no blur');
   ok(!/data-sw-glow|data-sw-backlight/.test(t({ dark: true, bits: 1 })), '1-bit dark: nothing');
-  ok(/<circle[^>]*\/><\/g><\/g><\/svg>$/.test(t({ dark: true, bits: 4 })), 'needle hub still last');
+  ok(/<circle[^>]*\/><\/g><\/g><\/svg>$/.test(t({ dark: true, bits: 4 }).replace(/<g data-sw-dlab.*<\/g><\/svg>$/, '</svg>')), 'needle hub still last (before the scale numbers)');
 });
 test('dark glow on the lit parts: blur halo on 4-bit, crisp halo on 2-bit, none in light mode or 1-bit (owner 2026-11-12)', () => {
   const SWv = { temp: '12', meters: [{ frac: 0.5 }], rain: { hours: [{ h: '14', wet: true }, { h: '15', wet: false }] }, sun: { phase: 0.3 } };
@@ -408,7 +409,7 @@ test('meter cell states for today (owner 2026-11-13): active, reached earlier, e
 });
 test('forecast cells: a light grey (owner 2026-11-14 "maybe a lighter gray")', () => {
   const lc = (m) => { D.mode = m; const s = D.meter({ frac: 0.3, past: null, later: 0.9, peak: 0.9 }, 300, 30, 10); D.mode = null; return (s.match(/data-sw-st="l"><g class="([^"]+)"/) || [])[1]; };
-  eq([lc({ dark: false, bits: 1 }), lc({ dark: false, bits: 4 })], ['text--gray-75', 'text--gray-75'], '1-bit and X light: gray-75 (was gray-50 / gray-70)');
+  eq([lc({ dark: false, bits: 1 }), lc({ dark: false, bits: 4 })], ['text--gray-75', 'text--gray-55'], '1-bit gray-75; X light gray-55 (B18 2026-11-15: gray-75 is the X panel grey, the cells did not show; render check FORECAST)');
 });
 // removed 'sensor readings in the shape TRMNL shows' and 'sensor_device picks one device': they ran the transform-side parser, which is gone; a screen shows only its own sensor (owner 2026-11-14), covered by the render cases og-sens-devid, og-sens-other*, og-sens-noid
 test('moon tilt: bright limb as the observer sees it (owner 2026-11-14, true tilt)', () => {

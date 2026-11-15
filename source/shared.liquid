@@ -60,7 +60,7 @@
     {%- else %}<span class="value value--small value--tnums">{{ ui.tdial.value }}</span><span class="{{ tsb }}">{{ ui.tdial.unit }}</span>{% endif -%}
    {%- endcapture %}
    <div class="absolute bottom--3 right--4 flex flex--row flex--bottom gap--small" data-sw-cap>{{ dv_row }}</div>
-   {%- if k == 2 and inn %}<div class="absolute top--3 right--4 flex flex--row flex--bottom gap--small text--gray-30 dark:text--gray-30" data-sw-cap data-sw-dialin>{% comment %} owner 2026-11-13 {% endcomment %}<div class="shrink-0 self--center h--[3cqh] w--[2cqw]" data-sw-part="loc" data-sw-sq data-sw-i="{% if inm %}0{% else %}1{% endif %}" data-sw-loc="{% if inm %}out{% else %}in{% endif %}"></div>{% if inm and ui.tdial.arrow == 'up' or inm and ui.tdial.arrow == 'down' %}<div class="shrink-0 self--center text--gray-30 dark:text--gray-30" data-sw-part="arrow" data-sw-i="1" data-sw-arrow="{{ ui.tdial.arrow }}"></div>{% endif %}<span class="value value--small value--tnums text--gray-30 dark:text--gray-30"{% unless inm %} data-sw-inval{% endunless %}>{% if inm %}{{ ui.tdial.value }}{% else %}{{ inn.temp }}{% endif %}</span><span class="{{ tsb }} text--gray-30 dark:text--gray-30">{{ ui.tdial.unit }}</span></div>{% endif %}
+   {%- if k == 2 and inn %}{% assign dgc = 'text--gray-30 dark:text--gray-30' %}<div class="absolute top--3 right--4 flex flex--row flex--bottom gap--small {{ dgc }}" data-sw-cap data-sw-dialin>{% comment %} owner 2026-11-13 {% endcomment %}<div class="shrink-0 self--center h--[3cqh] w--[2cqw]" data-sw-part="loc" data-sw-sq data-sw-i="{% if inm %}0{% else %}1{% endif %}" data-sw-loc="{% if inm %}out{% else %}in{% endif %}"></div>{% if inm and ui.tdial.arrow == 'up' or inm and ui.tdial.arrow == 'down' %}<div class="shrink-0 self--center {{ dgc }}" data-sw-part="arrow" data-sw-i="1" data-sw-arrow="{{ ui.tdial.arrow }}"></div>{% endif %}<span class="value value--small value--tnums {{ dgc }}"{% unless inm %} data-sw-inval{% endunless %}>{% if inm %}{{ ui.tdial.value }}{% else %}{{ inn.temp }}{% endif %}</span><span class="{{ tsb }} {{ dgc }}">{{ ui.tdial.unit }}</span></div>{% endif %}
   </div>{{ p_close }}
   {%- endfor %}
  </div></div>
@@ -69,7 +69,7 @@
 {% if calm_q %}{% assign mr_m = 6 %}{% assign mb_m = 4 %}{% endif %}
 {% capture c_meters %}
   <div class="flex flex--col gap--small shrink-0 w--[{% if inn and view < 3 %}{{ 25 | times: wm | round }}{% else %}{{ 30 | times: wm | round }}{% endif %}cqw]{% if view < 3 and inn == nil %} landscape:w--[24cqw] lg:landscape:w--[{{ 22 | times: wm | round }}cqw]{% endif %} lg:w--[{% if inn and view == 2 %}19{% else %}{{ 22 | times: wm | round }}{% endif %}cqw] lg:portrait:w--full">{% comment %} owner: no lamps; the rain unit's {% endcomment %}{% comment %} owner: the meters take the full {% endcomment %}
-   <div class="flex flex--row grow{% if view == 2 %} lg:portrait:flex--stretch-y{% endif %} gap--small w--full">{% capture c_lab %}{% endcapture %}{% capture c_blk %}{% endcapture %}{% for m in ms %}{% if forloop.index > n_lg %}{% break %}{% endif %}{% assign passes = 1 %}{% if m.tw or m.key == ph_tw %}{% assign passes = 2 %}{% endif %}{% capture rc %}{% if view == 1 and m.key == 'baro' %}{% if forloop.index > n_md %} hidden{% else %} flex lg:hidden{% endif %}{% elsif forloop.index > n_md %} hidden lg:flex{% else %} flex{% endif %} flex--row flex--center-y{% endcapture %}{% capture rh %}h--[{{ mr_m | times: hm | round | at_most: 100 }}cqh] lg:h--[{{ 5 | times: hl | round }}cqh]{% if view == 1 %} lg:portrait:h--[3cqh]{% endif %}{% endcapture %}{% for pass in (1..passes) %}{% assign h2 = '' %}{% assign pk = 'meter' %}{% assign is_in = false %}{% if pass == 2 %}{% assign h2 = ' data-sw-hum2' %}{% endif %}{% if m.tw or m.key == ph_tw %}{% if pass == 1 and inm %}{% assign is_in = true %}{% elsif pass == 2 and inm == false %}{% assign is_in = true %}{% endif %}{% if is_in %}{% assign pk = 'meterin' %}{% endif %}{% endif %}{% comment %} owner 2026-11-14: the indoor row first {% endcomment %}{% capture c_lab %}{{ c_lab }}<div class="{{ rc }} flex--right w--full gap--xsmall {{ rh }}"{{ h2 }}>{% if m.tw or m.key == ph_tw %}<div class="shrink-0" data-sw-part="loc" data-sw-sq data-sw-for="{{ m.key }}" data-sw-i="{% if is_in %}1{% else %}0{% endif %}" data-sw-loc="{% if is_in %}in{% else %}out{% endif %}"></div>{% endif %}<span class="title title--base lg:title--small text--bold" data-sw-mlabel>{{ m.label }}</span></div>{% endcapture %}{% capture c_blk %}{{ c_blk }}<div class="{{ rc }} w--full {{ rh }}"{{ h2 }}><div class="w--full h--[{{ mb_m | times: hm | round | at_most: 100 }}cqh] lg:hidden" data-sw-part="{{ pk }}" data-sw-n="5" data-sw-i="{{ m.idx }}" data-sw-key="{{ m.key }}"></div><div class="hidden lg:block w--full h--[{{ 4 | times: hl | round }}cqh]{% if view == 1 %} lg:portrait:h--[3cqh]{% endif %}" data-sw-part="{{ pk }}" data-sw-n="10" data-sw-i="{{ m.idx }}" data-sw-key="{{ m.key }}"></div></div>{% endcapture %}{% endfor %}{% endfor %}{% capture mcol %}flex flex--col flex--between{% endcapture %}
+   <div class="flex flex--row grow{% if view == 2 %} lg:portrait:flex--stretch-y{% endif %} gap--small w--full">{% capture c_lab %}{% endcapture %}{% capture c_blk %}{% endcapture %}{% for m in ms %}{% if forloop.index > n_lg %}{% break %}{% endif %}{% assign passes = 1 %}{% if m.tw or m.key == ph_tw %}{% assign passes = 2 %}{% endif %}{% capture rc %}{% if view == 1 and m.key == 'baro' %}{% if forloop.index > n_md %} hidden{% else %} flex lg:hidden{% endif %}{% elsif forloop.index > n_md %} hidden lg:flex{% else %} flex{% endif %} flex--row flex--center-y{% endcapture %}{% capture rh %}h--[{{ mr_m | times: hm | round | at_most: 100 }}cqh] lg:h--[{{ 5 | times: hl | round }}cqh]{% if view == 1 %} lg:portrait:h--[3cqh]{% endif %}{% endcapture %}{% for pass in (1..passes) %}{% assign h2 = '' %}{% assign pk = 'meter' %}{% assign is_in = false %}{% if pass == 2 %}{% assign h2 = ' data-sw-hum2' %}{% endif %}{% if m.tw or m.key == ph_tw %}{% if pass == 1 and inm %}{% assign is_in = true %}{% elsif pass == 2 and inm == false %}{% assign is_in = true %}{% endif %}{% if is_in %}{% assign pk = 'meterin' %}{% endif %}{% endif %}{% comment %} owner 2026-11-14: the indoor row first {% endcomment %}{% capture c_lab %}{{ c_lab }}<div class="{{ rc }} flex--right w--full gap--xsmall {{ rh }}"{{ h2 }}>{% if m.tw or m.key == ph_tw %}<div class="shrink-0" data-sw-part="loc" data-sw-sq data-sw-for="{{ m.key }}" data-sw-i="{% if is_in %}1{% else %}0{% endif %}" data-sw-loc="{% if is_in %}in{% else %}out{% endif %}"></div>{% endif %}<span class="title title--base lg:title--small text--bold{% if inn and pass == 2 or inn and m.key == 'co2' and inm == false %} 4bit:text--gray-35 dark:4bit:text--gray-40{% endif %}" data-sw-mlabel>{{ m.label }}</span></div>{% endcapture %}{% capture c_blk %}{{ c_blk }}<div class="{{ rc }} w--full {{ rh }}"{{ h2 }}><div class="w--full h--[{{ mb_m | times: hm | round | at_most: 100 }}cqh] lg:hidden" data-sw-part="{{ pk }}" data-sw-n="5" data-sw-i="{{ m.idx }}" data-sw-key="{{ m.key }}"></div><div class="hidden lg:block w--full h--[{{ 4 | times: hl | round }}cqh]{% if view == 1 %} lg:portrait:h--[3cqh]{% endif %}" data-sw-part="{{ pk }}" data-sw-n="10" data-sw-i="{{ m.idx }}" data-sw-key="{{ m.key }}"></div></div>{% endcapture %}{% endfor %}{% endfor %}{% capture mcol %}flex flex--col flex--between{% endcapture %}
     <div class="{{ mcol }} shrink-0">{{ c_lab }}</div>
     <div class="{{ mcol }} grow">{{ c_blk }}</div>
    </div>
@@ -271,6 +271,7 @@ if (SWS[1] * 2.67 < SWS[0]) { document.querySelectorAll('[data-sw-dstrip]').forE
 // ==== DRAW_BEGIN ====
 var SWDraw = (() => {
 var API = { paint: null };
+function ko(k, fs, b) { return '<g data-sw-' + k + ' stroke="' + ((API.paint && (API.paint('white') || {}).color) || '#fff') + '" stroke-width="' + n1(fs * 0.22) + '" paint-order="stroke" stroke-linejoin="round">' + b + '</g>'; }   /* the panel-coloured knock-out round text (the day strip's axis, the dial's scale numbers) */
 var GLYPH = { '0': 'abcdef', '1': 'bc', '2': 'abdeg', '3': 'abcdg', '4': 'bcfg', '5': 'acdfg', '6': 'acdefg', '7': 'abc', '8': 'abcdefg', '9': 'abcdfg', '-': 'g', ' ': '' };
 var SHADOW = 'dark:hidden 1bit:hidden', SO = 3, K = 0;
 var SK = 'stroke="currentColor" stroke-width="';   // size: the stroke attributes most shapes share
@@ -279,6 +280,7 @@ function pts(p) { return p.map((q) => n1(q[0]) + ',' + n1(q[1])).join(' '); }
 function poly(p, extra) { return '<polygon points="' + pts(p) + '"' + (extra || '') + '/>'; }
 function rect(x, y, w, h, rx, extra) { return '<rect x="' + n1(x) + '" y="' + n1(y) + '" width="' + n1(Math.max(0, w)) + '" height="' + n1(Math.max(0, h)) + '"' + (rx ? ' rx="' + n1(rx) + '"' : '') + (extra || '') + '/>'; }
 var DEFS = '';
+var OC = () => !API.mode ? 'text--gray-65' : (API.mode.bits <= 1 ? '' : (DKM() ? 'text--gray-70' : (B2() ? 'text--gray-45' : 'text--gray-65')));   /* the empty cell's grey */
 function b1() { return API.mode && API.mode.bits <= 1; }
 function B2() { return API.mode && API.mode.bits === 2; }
 function DKM() { return API.mode && API.mode.dark; }
@@ -287,7 +289,7 @@ var m = /^gray-(\d+)$/.exec(tok || ''); if (!m) return tok;
 var v = +m[1]; return v <= 20 ? 'black' : (v <= 47 ? 'gray-30' : (v <= 72 ? 'gray-55' : 'white'));
 }
 function mid() { return b1() ? '' : (B2() ? 'text--gray-40 dark:text--gray-60' : 'text--gray-45 dark:text--gray-50'); }
-function act() { return B2() ? 'text--gray-40' : 'text--gray-20'; }
+function act() { return 'text--gray-' + (B2() ? 40 : 20); }
 function blk(hi) { return b1() ? '' : (hi ? 'text--gray-10 dark:text--gray-75' : (act() + ' dark:text--gray-60')); }
 function g(cls, body) {
 var keep = [], tok = null;
@@ -357,8 +359,8 @@ return { html: svg(vw * k, HH * k, glow(body, GPX / k), '0 0 ' + vw + ' ' + HH).
 var LOC = { out: "<path d='M8 17a4.5 4.5 0 0 1 .5-8.8A5.5 5.5 0 0 1 19.5 8.2 4.5 4.5 0 0 1 20 17z'/><path d='M14 17v8M10.5 25h7'/>", in: "<path d='M3 14L14 4l11 10'/><path d='M6 12v12h16V12'/><path d='M12 24v-7h4v7'/>" };
 function loc(k, W, H) { return svg(W, H, locAt(k, (W - Math.min(W, H)) / 2, (H - Math.min(W, H)) / 2, Math.min(W, H))); }
 var swSec = () => typeof SW !== 'undefined' && SW.sim === false;   /* B13: the sensor is the second reading */
-function locAt(k, x, y, s) { return g((swSec() ? k === 'in' : k === 'out') ? inc() : '', '<svg x="' + n1(x) + '" y="' + n1(y) + '" width="' + n1(s) + '" height="' + n1(s) + '" viewBox="0 0 28 28" overflow="visible"><g fill="none" ' + SK + '' + n1(Math.max(1.8, 1.5 * 28 / Math.max(1, s)) * 100) / 100 + '" stroke-linecap="round" stroke-linejoin="round" data-sw-loc="' + k + '">' + LOC[k] + '</g></svg>'); }
-var inc = () => b1() ? '' : 'text--gray-30', inb = () => DKM() ? 'text--gray-45' : 'text--gray-50';
+function locAt(k, x, y, s) { return g((swSec() ? k === 'in' : k === 'out') ? inc() : '', '<svg x="' + n1(x) + '" y="' + n1(y) + '" width="' + n1(s) + '" height="' + n1(s) + '" viewBox="0 0 28 28" overflow="visible"><g fill="none" ' + SK + n1(Math.max(1.8, 1.5 * 28 / Math.max(1, s)) * 100) / 100 + '" stroke-linecap="round" stroke-linejoin="round" data-sw-loc="' + k + '">' + LOC[k] + '</g></svg>'); }
+var inc = () => b1() ? '' : (B2() ? 'text--gray-30' : dgr()), dgr = () => 'text--gray-' + (b1() || B2() ? (DKM() ? 45 : 50) : (DKM() ? 40 : 35));   /* B18 owner 2026-11-15: the dial's outdoor grey (arc, marks, needle) on the greyscale X: gray-35 (102, 5.7:1 on white) light, gray-40 (136, 5.9:1 on black) dark; still far from the black main needle; 1-bit and 2-bit keep inb() */
 function cells(frac, n) { return frac === null || frac === undefined || !(frac > 0) ? 0 : Math.max(1, Math.round(Math.min(1, frac) * n)); }
 function cellStates(m, n) {
 m = m || {}; var a = cells(m.frac, n), p = cells(m.past, n), l = cells(m.later, n), k = cells(m.peak, n), st = [];
@@ -367,8 +369,8 @@ return { st: st, peak: k - 1 };
 }
 function meter(m, W, H, n, ind) {
 var sec = swSec();   /* the sensor's rows are the grey ones when it is the second reading */
-if (!ind) return svg(W, H, m.tw ? '<g data-sw-twrow="out">' + mrow(m, W, H, n, sec ? '' : inb()) + '</g>' : mrow(m, W, H, n, m.key === 'co2' && sec ? inb() : ''));   /* owner 2026-11-14: indoor primary, the outdoor row of the twin in grey */
-return svg(W, H, '<g data-sw-twrow="in">' + mrow(m.tw.m, W, H, n, sec ? inb() : '') + '</g>');
+if (!ind) return svg(W, H, m.tw ? '<g data-sw-twrow="out">' + mrow(m, W, H, n, sec ? '' : dgr()) + '</g>' : mrow(m, W, H, n, m.key === 'co2' && sec ? dgr() : ''));   /* owner 2026-11-14: indoor primary, the outdoor row of the twin in grey */
+return svg(W, H, '<g data-sw-twrow="in">' + mrow(m.tw.m, W, H, n, sec ? dgr() : '') + '</g>');
 }
 function mrow(m, W, H, n, lc) {
 n = n || 10;
@@ -378,16 +380,15 @@ var DK = DKM() && API.mode.bits >= 2;
 for (var i = 0; i < n; i++) {
 var x = i * cw + gp / 2, w = cw - gp, s = CS.st[i];
 var zi = zones ? ((i + 0.5) / n >= zones[1] ? 2 : ((i + 0.5) / n >= zones[0] ? 1 : 0)) : 0;
-if (i === CS.peak && s === 'e') { var sw = Math.max(3, Math.min(w, ch) * 0.14), gr = rect(x + sw / 2, sw / 2, w - sw, ch - sw, 2, ' fill="none" ' + SK + '' + n1(sw) + '" data-sw-gust="' + i + '"'); gk = ZT[zi] ? hg(ZT[zi], gr) : gr; sh += rect(x + sw / 2 + SO, sw / 2 + SO, w - sw, ch - sw, 2, ' fill="none" ' + SK + '' + n1(sw) + '"'); }
+if (i === CS.peak && s === 'e') { var sw = Math.max(3, Math.min(w, ch) * 0.14), gr = rect(x + sw / 2, sw / 2, w - sw, ch - sw, 2, ' fill="none" ' + SK + n1(sw) + '" data-sw-gust="' + i + '"'); gk = ZT[zi] ? hg(ZT[zi], gr) : gr; sh += rect(x + sw / 2 + SO, sw / 2 + SO, w - sw, ch - sw, 2, ' fill="none" ' + SK + n1(sw) + '"'); }
 if (s === 'a' && ZT[zi]) { zc[zi] += rect(x, 0, w, ch, 2, ' data-sw-c="' + i + '"'); sh += rect(x + SO, SO, w, ch, 2); }
 else if (s === 'a') { on += rect(x, 0, w, ch, 2, ' data-sw-c="' + i + '"'); sh += rect(x + SO, SO, w, ch, 2); }
 else if (s === 'p') pv += rect(x, 0, w, ch, 2, ' data-sw-c="' + i + '"');
 else if (s === 'l') { lt += rect(x, 0, w, ch, 2, ' data-sw-c="' + i + '"'); if (!DK) lo += rect(x + 1, 1, w - 2, ch - 2, 2, ' fill="none" ' + SK + '2" data-sw-lo="' + i + '"'); }   // light forecast fill keeps the empty-cell outline (owner 2026-11-14)
 else off += DK ? rect(x, 0, w, ch, 2, ' data-sw-c="' + i + '"') : rect(x + 1, 1, w - 2, ch - 2, 2, ' fill="none" ' + SK + '2" data-sw-c="' + i + '"');
 }
-var PV = DKM() ? 'text--gray-45' : (b1() ? 'text--gray-75' : (API.mode && API.mode.bits <= 2 ? 'text--gray-65' : 'text--gray-75'));   // owner 2026-11-14: lighter grey for the forecast cells
-var LT = PV, OC;
-return ('<g data-sw-lit="' + lit + '" data-sw-ncell="' + n + '"></g>' + (lc ? '' : g(SHADOW + ' text--gray-65', sh)) + '<g data-sw-st="e">' + g(OC = !API.mode ? 'text--gray-65' : (API.mode.bits <= 1 ? '' : (API.mode.dark ? 'text--gray-70' : (API.mode.bits <= 2 ? 'text--gray-45' : 'text--gray-65'))), off) + '</g>' + '<g data-sw-st="p">' + g(PV, pv) + '</g><g data-sw-st="l">' + g(LT, lt) + (lo ? g(OC, lo) : '') + '</g><g data-sw-on data-sw-st="a">' + (lc ? g(lc, on) : API.mode && !API.mode.dark && API.mode.bits >= 2 ? '<g data-sw-dg>' + g(act(), on) + '</g>' : glow(on, GPX)) +   /* owner: 2-bit+ light dark grey, 1-bit black, dark white */ (zc[1] ? hg('yellow', zc[1]) : '') + (zc[2] ? hg('red', zc[2]) : '') + '</g>' + gk);
+var PV = DKM() ? 'text--gray-45' : (b1() ? 'text--gray-75' : 'text--gray-' + (B2() ? 65 : 55));   /* owner 2026-11-14: lighter grey for the forecast cells; B18: gray-75 equals the X's panel grey (238), the OG's 170 shows */
+return ('<g data-sw-lit="' + lit + '" data-sw-ncell="' + n + '"></g>' + (lc ? '' : g(SHADOW + ' text--gray-65', sh)) + '<g data-sw-st="e">' + g(OC(), off) + '</g>' + '<g data-sw-st="p">' + g(PV, pv) + '</g><g data-sw-st="l">' + g(PV, lt) + (lo ? g(OC(), lo) : '') + '</g><g data-sw-on data-sw-st="a">' + (lc ? g(lc, on) : API.mode && !DKM() && !b1() ? '<g data-sw-dg>' + g(act(), on) + '</g>' : glow(on, GPX)) +   /* owner: 2-bit+ light dark grey, 1-bit black, dark white */ (zc[1] ? hg('yellow', zc[1]) : '') + (zc[2] ? hg('red', zc[2]) : '') + '</g>' + gk);
 }
 function gauge(gq, W, H) {
 if (!gq) return '';
@@ -397,8 +398,7 @@ var x = x0 + i * cw + gp / 2, w = cw - gp;
 if (i < gq.segs) { on += rect(x, 0, w, H, 2, ' data-sw-c="' + i + '"'); sh += rect(x + SO, SO, w, H, 2); }
 else off += DK ? rect(x, 0, w, H, 2, ' data-sw-c="' + i + '"') : rect(x + 1, 1, w - 2, H - 2, 2, ' fill="none" ' + SK + '2" data-sw-c="' + i + '"');
 }
-var offc = !API.mode ? 'text--gray-65' : (API.mode.bits <= 1 ? '' : (API.mode.dark ? 'text--gray-70' : (API.mode.bits <= 2 ? 'text--gray-45' : 'text--gray-65')));
-return svg(W, H, '<g data-sw-gauge="' + gq.segs + '"></g>' + g(SHADOW + ' text--gray-65', sh) + '<g data-sw-st="e">' + g(offc, off) + '</g><g data-sw-on data-sw-st="a">' + (API.mode && !API.mode.dark && API.mode.bits >= 2 ? '<g data-sw-dg>' + g(act(), on) + '</g>' : glow(on, GPX)) + '</g>' + text(x0 / 2, H / 2, lab, fs, 'middle', ' dominant-baseline="central" data-sw-glabel'));
+return svg(W, H, '<g data-sw-gauge="' + gq.segs + '"></g>' + g(SHADOW + ' text--gray-65', sh) + '<g data-sw-st="e">' + g(OC(), off) + '</g><g data-sw-on data-sw-st="a">' + (API.mode && !DKM() && !b1() ? '<g data-sw-dg>' + g(act(), on) + '</g>' : glow(on, GPX)) + '</g>' + text(x0 / 2, H / 2, lab, fs, 'middle', ' dominant-baseline="central" data-sw-glabel'));
 }
 function tick(v) { return String(v === 0 ? 0 : v); }
 function lfs(sc) { var f = API.nfs ? (API.lp && API.nfs > API.lp && API.ogfull ? API.lp : Math.max(API.nfs, API.lp || 0)) : Math.max((API.scaleH || 20) * 0.7, API.lp || 0); return API.lhf ? Math.min(f, 1.28 * API.lhf) : f; }   // B12: scale labels at most 1.28 x the low/high digits (render check PORT; Kobo Forma, Voyage, X portrait)
@@ -461,8 +461,7 @@ var p = X(v), s = tick(v), tw = fs * 0.62 * s.length, l = p - tw / 2;
 body += text(p, ty, s, fs, 'middle', ' dominant-baseline="middle" data-sw-tick="' + s + '"') + text(p + tw / 2, ty, sc.deg, fs, 'start', ' dominant-baseline="middle"');
 
 });
-var pw = (API.paint && (API.paint('white') || {}).color) || '#fff';
-body = '<g data-sw-track="' + n1(X(sc.a)) + ',' + n1(X(sc.b)) + '"></g>' + g('text--gray-70', rules) + '<g data-sw-axis stroke="' + pw + '" stroke-width="' + n1(fs * 0.22) + '" paint-order="stroke" stroke-linejoin="round">' + body + '</g>';
+body = '<g data-sw-track="' + n1(X(sc.a)) + ',' + n1(X(sc.b)) + '"></g>' + g('text--gray-70', rules) + ko('axis', fs, body);
 return svg(W, H, body);
 }
 function rain(hours, W, H, rows) {
@@ -491,7 +490,7 @@ var r = H * 0.27, cx = H / 2, f = (1 - Math.cos(2 * Math.PI * p)) / 2, lit = '';
 var dk = DKM(), bits = API.mode ? API.mode.bits : 4, sw = Math.max(bits <= 2 ? 2.5 : 1.5, H * 0.03),
 ri = bits <= 1 && !dk ? r - sw * 1.6 : r;
 if (f > 0.01) lit = '<path d="' + moonLit(p, cx, cx, ri) + '" data-sw-moon="lit"' + (lb == null ? '' : ' transform="rotate(' + n1(-(lb - (p < 0.5 ? 270 : 90))) + ' ' + n1(cx) + ' ' + n1(cx) + ')"') + '/>';   // lb: the bright limb as the observer sees it (transform moonLimb, owner 2026-11-14: true tilt)
-var limb = '<circle cx="' + n1(cx) + '" cy="' + n1(cx) + '" r="' + n1(r) + '" fill="none" ' + SK + '' + n1(sw) + '"/>';
+var limb = '<circle cx="' + n1(cx) + '" cy="' + n1(cx) + '" r="' + n1(r) + '" fill="none" ' + SK + n1(sw) + '"/>';
 var h = dk ? halo('<circle cx="' + n1(cx) + '" cy="' + n1(cx) + '" r="' + n1(r) + '"/>', GPX) : '';
 if (h) { var mid = 'swmk' + (K++); h = '<defs><mask id="' + mid + '" maskUnits="userSpaceOnUse" x="' + n1(-H) + '" y="' + n1(-H) + '" width="' + n1(3 * H) + '" height="' + n1(3 * H) + '"><rect x="' + n1(-H) + '" y="' + n1(-H) + '" width="' + n1(3 * H) + '" height="' + n1(3 * H) + '" fill="#fff"/><circle cx="' + n1(cx) + '" cy="' + n1(cx) + '" r="' + n1(r + sw / 2) + '" fill="#000"/></mask></defs><g mask="url(#' + mid + ')" data-sw-moonhalo>' + h + '</g>'; }
 var disk = '<circle cx="' + n1(cx) + '" cy="' + n1(cx) + '" r="' + n1(r) + '" data-sw-moon="disk"/>';
@@ -582,7 +581,7 @@ function at(f, rad) { var an = -A + 2 * A * cl(f); return [cx + rad * Math.sin(a
 function arc(rad, f0, f1) { var p0 = at(f0, rad), p1 = at(f1, rad); return 'M' + n1(p0[0]) + ' ' + n1(p0[1]) + ' A' + n1(rad) + ' ' + n1(rad) + ' 0 0 1 ' + n1(p1[0]) + ' ' + n1(p1[1]); }
 var id = 'swink' + (K++), body = '<defs><filter id="' + id + '" x="0" y="0" width="1" height="1"><feFlood flood-color="currentColor"/><feComposite in2="SourceAlpha" operator="in"/></filter></defs>';
 body += '<g data-sw-arc="' + n1(r) + ',' + n1(W) + '"></g>';
-var path = (d, sw, extra) => '<path d="' + d + '" fill="none" ' + SK + '' + n1(sw) + '"' + (extra || '') + '/>';
+var path = (d, sw, extra) => '<path d="' + d + '" fill="none" ' + SK + n1(sw) + '"' + (extra || '') + '/>';
 if (baro) {
 var zro = r - H * 0.085, zri = zro - H * 0.05, zg = 0.012, isz = r * 0.34;
 [[0, 0.25, 1], [0.25, 0.5, 0], [0.5, 0.75, 1], [0.75, 1, 0]].forEach((z) => {
@@ -595,20 +594,19 @@ body += glow(path(arc(r, 0, 1), lw), lg);
 var step = baro ? 10 : D.step / 2, major = baro ? 20 : D.step, labs = '';
 for (var v = D.a; v <= D.b + 1e-9; v += step) {
 var mj = Math.abs((v - D.a) / major - Math.round((v - D.a) / major)) < 1e-6, p0 = at(F(v), r), p1 = at(F(v), r - (mj ? H * 0.07 : H * 0.035));
-body += '<line x1="' + n1(p0[0]) + '" y1="' + n1(p0[1]) + '" x2="' + n1(p1[0]) + '" y2="' + n1(p1[1]) + '" ' + SK + '' + n1(mj ? lw : Math.max(1, lw * 0.6)) + '"/>';
+body += '<line x1="' + n1(p0[0]) + '" y1="' + n1(p0[1]) + '" x2="' + n1(p1[0]) + '" y2="' + n1(p1[1]) + '" ' + SK + n1(mj ? lw : Math.max(1, lw * 0.6)) + '"/>';
 if (!baro && mj) { var fs = H * 0.1, pl = at(F(v), r - H * 0.07 - fs * 0.8); labs += text(pl[0], pl[1], String(v), fs, 'middle', ' dominant-baseline="central"'); }
 }
-body += labs;
 var lo = D.lo, hi = D.hi;
 if (lo != null && hi != null) {
-var so = (q, tx) => D.sec && !(tx && b1()) ? g(inb(), q.replace(/ stroke="currentColor"/g, '')).replace(/^<g[^>]*>/, (t) => t.slice(0, -1) + ' stroke="' + (/url\([^)]*\)/.exec(t) || 'currentColor') + '">') : q;   /* owner 2026-11-14: with the sensor as main reading the outdoor range and marks take the outdoor needle's grey; on 1-bit the dither pattern (stroke too), its labels stay black to be legible */
+var so = (q, tx) => D.sec && !tx ? g(dgr(), q.replace(/ stroke="currentColor"/g, '')).replace(/^<g[^>]*>/, (t) => t.slice(0, -1) + ' stroke="' + (/url\([^)]*\)/.exec(t) || 'currentColor') + '">') : q;   /* owner 2026-11-14: with the sensor as main reading the outdoor range and marks take the outdoor needle's grey (on 1-bit the dither pattern, stroke too); B18 2026-11-15: the labels (tx) stay black in every mode */
 body += so(path(arc(r + lw / 2 + bw / 2, F(lo), F(hi)), bw));
 var r0 = r + lw + bw + 2, r1 = r0 + mh;
 [[lo, true], [hi, false]].forEach((m) => {
 var f = F(m[0]), q = 0.022, t = [at(f, r0), at(f - q, r1), at(f + q, r1)];
 if (cm) { var lt = String(Math.round(m[0]) === 0 ? 0 : Math.round(m[0])) + '°', lp = mlp(f, r1, lt, W, H, py, !!m[1], baro ? 'baro' : 'tdial');
 body += so(text(lp[0], lp[1], lt, mfs, 'middle', ' dominant-baseline="central" data-sw-mark="' + (m[1] ? 'lo' : 'hi') + '"' + (lp[2] ? ' data-sw-beside' : '')), 1); }
-body += so(poly(t, ' data-sw-markt="' + (m[1] ? 'lo' : 'hi') + '"' + (m[1] ? ' fill="none" ' + SK + '' + n1(Math.max(1.5, lw * 0.5)) + '" stroke-linejoin="round"' : '')));
+body += so(poly(t, ' data-sw-markt="' + (m[1] ? 'lo' : 'hi') + '"' + (m[1] ? ' fill="none" ' + SK + n1(Math.max(1.5, lw * 0.5)) + '" stroke-linejoin="round"' : '')));
 });
 }
 if (D.now != null) {
@@ -617,16 +615,18 @@ var np = (ox, oy, an, k) => { var vx = an === undefined ? ux : Math.sin(an), vy 
 return [[t[0] + qx * wt / 2, t[1] + qy * wt / 2], [b[0] + qx * wb / 2, b[1] + qy * wb / 2], [q[0] + qx * wb * 1.6, q[1] + qy * wb * 1.6], [q[0] - qx * wb * 1.6, q[1] - qy * wb * 1.6], [b[0] - qx * wb / 2, b[1] - qy * wb / 2], [t[0] - qx * wt / 2, t[1] - qy * wt / 2]]; };
 var hr = Math.max(6, H * 0.035), tw = '';
 if (D.twin != null) {
-tw = '<g data-sw-twin="1">' + g(inb(), poly(np(0, 0, -A + 2 * A * cl(F(D.twin)), 0.86))) + '</g>';
+tw = '<g data-sw-twin="1">' + g(dgr(), poly(np(0, 0, -A + 2 * A * cl(F(D.twin)), 0.86))) + '</g>';
 }
 body += '<g data-sw-needle>' + g(SHADOW + ' text--gray-55', poly(np(SO, SO)) + '<circle cx="' + n1(cx + SO) + '" cy="' + n1(py + SO) + '" r="' + n1(hr) + '"/>');
 body += glow(tw + poly(np(0, 0)) + '<circle cx="' + n1(cx) + '" cy="' + n1(py) + '" r="' + n1(hr) + '" data-sw-hub="' + n1(Math.max(hr, tailR + wb * 1.6)) + '"/>', lg) + g('text--white', '<circle cx="' + n1(cx) + '" cy="' + n1(py) + '" r="' + n1(hr * 0.4) + '"/>') + '</g>';
 }
+/* B18: the scale numbers over both needles, a thin knock-out in the panel colour round each digit (paint-order stroke, as the day strip's axis) */
+if (labs) body += ko('dlab', H * 0.1, labs);
 return svg(W, H, body);
 }
 function tri(down, W, H, c) {
 var s = Math.min(W, H), x0 = (W - s) / 2, y0 = (H - s) / 2, p = down ? [[x0 + s * 0.1, y0 + s * 0.12], [x0 + s * 0.9, y0 + s * 0.12], [x0 + s / 2, y0 + s * 0.9]] : [[x0 + s * 0.1, y0 + s * 0.9], [x0 + s * 0.9, y0 + s * 0.9], [x0 + s / 2, y0 + s * 0.12]];
-var pl = poly(p, down ? ' fill="none" ' + SK + '' + n1(Math.max(2, s * 0.1)) + '" stroke-linejoin="round"' : '');
+var pl = poly(p, down ? ' fill="none" ' + SK + n1(Math.max(2, s * 0.1)) + '" stroke-linejoin="round"' : '');
 return svg(W, H, c ? g(c, pl) : pl);
 }
 function arrow(dir, W, H) {
@@ -659,7 +659,7 @@ case 'tdial': return dial(SW.inn && SW.sim !== false && SW.tdial.twin != null ? 
 case 'icon': return icon(API.src, W, H);
 case 'face': { var n = Math.max(1, Math.round(W / H)), w = W / n, two = B2();
 if (API.mode && !API.mode.dark && API.mode.bits <= 2) { var ow = API.mode.bits === 2 ? 2 : 1;
-return svg(W, H, g(API.mode.bits === 2 ? 'text--gray-55' : '', rect(ow / 2, ow / 2, W - ow, H - ow, Math.min(24, Math.min(W, H) * 0.08), ' fill="none" ' + SK + '' + ow + '" data-sw-outline'))); }
+return svg(W, H, g(API.mode.bits === 2 ? 'text--gray-55' : '', rect(ow / 2, ow / 2, W - ow, H - ow, Math.min(24, Math.min(W, H) * 0.08), ' fill="none" ' + SK + ow + '" data-sw-outline'))); }
 if (two) return '';
 var rx = Math.min(24, Math.min(W, H) * 0.08), cp = 'swfc' + (K++);
 return svg(W, H, '<defs><clipPath id="' + cp + '">' + rect(0, 0, W, H, rx) + '</clipPath></defs><g clip-path="url(#' + cp + ')">' + (two ? backlight(W, H, W / 2, H / 2, W * 0.6 / 0.8, H * 0.78 / (W * 0.6), rx) : backlight(W, H, Array.from({ length: n }, (_, j) => w * (j + 0.5)), H / 2, Math.max(w, H) * 0.62, 0.8, rx)) + '</g>').replace('overflow="visible"', 'overflow="hidden"'); }
@@ -1044,7 +1044,7 @@ function swPaint(el) {
 SWDraw.paint = function (t) { return TRMNLPaint.bg(t, { el: el }); };
 SWDraw.bg = null; for (var an = el; an && !SWDraw.bg; an = an.parentElement) { var bc = getComputedStyle(an).backgroundColor; if (bc && !/^rgba\(.*, 0\)$|^transparent$/.test(bc)) SWDraw.bg = bc; }
 var di = el.closest('[data-sw-dialin]'); if (di && !document.querySelector('.screen--1bit')) {   // 1-bit: the outdoor icon stays black (B10 rule; B12, X-size 1-bit models)
- var pf = TRMNLPaint.bg(SWDraw.mode.dark ? 'gray-45' : (SWDraw.mode.bits === 2 ? 'gray-55' : 'gray-50'), { el: el }); if (pf && pf.color) di.style.color = pf.color; }
+ var pf = TRMNLPaint.bg(SWDraw.mode.bits === 2 ? 'gray-55' : (SWDraw.mode.dark ? 'gray-40' : 'gray-35'), { el: el }); if (pf && pf.color) { di.style.color = pf.color; di.querySelectorAll('span,[data-sw-part="arrow"]').forEach(function (e) { e.style.color = pf.color; }); } }
 var sc = (el.closest('.screen') || document.querySelector('.screen') || document.body).classList;
 var cl = /(^| )screen--color-/.test(sc.value);
 SWDraw.mode = { color: cl, dark: sc.contains('screen--dark-mode'), bits: sc.contains('screen--1bit') || (cl && !sc.contains('screen--color-full')) ? 1 : (sc.contains('screen--2bit') ? 2 : 4) };
