@@ -19,13 +19,14 @@ files['plugin/views.json'] = JSON.stringify(views);
 files['plugin/transform.js'] = fs.readFileSync(path.join(root, 'plugin/src/transform.js'), 'utf8');
 files['engine.js'] = fs.readFileSync(path.join(__dirname, 'engine.js'), 'utf8');
 for (const f of ['index.html', 'app.js']) files[f] = fs.readFileSync(path.join(__dirname, 'page', f), 'utf8');
+for (const f of fs.readdirSync(path.join(__dirname, 'page', 'guide'))) files['guide/' + f] = fs.readFileSync(path.join(__dirname, 'page', 'guide', f));   // the guide's rendered screens, binary
 files['data/scenarios.json'] = execFileSync('python3', [path.join(__dirname, 'scenarios.py'), '--stdout'], { encoding: 'utf8' });
 
 let bad = 0;
 for (const [rel, text] of Object.entries(files)) {
   const p = path.join(docs, rel);
   if (check) {
-    if (!fs.existsSync(p) || fs.readFileSync(p, 'utf8') !== text) { console.error('docs/' + rel + ' is out of date: run tools/site/build.sh'); bad++; }
+    if (!fs.existsSync(p) || !Buffer.from(text).equals(fs.readFileSync(p))) { console.error('docs/' + rel + ' is out of date: run tools/site/build.sh'); bad++; }
   } else { fs.mkdirSync(path.dirname(p), { recursive: true }); fs.writeFileSync(p, text); }
 }
 if (check) process.exit(bad ? 1 : 0);

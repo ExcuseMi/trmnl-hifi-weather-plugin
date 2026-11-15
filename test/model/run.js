@@ -134,8 +134,8 @@ test('time format: the setting decides, 24 h when missing, the TIME constant ove
   eq([T.timeIs12('24', '12'), T.timeIs12('12', '24')], [false, true], 'constant wins');
   const y = fs.readFileSync(path.join(__dirname, '../../plugin/src/settings.yml'), 'utf-8');
   const fields = y.split(/^- keyname: /m).slice(1).map((part) => ({ key: part.split('\n')[0], group: (/^  group: (.+)$/m.exec(part) || [])[1] || null }));
-  eq(fields.map((f) => f.key), ['author_info', 'lat_lon', 'unit', 'time_format', 'bottom', 'hide_title_bar', 'sensor_show', 'sensor_device_id', 'sensor_label', 'sensor_primary', 'sensor_co2'], 'settings in owner order (owner 2026-11-15: the sensor group reads source, label, main reading, CO2)');
-  eq(fields.map((f) => f.group), [null, null, 'Display', 'Display', 'Display', 'Display', 'Sensor', 'Sensor', 'Sensor', 'Sensor', 'Sensor'], 'settings groups');
+  eq(fields.map((f) => f.key), ['author_info', 'lat_lon', 'unit', 'time_format', 'bottom', 'hide_title_bar', 'sensor_show', 'sensor_device_id', 'sensor_label', 'sensor_primary', 'sensor_co2', 'legend'], 'settings in owner order (owner 2026-11-15: the sensor group reads source, label, main reading, CO2)');
+  eq(fields.map((f) => f.group), [null, null, 'Display', 'Display', 'Display', 'Display', 'Sensor', 'Sensor', 'Sensor', 'Sensor', 'Sensor', 'Legend'], 'settings groups (the legend is the last, collapsed group)');
   // B13 (owner 2026-11-14) overrides 'a screen shows only its own sensor': an optional setting picks another TRMNL's sensor; empty keeps the own one
   const part = (k) => y.split(/^- keyname: /m).slice(1).find((q) => q.startsWith(k + '\n'));
   ['sensor_device_id', 'sensor_label', 'sensor_primary'].forEach((k) => ['description', 'description-de', 'description-fr', 'description-es-ES', 'description-nl', 'description-ja'].forEach((d) => ok(new RegExp('^  ' + d + ': .{20,}', 'm').test(part(k)), k + ' has ' + d)));
@@ -863,6 +863,39 @@ test('no shown label falls back to English in any locale (item 38.1)', () => {
   eq(empty, [], 'empty slots');
   ['ja', 'ko', 'zh-CN', 'zh-HK'].forEach((l) => { const p = OURS[l].split('|'); KEYS.forEach((k, i) => { if (!p[i] && !['raining_now'].includes(k)) empty.push(l + ':' + k); }); });
   eq(empty, [], 'empty CJK slots');
+});
+
+test('guide and legend (owner 2026-11-15): every meter and every major screen element is explained in the site guide, the README and the Legend field; About links the guide in every language', () => {
+  const root = path.join(__dirname, '..', '..'), rd = (f) => fs.readFileSync(path.join(root, f), 'utf-8');
+  const SITE = 'https://excusemi.github.io/trmnl-radio-weather-plugin/';
+  const y = rd('plugin/src/settings.yml'), parts = y.split(/^- keyname: /m).slice(1);
+  const part = (k) => parts.find((q) => q.startsWith(k + '\n'));
+  // the meter keys come from the transform (RO_ORDER) plus the rain gauge the markup draws
+  const keys = JSON.parse(/var RO_ORDER = (\[[^\]]*\])/.exec(src)[1].replace(/'/g, '"')).concat(['rain']);
+  ok(keys.length === 8 && keys.includes('co2') && keys.includes('pollen'), 'meter keys read from transform.js: ' + keys);
+  const ELEMENTS = ['baro', 'pressure', 'tdial', 'marks', 'trend', 'meters', 'cells', 'title', 'digits', 'cues', 'sun', 'moon', 'hours', 'footer', 'rain', 'calendar', 'gust', 'sensor', 'twin', 'days', 'today', 'range', 'nowmark', 'daycues', 'views', 'dark'];
+  const site = rd('tools/site/page/index.html');
+  ok(site.includes('id="guide"'), 'the site has the guide section');
+  keys.map((k) => 'm-' + k).concat(ELEMENTS).forEach((e) => ok(site.includes('data-guide="' + e + '"'), 'the site guide explains ' + e));
+  const LAB = { wind: 'WIND', uv: 'UV', aqi: 'AQI', humidity: 'HUM', pollen: 'POLLEN', baro: 'BARO', co2: 'CO2', rain: 'RAIN' };
+  const readme = rd('README.md');
+  ok(readme.includes('### Reading the screen') && readme.includes(SITE + '#guide'), 'README has the section and links the guide');
+  keys.forEach((k) => ok(readme.includes('| ' + LAB[k] + ' |'), 'README table has a row for ' + k));
+  // the numbers the texts quote are the code's: if a zone or scale moves, the texts move with it
+  ok(/ZONES = \{ wind: \[0\.5, F_ \? 0\.75 : 0\.83\], co2: \[0\.375, 0\.625\], pollen: \[0\.3, 0\.6\], aqi: \[0\.4, 0\.6\], uv: \[3 \/ 11, 8 \/ 11\] \}/.test(src) && /SCL = \{ wind: \[0, F_ \? 40 : 60\], uv: \[0, 11\], aqi: \[0, 100\], humidity: \[0, 100\], baro: \[970, 1050\] \}/.test(src) && /bar\(M\.inn\.co2, 400, 2000\)/.test(src), 'warning zones and scales the guide quotes are unchanged: update guide, README and settings with them');
+  const LEG = { description: ['WIND', 'UV', 'AQI', 'POLLEN', 'CO2', 'HUM', 'BARO'], 'description-de': ['WIND', 'UV', 'AQI', 'POLLEN', 'CO2', 'FEUCHTE', 'BARO'], 'description-fr': ['VENT', 'UV', 'AQI', 'POLLEN', 'CO2', 'HUMIDITÉ', 'BARO'],
+    'description-es-ES': ['VIENTO', 'UV', 'AQI', 'POLEN', 'CO2', 'HUMEDAD', 'BARO'], 'description-nl': ['WIND', 'UV', 'AQI', 'POLLEN', 'CO2', 'VOCHT', 'BARO'], 'description-ja': ['風', 'UV', 'AQI', '花粉', 'CO2', '湿度', '気圧'] };
+  const txt = (p, k) => { const m = new RegExp('^  ' + k + ": '(.*)'$", 'm').exec(p); return m ? m[1] : null; };
+  const lg = part('legend');
+  ok(/^  group: Legend$/m.test(lg) && /^  field_type: description$/m.test(lg) && /^  optional: true$/m.test(lg), 'legend: a description field in the Legend group');
+  Object.keys(LEG).forEach((d) => {
+    const a = txt(part('author_info'), d), l = txt(lg, d);
+    ok(a && a.includes('<a href="' + SITE + '#guide"'), d + ': About links the guide');
+    ok(a && /30 \/ 50/.test(a) && /3 \/ 8/.test(a) && /40 \/ 60/.test(a) && /10 \/ 50/.test(a) && /1000 \/ 1400/.test(a), d + ': About quotes the warning / alarming numbers');
+    ok(l && l.includes('<a href="' + SITE + '#guide"') && !/[—–]/.test(l), d + ': the legend links the guide');
+    LEG[d].forEach((n) => ok(l.includes('<strong>' + n + '</strong>'), d + ': the legend has a line for ' + n));
+    ok(/1000/.test(l) && /1400/.test(l) && /(^|\D)30(\D|$)/.test(l) && /(^|\D)50(\D|$)/.test(l), d + ': the legend has the bands');
+  });
 });
 
 test('About text (B17): HTML, 100+ words in English (TRMNL search), all six languages, learn-more URL; the site in docs/ is current', () => {

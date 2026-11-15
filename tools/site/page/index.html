@@ -57,13 +57,22 @@ th{white-space:nowrap;font-weight:600;width:11rem}
 footer{padding:20px 0 40px;color:var(--mute);font-size:.85rem;border-top:1px solid var(--rule)}
 .note{color:var(--mute);font-size:.85rem}
 .hide{display:none!important}
+.fig{display:grid;gap:14px 24px;grid-template-columns:minmax(0,1fr);margin:14px 0 26px}
+@media (min-width:980px){.fig{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-items:start}}
+.pic{position:relative;background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:8px}
+.im{position:relative}
+.pic img{display:block;width:100%;height:auto;border-radius:6px}
+.bd{position:absolute;transform:translate(-50%,-50%);min-width:20px;height:20px;border-radius:10px;background:#c8321e;color:#fff;font:600 12px/20px system-ui,sans-serif;text-align:center;padding:0 4px;box-shadow:0 0 0 2px #fff}
+ol.legend{margin:0;padding-left:1.6rem}
+ol.legend li{padding:5px 0;font-size:.92rem}
+
 </style>
 </head>
 <body>
 <div class="wrap">
 <header>
   <h1>Radio Weather</h1>
-  <nav><a href="#settings">Settings</a><a href="https://github.com/ExcuseMi/trmnl-radio-weather-plugin">GitHub</a><a href="https://trmnl.com" id="recipe">Get it on TRMNL</a></nav>
+  <nav><a href="#guide">Guide</a><a href="#settings">Settings</a><a href="https://github.com/ExcuseMi/trmnl-radio-weather-plugin">GitHub</a><a href="https://trmnl.com" id="recipe">Get it on TRMNL</a></nav>
 </header>
 <p class="tag">The weather as a calm early-80s hi-fi receiver, for TRMNL e-paper displays. This is the real plugin running in your browser: pick a day, a device and your settings, or look at the weather where you are.</p>
 
@@ -110,6 +119,85 @@ footer{padding:20px 0 40px;color:var(--mute);font-size:.85rem;border-top:1px sol
     <li><b>Indoor sensor</b>: a TRMNL temperature sensor on this screen or on another TRMNL, with an optional label and CO2 meter.</li>
     <li><b>Every view</b>: full, half horizontal, half vertical, quadrant; 1-bit, greyscale and colour screens; dark mode.</li>
     <li><b>Offline</b>: when Open-Meteo is slow or down, the last saved forecast shows with its time.</li>
+  </ul>
+</section>
+
+<section id="guide">
+  <h2>Guide: every part of the screen</h2>
+  <p class="note">Four real screens from this page (TRMNL X, full view). Numbers match the lists. Values come from the plugin's code; yellow and red show on colour screens only, on the others count the blocks.</p>
+
+  <div class="fig">
+    <div class="pic"><div class="im"><img src="guide/g1.png" alt="Radio Weather, heat wave example, with numbered parts" width="758" height="614" loading="lazy"><b class="bd" style="left:29.7%;top:17.9%">1</b><b class="bd" style="left:49.9%;top:26.1%">2</b><b class="bd" style="left:69.9%;top:17.6%">3</b><b class="bd" style="left:60.9%;top:17.1%">4</b><b class="bd" style="left:89.2%;top:28.7%">5</b><b class="bd" style="left:10.8%;top:40.7%">6</b><b class="bd" style="left:19.8%;top:34.5%">7</b><b class="bd" style="left:39.6%;top:33.4%">8</b><b class="bd" style="left:31.7%;top:48.0%">9</b><b class="bd" style="left:59.1%;top:46.1%">10</b><b class="bd" style="left:75.2%;top:42.7%">11</b><b class="bd" style="left:68.1%;top:41.0%">12</b><b class="bd" style="left:11.9%;top:61.9%">13</b><b class="bd" style="left:35.6%;top:81.9%">14</b></div></div>
+    <ol class="legend">
+      <li data-guide="baro"><b>Barometer</b> (X): the needle is the air pressure now, scale 970 to 1050 hPa. The four zones are 20 hPa each: thunderstorm (970 to 990), rain (990 to 1010), changeable (1010 to 1030), sunny (1030 to 1050). Normal is about 1013 hPa.</li>
+      <li data-guide="pressure"><b>Pressure and trend</b>: hPa now; the arrow compares with 3 hours ago (rising or falling from 1 hPa, otherwise level).</li>
+      <li data-guide="tdial"><b>Temperature dial</b> (X): the black needle is the temperature now.</li>
+      <li data-guide="marks"><b>Low and high marks</b>: the outlined triangle is today's lowest temperature, the filled one today's highest; the thick arc between them is today's range. The barometer has the same marks for the lowest and highest pressure of the next 24 hours.</li>
+      <li data-guide="trend"><b>Temperature and arrow</b>: the arrow compares now with 3 hours ahead (up or down from 1 degree C, 2 degrees F, otherwise level).</li>
+      <li data-guide="meters"><b>Meters</b>: up to four rows, chosen by what matters now (UV only from a day maximum of 3, pollen only when there is some, air quality, wind, humidity; the barometer row only fills a spare place). 10 blocks on large screens, 5 on small ones. Bands are in the table below.</li>
+      <li data-guide="cells"><b>Light grey blocks</b>: the highest value still to come today (the rest of today up to midnight).</li>
+      <li data-guide="title"><b>Condition</b>: icon and words for the weather now, in your language; a moon icon at night.</li>
+      <li data-guide="digits"><b>Temperature digits</b> in the unit you chose. The last digit is the tenths.</li>
+      <li data-guide="cues"><b>What to wear</b>: one garment by the felt temperature from now to 3 hours ahead (coldest and warmest hour): parka under 3 C (37 F), jacket under 12 C (54 F), sweater under 18 C (64 F), otherwise a T-shirt. An umbrella is added when any hour until 19:00 (at least 3 hours) has a rain chance of 50 % or more. The garment changes only once the felt temperature is 1 degree C (2 F) past the line, so it does not flip back and forth.</li>
+      <li data-guide="sun"><b>Sun times</b>: the next sunrise and sunset; once today's has passed, tomorrow's shows.</li>
+      <li data-guide="moon"><b>Moon</b>: the phase as it looks from your place today.</li>
+      <li data-guide="hours"><b>Hours strip</b>: 12 columns of 2 hours from the current even hour, each with its time, icon, and a bar with the temperature. A black time stamp is the first column (now) or a column where it rains (a rain chance of 50 % or more in one of its hours).</li>
+      <li data-guide="footer"><b>Footer</b>: plugin name, data source and the time of the last update (can be hidden in the settings). When the weather service is down it shows the last saved forecast with its time.</li>
+    </ol>
+  </div>
+
+  <div class="fig">
+    <div class="pic"><div class="im"><img src="guide/g2.png" alt="Radio Weather with rain coming, with numbered parts" width="758" height="614" loading="lazy"><b class="bd" style="left:69.7%;top:39.1%">1</b><b class="bd" style="left:88.1%;top:35.2%">2</b><b class="bd" style="left:88.1%;top:42.7%">3</b><b class="bd" style="left:12.1%;top:62.2%">4</b><b class="bd" style="left:25.6%;top:33.9%">5</b></div></div>
+    <ol class="legend">
+      <li data-guide="rain"><b>Rain column</b>: replaces the sun and moon while rain is expected in the next 12 hours. The icon says what falls: rain, snow or hail.</li>
+      <li data-guide="calendar"><b>Hour calendar</b>: the next 6 or 9 hours. A dark tile is an hour with a rain chance of 50 % or more (or a wet weather code).</li>
+      <li data-guide="m-rain"><b>Rain gauge</b>: 3 blocks by the heaviest hour of the next 12: 1 drizzle (under 1 mm/h, 0.04 in/h), 2 rain, 3 heavy rain (4 mm/h, 0.16 in/h and up). The number is the 12 hour total, at most 10+ mm (0.4+ in).</li>
+      <li data-guide="hours-wet"><b>Hours strip</b>: the dark time stamps show the same wet hours over the next day.</li>
+      <li data-guide="gust"><b>Gust outline</b> on WIND: the outlined block is the strongest gust still to come today. Dark blocks are the wind now, light grey blocks the wind speed still to come.</li>
+    </ol>
+  </div>
+
+  <div class="fig">
+    <div class="pic"><div class="im"><img src="guide/g3.png" alt="Radio Weather with an indoor sensor, with numbered parts" width="758" height="614" loading="lazy"><b class="bd" style="left:34.6%;top:42.7%">1</b><b class="bd" style="left:54.1%;top:40.2%">2</b><b class="bd" style="left:62.0%;top:20.8%">3</b><b class="bd" style="left:11.1%;top:37.1%">4</b><b class="bd" style="left:89.2%;top:15.0%">5</b></div></div>
+    <ol class="legend">
+      <li data-guide="sensor"><b>Indoor sensor</b>: the house icon marks the sensor's reading (your own TRMNL's or another one's), the tree icon the outside weather. One of them is the big black reading (setting Main reading), the other is grey beside it. An optional short label (for example Upstairs) shows beside the house icon and on the dial.</li>
+      <li data-guide="outside"><b>Outside reading with its cues</b>: the garment and umbrella always belong to the outside weather.</li>
+      <li data-guide="twin"><b>Second needle</b>: the grey needle is the other reading. The marks and range on the dial belong to the outside temperature.</li>
+      <li data-guide="m-co2"><b>CO2</b> (sensor with CO2): comes first with the sensor, and moves up the list past 1400 ppm. Indoor humidity is a second block row next to the outside one, marked with the house and the tree.</li>
+      <li data-guide="small"><b>Small readout</b>: the reading that is not the main one, with its trend arrow.</li>
+    </ol>
+  </div>
+
+  <div class="fig">
+    <div class="pic"><div class="im"><img src="guide/g4.png" alt="Radio Weather with the days strip, with numbered parts" width="758" height="614" loading="lazy"><b class="bd" style="left:30.1%;top:68.4%">1</b><b class="bd" style="left:10.6%;top:64.5%">2</b><b class="bd" style="left:68.6%;top:68.4%">3</b><b class="bd" style="left:53.4%;top:62.9%">4</b><b class="bd" style="left:88.7%;top:68.4%">5</b></div></div>
+    <ol class="legend">
+      <li data-guide="days"><b>Days strip</b> (setting Bottom strip): the weekday, the weather icon, and the lowest (outlined triangle) and highest (filled triangle) temperature of each day. 4 to 7 days fit on screen.</li>
+      <li data-guide="today"><b>Today</b>: the first row, its label in black.</li>
+      <li data-guide="range"><b>Range bars</b>: from the day's low to its high, all on one temperature scale.</li>
+      <li data-guide="nowmark"><b>Now marker</b>: the small triangle above today's bar is the temperature now.</li>
+      <li data-guide="daycues"><b>Cue per day</b>: the garment for the day's felt temperatures between 07:00 and 19:00, and an umbrella when the rain chance there is 50 % or more.</li>
+    </ol>
+  </div>
+
+  <h2>The meters, band by band</h2>
+  <p class="note">A block is yellow when its centre is in the warning zone, red in the alarming zone. A meter has 10 blocks (5 on small screens); the full meter is the whole scale. Wind and rain follow your unit setting.</p>
+  <div style="overflow-x:auto"><table id="meter-table">
+    <tr><th>Meter</th><th style="width:auto;white-space:normal">Full meter</th><th style="width:auto;white-space:normal">Good</th><th style="width:auto;white-space:normal">Warning (yellow)</th><th style="width:auto;white-space:normal">Alarming (red)</th></tr>
+    <tr data-guide="m-wind"><th>WIND</th><td>0 to 60 km/h (0 to 40 mph)</td><td>under 30 km/h (20 mph)</td><td>30 to 50 km/h (20 to 30 mph)</td><td>over 50 km/h (30 mph)</td></tr>
+    <tr data-guide="m-uv"><th>UV</th><td>UV index 0 to 11</td><td>under 3 (low)</td><td>3 to 7 (moderate, high)</td><td>8 and up (very high, extreme)</td></tr>
+    <tr data-guide="m-aqi"><th>AQI</th><td>European AQI 0 to 100</td><td>under 40 (good, fair)</td><td>40 to 60 (moderate)</td><td>over 60 (poor, very poor, extremely poor)</td></tr>
+    <tr data-guide="m-humidity"><th>HUM</th><td>0 to 100 % relative humidity</td><td colspan="3">A plain reading, no bands.</td></tr>
+    <tr data-guide="m-pollen"><th>POLLEN</th><td>grains per m3 of the strongest of grass, birch, alder, mugwort, olive, ragweed</td><td>under 10 (low)</td><td>10 to 50 (moderate)</td><td>over 50 (high; very high from 150)</td></tr>
+    <tr data-guide="m-baro"><th>BARO</th><td>970 to 1050 hPa</td><td colspan="3">No bands. About 1013 hPa is normal; the dial shows the weather zones.</td></tr>
+    <tr data-guide="m-co2"><th>CO2</th><td>400 to 2000 ppm (indoor sensor)</td><td>under 1000 ppm</td><td>1000 to 1400 ppm</td><td>over 1400 ppm</td></tr>
+    <tr data-guide="m-rain"><th>RAIN</th><td>3 blocks, mm per hour</td><td>1 block: drizzle, under 1</td><td>2 blocks: rain, from 1</td><td>3 blocks: heavy rain, from 4</td></tr>
+  </table></div>
+  <p class="note">Sources: UV bands from the WHO, air quality from the European scale as served by Open-Meteo (European Environment Agency bands), pollen grains per m3 as Open-Meteo reports them. The wind and CO2 lines are this plugin's own, not an official standard.</p>
+
+  <h2>Other views and dark mode</h2>
+  <ul class="feat">
+    <li data-guide="views"><b>Half horizontal</b>: the console only (meters, condition, digits, cue, rain or sun), no dials and no bottom strip. <b>Half vertical</b>: digits, cue, rain calendar, two meters and the hours strip. <b>Quadrant</b>: digits, the rain calendar or the sun, and one meter. The OG has no dials and uses 5-block meters. Everything above reads the same.</li>
+    <li data-guide="dark"><b>Dark mode</b>: the same screen in white on black; greys and the grey needle keep their meaning.</li>
   </ul>
 </section>
 

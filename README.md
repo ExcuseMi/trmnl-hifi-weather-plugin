@@ -29,6 +29,23 @@ Every view (full, half horizontal, half vertical, quadrant), 1-bit, greyscale an
 | Main reading | Which reading comes first, in black: Automatic (the sensor when it is this screen's own, outside when it comes from another TRMNL), Sensor, or Outside. The other one follows in grey, its meters after. Both temperatures are the same size. |
 | CO2 meter | Shows the CO2 meter when the sensor measures CO2. |
 
+### Reading the screen
+
+Every part of the screen is explained with numbered pictures in the [full guide](https://excusemi.github.io/trmnl-radio-weather-plugin/#guide). The meters in short: ten blocks (five on small screens), yellow is a warning and red is alarming on colour screens; light grey blocks are the highest value still to come today, an outlined block is the strongest gust.
+
+| Meter | Full meter | Good | Warning (yellow) | Alarming (red) |
+|---|---|---|---|---|
+| WIND | 0 to 60 km/h (0 to 40 mph) | under 30 km/h (20 mph) | 30 to 50 km/h (20 to 30 mph) | over 50 km/h (30 mph) |
+| UV | UV index 0 to 11 | under 3 (low) | 3 to 7 (moderate, high) | 8 and up (very high, extreme) |
+| AQI | European AQI 0 to 100 | under 40 (good, fair) | 40 to 60 (moderate) | over 60 (poor to extremely poor) |
+| HUM | 0 to 100 % relative humidity | plain reading, no bands | | |
+| POLLEN | grains per m3, strongest type | under 10 (low) | 10 to 50 (moderate) | over 50 (high, very high) |
+| BARO | 970 to 1050 hPa | plain reading, about 1013 hPa is normal | | |
+| CO2 | 400 to 2000 ppm (indoor sensor) | under 1000 ppm | 1000 to 1400 ppm | over 1400 ppm |
+| RAIN | 3 blocks, mm per hour | 1 block: drizzle, under 1 | 2 blocks: rain, from 1 | 3 blocks: heavy rain, from 4 |
+
+The same legend is in the plugin's settings under Legend.
+
 Data comes from [Open-Meteo](https://open-meteo.com); no key is needed.
 
 ## Development
