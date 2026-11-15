@@ -3,6 +3,7 @@
   "private": true,
   "description": "Build step only: source/shared.liquid -> plugin/src/shared.liquid",
   "devDependencies": {
+    "liquidjs": "^10.21.0",
     "terser": "5.36.0"
   },
   "license": "MIT"

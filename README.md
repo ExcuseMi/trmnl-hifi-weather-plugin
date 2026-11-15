@@ -57,6 +57,10 @@ Two render-check tiers, same spec (`tools/render_check_spec.rb`), run base first
 
 Regenerate the device file after TRMNL adds a model: `python3 tools/make_device_cases.py` (reads trmnl.com/api/models). Playdate is left out until the owner decides on small screens.
 
+## Try-it site (GitHub Pages, from main /docs)
+
+The real transform and markup run in the page (LiquidJS), inside TRMNL's `trmnl-frame`. Regenerate: `tools/site/build.sh` (writes `docs/`; `--check` fails when stale, also run by the model tests). Guard: `tools/site/check_fidelity.sh` compares the page's markup with trmnlp's Ruby Liquid for 12 cases (no browser).
+
 ## Open items
 
 | Item | Detail |
