@@ -10,7 +10,7 @@ The weather as a calm early-80s hi-fi receiver, for [TRMNL](https://trmnl.com) e
 - **Console**: the temperature in segment digits with what to wear (clothing, umbrella, sunglasses); block meters for wind and gusts, UV, air quality, humidity, pollen and pressure when they matter, grey cells for what is still to come today.
 - **Rain or sun**: an hour calendar when rain is coming; otherwise sunrise, sunset and the moon as it looks from your location.
 - **Bottom strip**: the coming days or hours.
-- **Indoor sensor**: with a TRMNL temperature sensor on the screen, indoor becomes the big reading and outdoor moves beside it, or show another TRMNL's sensor (a hallway upstairs) with outside as the big reading. Readings older than 3 hours are ignored.
+- **Indoor sensor**: with a TRMNL temperature sensor on the screen, indoor becomes the big reading and outdoor moves beside it, or show another TRMNL's sensor (a hallway upstairs) with outside as the big reading. Readings older than 3 hours are ignored. Other sources: Home Assistant, Awair, AirGradient, Sensibo, Ecowitt, Adafruit IO or any JSON link (below).
 
 Every view (full, half horizontal, half vertical, quadrant), 1-bit, greyscale and colour screens, dark mode, 24 or 12 hour time. When Open-Meteo is slow or down, the last saved forecast shows with its time.
 
@@ -24,10 +24,25 @@ Every view (full, half horizontal, half vertical, quadrant), 1-bit, greyscale an
 | Bottom strip | Days, hours, or hours with days after 18:00 |
 | Hide title bar | Hides the title bar on the full view |
 | Sensor | Shows the readings of a TRMNL sensor: this screen's own, or the TRMNL set below. Hide: outside weather only. |
+| Sensor source | This TRMNL, Another TRMNL, Home Assistant, Awair, AirGradient, Sensibo, Ecowitt, Adafruit IO or Custom link (JSON); see Indoor sensor sources below. |
 | Sensor from another TRMNL | Optional device number (the digits in the address of its page on trmnl.com). Empty: this screen's own sensor. |
 | Sensor label | Optional short name, for example Upstairs, shown beside the house icon and on the temperature dial. Empty: the icon alone. |
 | Main reading | Which reading comes first, in black: Automatic (the sensor when it is this screen's own, outside when it comes from another TRMNL), Sensor, or Outside. The other one follows in grey, its meters after. Both temperatures are the same size. |
 | CO2 meter | Shows the CO2 meter when the sensor measures CO2. |
+
+### Indoor sensor sources
+
+Set **Sensor source** to a provider and fill in the fields that show. The reading takes the place of a TRMNL sensor (house icon, label, main reading, CO2 meter). TRMNL fetches it from the cloud: the source must be reachable from the internet. Tokens sit in password fields and go only to the provider. Readings older than 3 hours are ignored; when the source fails the last good reading stays up to 3 hours and the bottom bar says SENSOR OFFLINE with its time.
+
+| Source | What you fill in | API docs |
+|---|---|---|
+| Home Assistant | Address of your Home Assistant from the internet (https://, for example Nabu Casa or a Cloudflare tunnel; a local address does not work), a long-lived access token (your profile, Security), the entity ids for temperature, humidity and CO2 (humidity and CO2 optional). Fahrenheit entities are converted. | https://developers.home-assistant.io/docs/api/rest/ |
+| Awair | Access token from the Awair Developer Console. Device type and id are optional (empty: your first Awair). The free tier allows 300 readings per device per day. | https://docs.developer.getawair.com/ |
+| AirGradient | Token of your place (app.airgradient.com, Settings, Place). Location id optional (empty: the first indoor monitor). | https://api.airgradient.com/public/docs/api/v1/ |
+| Sensibo | API key from home.sensibo.com/me/api. Device id optional (empty: your first device with a reading). Temperature and humidity only. Unit assumed Celsius. | https://sensibo.github.io/api/ |
+| Ecowitt | Application key and API key from ecowitt.net (API management) and the MAC of the station. Indoor temperature, humidity and, with a CO2 sensor, CO2. | https://doc.ecowitt.net/web/#/apiv3en?page_id=17 |
+| Adafruit IO | Username, active key, and the feed key for each reading (temperature required), plus the unit the temperature feed uses. | https://io.adafruit.com/api/docs/ |
+| Custom link (JSON) | Any https:// link that answers JSON: optional header name and token, a dot path for each reading (data.rooms.0.temp), optional time path, the temperature unit. | - |
 
 ### Reading the screen
 
@@ -69,7 +84,7 @@ Two render-check tiers, same spec (`tools/render_check_spec.rb`), run base first
 
 | Tier | Cases | Run |
 |---|---|---|
-| Base | `tools/render_check_cases.json` (OG, X, colour OG; scope unchanged) | `cd plugin && SW_CASES_FILE=../tools/render_check_cases.json SW_OUT=<dir> trmnlp test ../tools/render_check_spec.rb` |
+| Base | `tools/render_check_cases.json` (OG, X, colour OG; scope unchanged); `tools/render_check_b22.json`: Home Assistant reading live, kept after an outage, none (OG, X) | `cd plugin && SW_CASES_FILE=../tools/render_check_cases.json SW_OUT=<dir> trmnlp test ../tools/render_check_spec.rb` |
 | Devices | `tools/render_check_devices.json`: every TRMNL model x full/hh/hv/quadrant, portrait full+hv, one dark, full and portrait full with an indoor sensor | `tools/check_devices.sh [out_dir] [model-substring]` prints a pass/fail table per device (about 35 min for all, one browser) |
 
 Regenerate the device file after TRMNL adds a model: `python3 tools/make_device_cases.py` (reads trmnl.com/api/models). Playdate is left out until the owner decides on small screens.
