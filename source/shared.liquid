@@ -945,11 +945,17 @@ var k = (cap.offsetWidth && cap.getBoundingClientRect().width / cap.offsetWidth)
 if (Math.abs(dl) > 0.2) cap.style.bottom = (parseFloat(getComputedStyle(cap).bottom) - dl / k).toFixed(2) + 'px';
 });
 }
+/* B15 (Kindle Scribe hv-port, pixel ratio 2.5: the 4th bar ended 1.7 px below its panel): the last day row sticking out of its panel by under 8 % of a row (it must stick out past the panel's edge, as the render check CLIP sees it) is not dropped, every row gets shorter by its share of the overshoot */
+function swRows() {
+document.querySelectorAll('[data-sw-dstrip] [data-sw-panel]').forEach(function (p) { var rs = [].filter.call(p.querySelectorAll('[data-sw-row="day"]'), function (r) { return r.getBoundingClientRect().height > 0; }); if (rs.length < 2) return;
+var k0 = (p.offsetHeight && p.getBoundingClientRect().height / p.offsetHeight) || 1, l = rs[rs.length - 1], lb = Math.max(l.firstElementChild.getBoundingClientRect().bottom, l.querySelector('[data-sw-part="day"]').getBoundingClientRect().bottom), ov = lb - (p.getBoundingClientRect().bottom - parseFloat(getComputedStyle(p).paddingBottom) * k0), rh = rs[0].firstElementChild.getBoundingClientRect().height;
+if (lb > p.getBoundingClientRect().bottom + 0.5 && ov < 0.08 * rh) rs.forEach(function (r) { var c = r.firstElementChild; c.style.setProperty('height', ((c.getBoundingClientRect().height - ov / rs.length) / k0).toFixed(2) + 'px', 'important'); }); });
+}
 var swN = 0;
 function swAlign() {
 if (++swN > 60) return;
 var cx = document.createElement('canvas').getContext('2d');
-swSmall(cx); swNames(); swNums(); swSeg(cx); swCond(cx); swDayIcons(); swFit(); swBadge(cx); swFit(); swBadge(cx); swTri();
+swSmall(cx); swNames(); swNums(); swSeg(cx); swCond(cx); swDayIcons(); swFit(); swBadge(cx); swFit(); swBadge(cx); swTri(); swRows();
 }
 // The OG portrait layouts serve every portrait screen below lg: md and sm (Kindle 2024, B12)
 function swOGPortrait() {
