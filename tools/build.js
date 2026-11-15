@@ -9,7 +9,7 @@ const ROOT = path.join(__dirname, '..');
 // aliases of the SAME functions (prototype aliases, no wrappers) in the built script only; the source stays readable.
 // The DOM aliases open the page script; the Math and toFixed aliases open the DRAW block (the model tests run that block alone).
 const DOM_ALIAS = { getBoundingClientRect: '$b', querySelectorAll: '$A', querySelector: '$Q', getAttribute: '$g', setAttribute: '$s', hasAttribute: '$h', removeAttribute: '$r', closest: '$c' };
-const MATH_ALIAS = ['max', 'min', 'round', 'abs'];
+const MATH_ALIAS = ['max', 'min', 'round', 'abs', 'floor', 'ceil', 'cos', 'sin'];
 function alias(js) {
   const hit = (k) => new RegExp('\\.' + k + '\\b').test(js);
   const dom = Object.keys(DOM_ALIAS).filter(hit);
@@ -30,7 +30,7 @@ function alias(js) {
   js = out(sel(js.slice(0, da))) + js.slice(da, db) + out(sel(js.slice(db)));
   const drawPre = '\nvar ' + MATH_ALIAS.map((f) => 'M' + f + '=Math.' + f).join(',') + ';Number.prototype.$f=Number.prototype.toFixed;\n';
   const cut = js.indexOf('// ==== DRAW_BEGIN ====');   // the Math aliases are defined inside the DRAW block: only code after it may use them
-  js = js.slice(0, cut) + js.slice(cut).replace(/\bMath\.(max|min|round|abs)\(/g, (m, f) => 'M' + f + '(');
+  js = js.slice(0, cut) + js.slice(cut).replace(/\bMath\.(max|min|round|abs|floor|ceil|cos|sin)\(/g, (m, f) => 'M' + f + '(');
   js = js.replace('// ==== DRAW_BEGIN ====', '// ==== DRAW_BEGIN ====' + drawPre);
   return domPre + '\n' + js;
 }
@@ -50,6 +50,10 @@ async function build(src) {
   s = s.replace(tagRe, (tag) => tag.split(/('[^']*'|"[^"]*")/).map((q, i) => i % 2 ? q : q.replace(/(?<![\w-])(?<![^.]\.)[A-Za-z_]\w{2,}(?![\w-])/g, (w) => short.get(w) || w)).join(''));
   s = s.slice(0, sa).replace(/^[ \t]+/gm, '').replace(/[ \t]+$/gm, '').replace(/\{\{[^}]*\}\}|\{%[^%]*%\}/g, tight) + s.slice(sa);   // size: no indentation in the markup (whitespace there only separates tags)
   { const k = s.indexOf('<script'); s = s.slice(0, k).replace(/([>}])\n+(?=[<{])/g, '$1') + s.slice(k); }   // size: a line break between two tags is only whitespace in a flex layout
+  { const k = s.indexOf('<script'), tm = '{%template main%}';   // size: the attribute written 30+ times in the markup is one Liquid variable (outside tags; the rendered HTML is identical)
+    let mk = s.slice(0, k).split(/(\{\{[\s\S]*?\}\}|\{%[\s\S]*?%\})/).map((q, i) => i % 2 ? q : q.replace(/ data-sw-part=/g, ' {{dsp}}=')).join('');
+    if (mk.startsWith(tm)) mk = tm + "{%-assign dsp='data-sw-part'-%}" + mk.slice(tm.length); else throw new Error('template start not found');
+    s = mk + s.slice(k); }
   const a = s.indexOf('<script'), b = s.indexOf('</script>');
   if (a < 0 || b < a) throw new Error('page script not found in shared.liquid');
   const open = s.slice(a, s.indexOf('>', a) + 1), start = a + open.length;
@@ -58,7 +62,7 @@ async function build(src) {
   js = js.replace(/\{\{[^}]*\}\}|\{%[^%]*%\}/g, (m) => { lq.push(m); return '__LQ' + (lq.length - 1) + '__'; });
   js = alias(js);
   const r = await minify(js, {
-    ecma: 2020, compress: { passes: 4, toplevel: true, pure_getters: true, unsafe_arrows: true, unsafe: true, keep_fargs: false, unsafe_comps: true },
+    ecma: 2020, compress: { passes: 4, toplevel: true, pure_getters: true, unsafe_arrows: true, unsafe: true, keep_fargs: false, unsafe_comps: true, unsafe_proto: true, unsafe_methods: true },
     mangle: { toplevel: true, reserved: ['SW', 'SWDraw'], properties: { regex: /^(condH|condW|mainRow|sideCol|calH|calW|cueH|ouW|olW|lbW|fsC|fsU|fsL|fsM|ofU|tW|tH|sW|sH)$/ } },   // the small-view solver's own result fields (size)
     format: { comments: /==== (DRAW|I18N)/, max_line_len: false },
   });

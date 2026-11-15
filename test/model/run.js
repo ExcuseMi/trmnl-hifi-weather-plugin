@@ -626,7 +626,7 @@ async function sensorSettingsTests() {
       const d = await run({}, false, null);
       eq([d.ph.id, d.ph.im, d.ph.lab, d.ph.inn.im], ['', true, null, true], 'defaults: this screen\'s sensor, sensor main, no label');
       const own = await run({ sensor_label: ' living  room ' }, false, null);
-      eq([own.ph.id, own.ph.im, own.ph.lab, own.ph.l8], ['', true, 'LIVING ROOM', 'LIVING .'], 'own sensor with a label: still main, label upper case, spaces tidied, short form for the small views');
+      eq([own.ph.id, own.ph.im, own.ph.lab, own.ph.l8], ['', true, 'LIVING ROOM', undefined], 'own sensor with a label: still main, label upper case, spaces tidied, no short form (the page Clamp cuts)');
       const rem = await run({ sensor_device_id: ' 2 ', sensor_label: 'Upstairs' }, false, null);
       eq([rem.ph.id, rem.ph.im, rem.ph.inn.im, rem.ph.lab], ['2', false, false, 'UPSTAIRS'], 'another device: Automatic makes outside main');
       for (const [pri, id, want] of [['auto', '', true], ['auto', '7', false], ['sensor', '', true], ['sensor', '7', true], ['outside', '', false], ['outside', '7', false], ['bogus', '7', false]]) {
@@ -635,8 +635,8 @@ async function sensorSettingsTests() {
       eq((await run({ sensor_device_id: 'abc 12x3' }, false, null)).ph.id, '123', 'the id keeps its digits only');
       const bad = await run({ sensor_label: '<b>"x"</b>&' }, false, null);
       ok(!/[<>"'&]/.test(bad.ph.lab), 'no markup characters survive in the label: ' + bad.ph.lab);
-      const lg = await run({ sensor_label: 'Upstairs guest bedroom north wing' }, false, null), one = await run({ sensor_label: 'Abcdefghijklmnopqrstuvwxyz' }, false, null);
-      eq([lg.ph.lab, one.ph.lab.length, one.ph.lab.slice(-1)], ['UPSTAIRS', 12, '\u2026'], 'a long label: whole words up to 12 characters, a single long word cut with an ellipsis');
+      const lg = await run({ sensor_label: 'Upstairs guest bedroom north wing' }, false, null), one = await run({ sensor_label: 'a'.repeat(60) }, false, null);
+      eq([lg.ph.lab, one.ph.lab.length], ['UPSTAIRS GUEST BEDROOM NORTH WING', 40], 'a long label stays whole (the page Clamp cuts it to its space); only a bound of 40 characters on the data');
       const hid = await run({ sensor_show: 'hide', sensor_device_id: '2' }, false, null);
       eq([hid.ph.id, hid.ph.im], ['2', false], 'the id and main flag stay with the CO2 meter when the indoor reading is hidden');
     });
