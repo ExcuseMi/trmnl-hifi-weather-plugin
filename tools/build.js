@@ -19,13 +19,15 @@ function alias(js) {
   js = js.replace(/\.setProperty\(([^;]*?), 'important'\)/g, (m, a) => { if (a.includes('.setProperty(')) throw new Error('important alias swallowed a second call'); imp++; return '.$I(' + a + ')'; });
   js = js.replace(/\.setProperty\(/g, '.$P(').replace(/\.toFixed\(/g, '.$f(');
   const on = (P, ks) => ks.filter((k) => dom.includes(k)).map((k) => P + '.' + DOM_ALIAS[k] + '=' + P + '.' + k + ';').join('');
-  const domPre = 'var $d=document,$C=getComputedStyle,$F=parseFloat;(function(){Object.defineProperty(Node.prototype,"$p",{get(){return this.parentElement}});var E=Element.prototype,D=Document.prototype;' + on('E', ['getBoundingClientRect', 'querySelectorAll', 'querySelector', 'getAttribute', 'setAttribute', 'hasAttribute', 'removeAttribute', 'closest'])
+  const domPre = 'var $sp=\'[data-sw-part="\',$sb=\'[data-sw-\',$sd=\'data-sw-\',$d=document,$C=getComputedStyle,$F=parseFloat;(function(){Object.defineProperty(Node.prototype,"$p",{get(){return this.parentElement}});var E=Element.prototype,D=Document.prototype;' + on('E', ['getBoundingClientRect', 'querySelectorAll', 'querySelector', 'getAttribute', 'setAttribute', 'hasAttribute', 'removeAttribute', 'closest'])
     + on('D', ['querySelectorAll', 'querySelector']) + (dom.includes('getBoundingClientRect') ? 'Range.prototype.$b=Range.prototype.getBoundingClientRect;' : '') + 'CSSStyleDeclaration.prototype.$P=CSSStyleDeclaration.prototype.setProperty;Object.defineProperty(E,"$ow",{get(){return this.offsetWidth}});Object.defineProperty(E,"$oh",{get(){return this.offsetHeight}});Object.defineProperty(E,"$L",{get(){return this.classList}});Object.defineProperty(E,"$1",{get(){return this.firstElementChild}});Array.prototype.$e=Array.prototype.forEach;NodeList.prototype.$e=NodeList.prototype.forEach;DOMTokenList.prototype.$k=DOMTokenList.prototype.contains;Node.prototype.$k=Node.prototype.contains;' + (imp ? 'CSSStyleDeclaration.prototype.$I=function(a,b){this.setProperty(a,b,"important")};' : '') + '})();';
   // parseFloat, the offset sizes, classList, firstElementChild and contains (owner budget, B12): aliased outside the DRAW block only (the same functions and getters)
   const da = js.indexOf('// ==== DRAW_BEGIN ===='), db = js.indexOf('// ==== DRAW_END ====');
   if (da < 0 || db < da) throw new Error('DRAW markers missing');
   const out = (t) => t.replace(/\bparseFloat\(/g, '$F(').replace(/\.offsetWidth\b/g, '.$ow').replace(/\.offsetHeight\b/g, '.$oh').replace(/\.classList\b/g, '.$L').replace(/\.contains\(/g, '.$k(').replace(/\.firstElementChild\b/g, '.$1').replace(/\.forEach\(/g, '.$e(');
-  js = out(js.slice(0, da)) + js.slice(da, db) + out(js.slice(db));
+  // size: the selector and attribute prefixes written dozens of times become three constants (outside the DRAW block; a literal's own quote is kept, so the string value is identical)
+  const sel = (t) => t.replace(/'\[data-sw-part="/g, '$sp+\'').replace(/\[data-sw-part="/g, "'+$sp+'").replace(/'\[data-sw-/g, "$sb+'").replace(/\[data-sw-/g, "'+$sb+'").replace(/'data-sw-/g, "$sd+'");
+  js = out(sel(js.slice(0, da))) + js.slice(da, db) + out(sel(js.slice(db)));
   const drawPre = '\nvar ' + MATH_ALIAS.map((f) => 'M' + f + '=Math.' + f).join(',') + ';Number.prototype.$f=Number.prototype.toFixed;\n';
   const cut = js.indexOf('// ==== DRAW_BEGIN ====');   // the Math aliases are defined inside the DRAW block: only code after it may use them
   js = js.slice(0, cut) + js.slice(cut).replace(/\bMath\.(max|min|round|abs)\(/g, (m, f) => 'M' + f + '(');
