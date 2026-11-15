@@ -190,7 +190,7 @@ return bad.join('; ')})()})
       # and stays lighter than the forecast and lit cells (EMPTY_ABOVE levels above the forecast cell where there is one). Plain colours only (1-bit patterns have no grey level).
       ec = s.evaluate(%q{(function(){var bad=[],rows=[],L=function(c){var m=c&&c.match(/[\d.]+/g);return m&&m.length>=3&&!/rgba\(.*, 0\)/.test(c)?0.3*m[0]+0.59*m[1]+0.11*m[2]:null},cs=function(e,k){return getComputedStyle(e)[k]};
 [].forEach.call(document.querySelectorAll('[data-sw-st="e"]'),function(g){var r=g.querySelector('rect');if(!r||!r.getBoundingClientRect().width)return;var sv=g.ownerSVGElement,e=L(cs(r,'fill')===undefined||cs(r,'fill')==='none'||/rgba\(.*, 0\)/.test(cs(r,'fill'))?cs(r,'stroke'):cs(r,'fill')),pn=(function(){var fc=sv.closest('[data-sw-panel]'),fe=fc&&fc.querySelector('[data-sw-part="face"]');if(fe&&L(cs(fe,'backgroundColor'))!==null)return fe;for(var a=sv;a;a=a.parentElement){if(L(cs(a,'backgroundColor'))!==null)return a}return document.body})(),p=L(cs(pn,'backgroundColor')),f=sv.querySelector('[data-sw-st="l"] rect:not([data-sw-lo]),[data-sw-st="p"] rect'),fl=f?L(cs(f,'fill')):null,lit=sv.querySelector('[data-sw-on] rect'),li=lit?L(cs(lit,'fill')):null;if(e===null||p===null)return;rows.push([e,p,fl,li]);});
-var dk=document.documentElement.classList.contains('dark')||!!document.querySelector('.screen--dark-mode'),pl=dk?0:(document.querySelector('.screen--lg')?238:255);   /* the X's backlit panel is 238 at its centre, the OG's white, any dark panel black */
+var dk=document.documentElement.classList.contains('dark')||!!document.querySelector('.screen--dark-mode'),pl=dk?0:255;   /* B27 (owner 2026-11-16): the panels are the page's own colour (the X's light backlit 238 fill is gone): white, any dark panel black */
 if(!document.querySelector('.screen--1bit'))rows.forEach(function(q){if(Math.abs(q[0]-pl)<60)bad.push('empty cell '+q[0].toFixed(0)+' vs panel '+pl);if(q[2]!==null&&q[0]>pl-30&&Math.abs(q[0]-q[2])<30)bad.push('empty cell '+q[0].toFixed(0)+' vs forecast '+q[2].toFixed(0))});
 return rows.map(function(q){return q.map(function(v){return v===null?'-':v.toFixed(0)}).join('/')}).join(' ')+'|'+bad.slice(0,3).join('; ')})()})
       ecr, ecb = ec.split('|', 2)
@@ -219,6 +219,35 @@ return rows.map(function(q){return q.map(function(v){return v===null?'-':v.toFix
           bot = (fbm * kk - rows.last) / kk
           puts "HVPAD #{c['name']}: ink top #{top.round(1)} bottom #{bot.round(1)}"
           expect((top - bot).abs).to be <= 1
+        end
+      end
+      # B27 (owner 2026-11-16): on the X the panels are the page's own colour with a thin outline: gray 170 on light, gray 85 on dark (OG outline mechanism, 2 px).
+      # Seen red on 9715cc4: the light panel was a 238 backlit fill without an outline.
+      if c['device'] == 'v2' && !c['palette'] && !c['orientation']
+        pf = s.evaluate(%q{(function(){return [].filter.call(document.querySelectorAll('[data-sw-part="face"]'),function(e){var b=e.getBoundingClientRect();return b.width>40&&b.height>40}).map(function(e){var b=e.getBoundingClientRect();return [b.left,b.top,b.right,b.bottom].join(',')}).join(';')+'|'+innerWidth+'|'+(document.querySelector('.screen--dark-mode')||document.documentElement.classList.contains('dark')?'dark':'light')})()})
+        faces, iw2, mode = pf.split('|')
+        unless faces.to_s.empty?
+          require 'chunky_png'
+          png = ChunkyPNG::Image.from_file(s.png_path)
+          kk = png.width / iw2.to_f
+          lum = ->(v) { 0.3 * ChunkyPNG::Color.r(v) + 0.59 * ChunkyPNG::Color.g(v) + 0.11 * ChunkyPNG::Color.b(v) }
+          want = mode == 'dark' ? 85 : 170
+          bad = []
+          faces.split(';').each do |f|
+            fl, ft, fr, fbm = f.split(',').map(&:to_f)
+            ym = ((ft + fbm) / 2 * kk).to_i
+            xm = ((fl + fr) / 2 * kk).to_i
+            pout = lum.call(png[(fl * kk - 3).to_i, ym])
+            pins = lum.call(png[(fl * kk + 7).to_i, ym])
+            edge = ((fl * kk - 1).to_i..(fl * kk + 5).to_i).map { |x| lum.call(png[x, ym]) }
+            top_e = ((ft * kk - 1).to_i..(ft * kk + 5).to_i).map { |y| lum.call(png[xm, y]) }
+            ink = mode == 'dark' ? ->(a) { a.max } : ->(a) { a.min }
+            bad << "fill #{pins.round} vs page #{pout.round}" if (pins - pout).abs > 3
+            bad << "left outline #{ink.call(edge).round} want #{want}" if (ink.call(edge) - want).abs > 8
+            bad << "top outline #{ink.call(top_e).round} want #{want}" if (ink.call(top_e) - want).abs > 8
+          end
+          puts "PANEL #{c['name']}: #{bad.first(3).join('; ')}" unless bad.empty?
+          expect(bad).to eq([])
         end
       end
       # B27 (owner 2026-11-15, option B): a small console shows no meter row or at least two, never a lone row. (Seen red at 9715cc4: the one-row fallback.)

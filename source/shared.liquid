@@ -301,7 +301,7 @@ var API = { paint: null };
 function ko(k, fs, b) { return '<g data-sw-' + k + ' stroke="' + ((API.paint && (API.paint('white') || {}).color) || '#fff') + '" stroke-width="' + n1(fs * 0.22) + '" paint-order="stroke" stroke-linejoin="round">' + b + '</g>'; }   /* the panel-coloured knock-out round text (the day strip's axis, the dial's scale numbers) */
 var GLYPH = { '0': 'abcdef', '1': 'bc', '2': 'abdeg', '3': 'abcdg', '4': 'bcfg', '5': 'acdfg', '6': 'acdefg', '7': 'abc', '8': 'abcdefg', '9': 'abcdfg', '-': 'g', ' ': '' };
 var SHADOW = 'dark:hidden 1bit:hidden', SO = 3, K = 0;
-var SK = 'stroke="currentColor" stroke-width="', FS = ' fill="none" ' + SK;   // size: the stroke attributes most shapes share
+var SK = 'stroke="currentColor" stroke-width="', FS = ' fill="none" ' + SK, LR = ' stroke-linecap="round" stroke-linejoin="round"';   // size: the stroke attributes most shapes share
 function n1(v) { return String(Math.round(v * 10) / 10); }
 function pts(p) { return p.map((q) => n1(q[0]) + ',' + n1(q[1])).join(' '); }
 function poly(p, extra) { return '<polygon points="' + pts(p) + '"' + (extra || '') + '/>'; }
@@ -387,7 +387,7 @@ return { html: svg(vw * k, HH * k, glow(body, GPX / k), '0 0 ' + vw + ' ' + HH).
 var LOC = { out: "<path d='M8 17a4.5 4.5 0 0 1 .5-8.8A5.5 5.5 0 0 1 19.5 8.2 4.5 4.5 0 0 1 20 17z'/><path d='M14 17v8M10.5 25h7'/>", st: "<path fill='currentColor' stroke='none' d='M12.8 12.5h2.4V21l2.3 4H10.5l2.3-4zM11.3 9.2h5.4v3.3h-5.4zM8 7.6h12v1.8H8zM9 4.2a4.3 4.3 0 0 0 0 8.6zM19 4.2a4.3 4.2 0 0 1 0 8.6zM13.3.8a2.4 3.4 0 0 1 0 6.8z'/>", in: "<path d='M3 14L14 4l11 10'/><path d='M6 12v12h16V12'/><path d='M12 24v-7h4v7'/>" };
 function loc(k, W, H) { return svg(W, H, locAt(k, (W - Math.min(W, H)) / 2, (H - Math.min(W, H)) / 2, Math.min(W, H))); }
 var swSec = () => typeof SW !== 'undefined' && SW.sim === false;   /* B13: the sensor is the second reading */
-function locAt(k, x, y, s) { return g(!API.mk && (swSec() ? k === 'in' : k === 'out') ? inc() : '', '<svg x="' + n1(x) + '" y="' + n1(y) + '" width="' + n1(s) + '" height="' + n1(s) + '" viewBox="0 0 28 28" overflow="visible"><g fill="none" ' + SK + n1(Math.max(1.8, 1.5 * 28 / Math.max(1, s)) * 100) / 100 + '" stroke-linecap="round" stroke-linejoin="round" data-sw-loc="' + k + '">' + LOC[k === 'in' && typeof SW !== 'undefined' && SW.po ? 'st' : k] + '</g></svg>'); }
+function locAt(k, x, y, s) { return g(!API.mk && (swSec() ? k === 'in' : k === 'out') ? inc() : '', '<svg x="' + n1(x) + '" y="' + n1(y) + '" width="' + n1(s) + '" height="' + n1(s) + '" viewBox="0 0 28 28" overflow="visible"><g fill="none" ' + SK + n1(Math.max(1.8, 1.5 * 28 / Math.max(1, s)) * 100) / 100 + '"' + LR + ' data-sw-loc="' + k + '">' + LOC[k === 'in' && typeof SW !== 'undefined' && SW.po ? 'st' : k] + '</g></svg>'); }
 var inc = () => b1() ? '' : (B2() ? 'text--gray-30' : dgr()), dgr = () => 'text--gray-' + (b1() || B2() ? (DKM() ? 45 : 50) : (DKM() ? 40 : 35));   /* B18 owner 2026-11-15: the dial's outdoor grey (arc, marks, needle) on the greyscale X: gray-35 (102, 5.7:1 on white) light, gray-40 (136, 5.9:1 on black) dark; still far from the black main needle; 1-bit and 2-bit keep inb() */
 function cells(frac, n) { return frac === null || frac === undefined || !(frac > 0) ? 0 : Math.max(1, Math.round(Math.min(1, frac) * n)); }
 function cellStates(m, n) {
@@ -538,7 +538,7 @@ if (!mid) W = Math.max(W, 1.6 * H);
 var s = Math.min(48, 30 * W / H), e = s * 0.55, sw = (z) => n1(Math.max(1.05, (b1() ? 1.25 : 0.9) * 28 / (z * H / 48)) * 100) / 100,
 it = (k, x, y, z) => '<g data-sw-item="' + (k === 'umbrella' ? k : 'top') + '" transform="translate(' + n1(x) + ' ' + n1(y) + ') scale(' + n1(z / 28 * 1000) / 1000 + ')" stroke-width="' + sw(z) + '">' + CLOTH[k] + '</g>', y0 = (48 - s) / 2;
 var body = it(ks[0], 0, y0, s) + (ks[1] ? it(ks[1], s * 1.6 - e, y0, e) : '');
-return svg(W, H, '<svg width="' + n1(W) + '" height="' + n1(H) + '" viewBox="0 0 ' + n1(48 * W / H) + ' 48" overflow="visible"><g data-sw-cloth data-sw-box="0,0,' + n1(H) + '"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="' + sw(s) + '">' + body + '</g></g></svg>');
+return svg(W, H, '<svg width="' + n1(W) + '" height="' + n1(H) + '" viewBox="0 0 ' + n1(48 * W / H) + ' 48" overflow="visible"><g data-sw-cloth data-sw-box="0,0,' + n1(H) + '"><g fill="none" stroke="currentColor"' + LR + ' stroke-width="' + sw(s) + '">' + body + '</g></g></svg>');
 }
 function backlight(W, H, cx, cy, rad, ryk, rx) {
 var m = API.mode || {}, pa = API.paint ? API.paint(m.bits === 2 ? 'gray-55' : 'gray-75') : null;
@@ -661,7 +661,7 @@ return svg(W, H, c ? g(c, pl) : pl);
 function arrow(dir, W, H) {
 if (dir !== 'up' && dir !== 'down') return '';
 var s = Math.min(W, H), k = s / 28, tf = 'translate(' + n1((W - s) / 2) + ' ' + n1((H - s) / 2) + ') scale(' + n1(k) + ')' + (dir === 'down' ? ' translate(0 28) scale(1 -1)' : '');
-return svg(W, H, '<g transform="' + tf + '" fill="none" ' + SK + '2" stroke-linecap="round" stroke-linejoin="round" data-sw-arrowpoly="' + dir + '"><path d="M3 20l7-7 4 4 9-9"/><path d="M17 8h6v6"/></g>');
+return svg(W, H, '<g transform="' + tf + '" fill="none" ' + SK + '2"' + LR + ' data-sw-arrowpoly="' + dir + '"><path d="M3 20l7-7 4 4 9-9"/><path d="M17 8h6v6"/></g>');
 }
 function axisFor(SW) { return (API.nRows && SW.scales && SW.scales[API.nRows]) || SW.scale; }
 function part(SW, kind, i, W, H) {
@@ -687,8 +687,9 @@ case 'baro': return dial(SW.baro, W, H, true, SW.tdial);
 case 'tdial': return dial(SW.inn && SW.sim !== false && SW.tdial.twin != null ? Object.assign({}, SW.tdial, { now: SW.tdial.twin, twin: SW.tdial.now, sec: 1 }) : SW.tdial, W, H, false, SW.baro);   /* owner 2026-11-14: main needle indoor, the twin needle outdoor */
 case 'icon': return icon(API.src, W, H);
 case 'face': { var n = Math.max(1, Math.round(W / H)), w = W / n, two = B2();
-if (API.mode && !API.mode.dark && API.mode.bits <= 2) { var ow = API.mode.bits === 2 ? 2 : 1;
-return svg(W, H, g(API.mode.bits === 2 ? 'text--gray-55' : '', rect(ow / 2, ow / 2, W - ow, H - ow, Math.min(24, Math.min(W, H) * 0.08), FS + ow + '" data-sw-outline'))); }
+/* B27 (owner 2026-11-16): a 4-bit screen's panels are the page's own colour with the OG's thin outline, gray 170 on light, gray 85 on dark (render check PANEL) */
+if (API.mode && (API.mode.bits >= 4 || (!API.mode.dark && API.mode.bits <= 2))) { var hi = API.mode.bits >= 4, ow = hi || API.mode.bits === 2 ? 2 : 1, ol = rect(ow / 2, ow / 2, W - ow, H - ow, Math.min(24, Math.min(W, H) * 0.08), FS + ow + '" data-sw-outline');
+return svg(W, H, hi ? '<g color="' + (DKM() ? '#555' : '#aaa') + '">' + ol + '</g>' : g(API.mode.bits === 2 ? 'text--gray-55' : '', ol)); }
 if (two) return '';
 var rx = Math.min(24, Math.min(W, H) * 0.08), cp = 'swfc' + (K++);
 return svg(W, H, '<defs><clipPath id="' + cp + '">' + rect(0, 0, W, H, rx) + '</clipPath></defs><g clip-path="url(#' + cp + ')">' + (two ? backlight(W, H, W / 2, H / 2, W * 0.6 / 0.8, H * 0.78 / (W * 0.6), rx) : backlight(W, H, Array.from({ length: n }, (_, j) => w * (j + 0.5)), H / 2, Math.max(w, H) * 0.62, 0.8, rx)) + '</g>').replace('overflow="visible"', 'overflow="hidden"'); }

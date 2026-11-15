@@ -349,7 +349,8 @@ test('days strip: 5-degree lines faint, other days thin mid-grey bars (at least 
 });
 test('panel face (owner 2026-11-12): a plain fill on 4-bit light, no backlight lamps; none on 2-bit, in dark or 1-bit', () => {
   const f = (m, W, H) => { D.mode = m; const s = D.part({}, 'face', 0, W, H); D.mode = null; return s; };
-  ok(/data-sw-fill/.test(f({ dark: false, bits: 4 }, 1200, 400)) && !/ellipse|<pattern|data-sw-backlight/.test(f({ dark: false, bits: 4 }, 1200, 400)), '4-bit light: plain fill only');
+  ok(/data-sw-outline/.test(f({ dark: false, bits: 4 }, 1200, 400)) && /color="#aaa"/.test(f({ dark: false, bits: 4 }, 1200, 400)) && !/data-sw-fill|ellipse|<pattern|data-sw-backlight/.test(f({ dark: false, bits: 4 }, 1200, 400)), '4-bit light: no fill, a gray 170 outline (owner 2026-11-16 replaces the 2026-11-12 plain fill)');
+  ok(/color="#555"/.test(f({ dark: true, bits: 4 }, 1200, 400)), '4-bit dark: gray 85 outline (owner 2026-11-16)');
   ok(!/ellipse|<pattern/.test(f({ dark: false, bits: 2 }, 1200, 400)), '2-bit: no face (borderless: a single native band leaves grey corner pieces)');
   ok(!/ellipse/.test(f({ dark: true, bits: 4 }, 1200, 400)) && !/ellipse/.test(f({ dark: false, bits: 1 }, 1200, 400)), 'dark and 1-bit: none');
 });
