@@ -223,7 +223,7 @@ var wr = e.parentElement.hasAttribute('data-sw-lw') ? e.parentElement : e, ic = 
 e.style.transform = ''; e.style.color = getComputedStyle(ip).stroke;
 var n = e.querySelector('text') || e, cs = getComputedStyle(n), kk = (e.offsetWidth && e.getBoundingClientRect().width / e.offsetWidth) || 1, ik = ((ic.querySelector('[data-sw-ink]') || ic).getAttribute('data-sw-ink') || '0,1').split(',').map(Number), rr = document.createRange();
 cx.font = cs.fontWeight + ' ' + parseFloat(cs.fontSize) + 'px ' + cs.fontFamily; var m = cx.measureText('H'); rr.selectNodeContents(e);
-var dy = (ib.top + (ik[0] + ik[1] / 2) * ib.height - (rr.getBoundingClientRect().top + (m.fontBoundingBoxAscent - m.actualBoundingBoxAscent / 2) * kk)) / kk;
+var dy = (ib.top + (ik[0] + ik[1] / 2) * ib.height - ((rr.getClientRects()[0] || e.getBoundingClientRect()).top + (m.fontBoundingBoxAscent - m.actualBoundingBoxAscent / 2) * kk)) / kk;
 if (Math.abs(dy) > 0.05) e.style.transform = 'translateY(' + dy.toFixed(2) + 'px)';
 });
 }
@@ -1123,7 +1123,7 @@ swAlign();
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(swAlign);
 if (window.ResizeObserver) { var ro = new ResizeObserver(function () { swAlign(); }); document.querySelectorAll('[data-sw-unit=""], [data-sw-part="temp"], [data-sw-cond]').forEach(function (q) { ro.observe(q); ro.observe(q.parentElement); }); }
 if (window.MutationObserver) { var mo = new MutationObserver(function () { swAlign(); }); document.querySelectorAll('[data-sw-cond]').forEach(function (q) { mo.observe(q, { attributes: true, childList: true, characterData: true, subtree: true }); }); }
-[200, 800, 2000].forEach(function (ms) { setTimeout(function () { swN = 0; swAlign(); }, ms); });
+[200, 800, 2000].forEach(function (ms) { setTimeout(function () { swN = 0; swAlign(); swNameFit(); }, ms);   /* the framework's clamp settles after the first pass */ });
 swNameFit();
 document.body.setAttribute('data-sw-drawn', '1');
 });
