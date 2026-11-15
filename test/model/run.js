@@ -461,7 +461,7 @@ test('meter cell states for today (owner 2026-11-13): active, reached earlier, e
 });
 test('forecast cells: a light grey (owner 2026-11-14 "maybe a lighter gray")', () => {
   const lc = (m) => { D.mode = m; const s = D.meter({ frac: 0.3, past: null, later: 0.9, peak: 0.9 }, 300, 30, 10); D.mode = null; return (s.match(/data-sw-st="l"><g class="([^"]+)"/) || [])[1]; };
-  eq([lc({ dark: false, bits: 1 }), lc({ dark: false, bits: 4 })], ['text--gray-75', 'text--gray-55'], '1-bit gray-75; X light gray-55 (B18 2026-11-15: gray-75 is the X panel grey, the cells did not show; render check FORECAST)');
+  eq([lc({ dark: false, bits: 1 }), lc({ dark: false, bits: 4 })], ['text--gray-75', 'text--gray-40'], '1-bit gray-75; X light gray-40 (B18 2026-11-15: gray-75 is the X panel grey, the cells did not show; B26 owner go 2026-11-15: the empty outline is gray-50, 85 from the panel, so the forecast fill went from gray-55 to gray-40; render check FORECAST and EMPTYC)');
 });
 // removed 'sensor readings in the shape TRMNL shows' and 'sensor_device picks one device': they ran the transform-side parser, which is gone; a screen shows only its own sensor (owner 2026-11-14), covered by the render cases og-sens-devid, og-sens-other*, og-sens-noid
 test('moon tilt: bright limb as the observer sees it (owner 2026-11-14, true tilt)', () => {

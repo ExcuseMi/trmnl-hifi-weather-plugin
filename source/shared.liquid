@@ -292,7 +292,7 @@ function pts(p) { return p.map((q) => n1(q[0]) + ',' + n1(q[1])).join(' '); }
 function poly(p, extra) { return '<polygon points="' + pts(p) + '"' + (extra || '') + '/>'; }
 function rect(x, y, w, h, rx, extra) { return '<rect x="' + n1(x) + '" y="' + n1(y) + '" width="' + n1(Math.max(0, w)) + '" height="' + n1(Math.max(0, h)) + '"' + (rx ? ' rx="' + n1(rx) + '"' : '') + (extra || '') + '/>'; }
 var DEFS = '';
-var OC = () => !API.mode ? 'text--gray-65' : (API.mode.bits <= 1 ? '' : (DKM() ? 'text--gray-70' : (B2() ? 'text--gray-45' : 'text--gray-65')));   /* the empty cell's grey */
+var OC = () => !API.mode ? 'text--gray-50' : (API.mode.bits <= 1 ? '' : (DKM() ? 'text--gray-' + (B2() ? 70 : 60) : (B2() ? 'text--gray-45' : 'text--gray-50')));   /* the empty cell's grey */
 function b1() { return API.mode && API.mode.bits <= 1; }
 function B2() { return API.mode && API.mode.bits === 2; }
 function DKM() { return API.mode && API.mode.dark; }
@@ -400,7 +400,7 @@ else if (s === 'p') pv += rect(x, 0, w, ch, 2, ' data-sw-c="' + i + '"');
 else if (s === 'l') { lt += rect(x, 0, w, ch, 2, ' data-sw-c="' + i + '"'); if (!DK) lo += rect(x + 1, 1, w - 2, ch - 2, 2, ' fill="none" ' + SK + '2" data-sw-lo="' + i + '"'); }   // light forecast fill keeps the empty-cell outline (owner 2026-11-14)
 else off += DK ? rect(x, 0, w, ch, 2, ' data-sw-c="' + i + '"') : rect(x + 1, 1, w - 2, ch - 2, 2, ' fill="none" ' + SK + '2" data-sw-c="' + i + '"');
 }
-var PV = DKM() ? 'text--gray-45' : (b1() ? 'text--gray-75' : 'text--gray-' + (B2() ? 65 : 55));   /* owner 2026-11-14: lighter grey for the forecast cells; B18: gray-75 equals the X's panel grey (238), the OG's 170 shows */
+var PV = DKM() ? 'text--gray-45' : (b1() ? 'text--gray-75' : 'text--gray-' + (B2() ? 65 : 40));   /* B26: the X's empty outline is gray-50 (153, 85 from the panel's 238), the forecast fill gray-40 (119); owner 2026-11-14: lighter grey for the forecast cells; B18: gray-75 equals the X's panel grey (238), the OG's 170 shows */
 return ('<g data-sw-lit="' + lit + '" data-sw-ncell="' + n + '"></g>' + (lc ? '' : g(SHADOW + ' text--gray-65', sh)) + '<g data-sw-st="e">' + g(OC(), off) + '</g>' + '<g data-sw-st="p">' + g(PV, pv) + '</g><g data-sw-st="l">' + g(PV, lt) + (lo ? g(OC(), lo) : '') + '</g><g data-sw-on data-sw-st="a">' + (lc ? g(lc, on) : API.mode && !DKM() && !b1() ? '<g data-sw-dg>' + g(act(), on) + '</g>' : glow(on, GPX)) +   /* owner: 2-bit+ light dark grey, 1-bit black, dark white */ (zc[1] ? hg('yellow', zc[1]) : '') + (zc[2] ? hg('red', zc[2]) : '') + '</g>' + gk);
 }
 function gauge(gq, W, H) {
