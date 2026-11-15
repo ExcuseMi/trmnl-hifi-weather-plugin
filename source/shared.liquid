@@ -60,12 +60,12 @@
    {%- capture dv_row %}
     {%- comment %} owner 2026-11-14: with a sensor the caption follows the main needle, indoor (no house icon: with it and a trend arrow the wider value shrank the dial, render check DIALR) {% endcomment %}
     {%- if k == 1 %}{% assign arw = ui.baro.arrow %}{% assign arw_i = 0 %}{% elsif inn and inm %}{% assign arw = '' %}{% else %}{% assign arw = ui.tdial.arrow %}{% assign arw_i = 1 %}{% endif %}{% if arw == 'up' or arw == 'down' %}<div class="shrink-0 self--center" data-sw-part="arrow" data-sw-i="{{ arw_i }}" data-sw-arrow="{{ arw }}"></div>{% endif %}{% comment %} owner 2026-11-13 {% endcomment %}
-    {%- if k == 1 %}<span class="{{ vst }}">{{ ui.baro.value }}</span><span class="{{ tsb }}">{{ ui.baro.unit }}</span>{% comment %} owner: the pressure, the trend {% endcomment %}
-    {%- elsif inn and inm %}<span class="{{ vst }}" data-sw-inval>{{ inn.temp }}</span><span class="{{ tsb }}">{{ ui.tdial.unit }}</span>
-    {%- else %}<span class="{{ vst }}">{{ ui.tdial.value }}</span><span class="{{ tsb }}">{{ ui.tdial.unit }}</span>{% endif -%}
+    {%- if k == 1 %}<span class="{{ vst }}">{{ ui.baro.value }}</span><span class="{{ tsb }}" data-sw-uu>{{ ui.baro.unit }}</span>{% comment %} owner: the pressure, the trend {% endcomment %}
+    {%- elsif inn and inm %}<span class="{{ vst }}" data-sw-inval>{{ inn.temp }}</span><span class="{{ tsb }}" data-sw-uu>{{ ui.tdial.unit }}</span>
+    {%- else %}<span class="{{ vst }}">{{ ui.tdial.value }}</span><span class="{{ tsb }}" data-sw-uu>{{ ui.tdial.unit }}</span>{% endif -%}
    {%- endcapture %}
    <div class="absolute bottom--3 right--4 flex flex--row flex--bottom gap--small" data-sw-cap>{{ dv_row }}</div>
-   {%- if k == 2 and inn %}{% assign dgc = 'text--gray-30 dark:text--gray-30' %}<div class="absolute top--3 right--4 flex flex--row flex--bottom gap--small {{ dgc }}" data-sw-cap data-sw-dialin>{% comment %} owner 2026-11-13 {% endcomment %}<div class="shrink-0 self--center h--[3cqh] w--[2cqw]" data-sw-part="loc" data-sw-sq data-sw-i="{% if inm %}0{% else %}1{% endif %}" data-sw-loc="{% if inm %}out{% else %}in{% endif %}"></div>{% if inm and ui.tdial.arrow == 'up' or inm and ui.tdial.arrow == 'down' %}<div class="shrink-0 self--center {{ dgc }}" data-sw-part="arrow" data-sw-i="1" data-sw-arrow="{{ ui.tdial.arrow }}"></div>{% endif %}<span class="value value--small value--tnums {{ dgc }}"{% unless inm %} data-sw-inval{% endunless %}>{% if inm %}{{ ui.tdial.value }}{% else %}{{ inn.temp }}{% endif %}</span><span class="{{ tsb }} {{ dgc }}">{{ ui.tdial.unit }}</span></div>{% endif %}
+   {%- if k == 2 and inn %}{% assign dgc = 'text--gray-30 dark:text--gray-30' %}<div class="absolute top--3 right--4 flex flex--row flex--bottom gap--small {{ dgc }}" data-sw-cap data-sw-dialin>{% comment %} owner 2026-11-13 {% endcomment %}<div class="shrink-0 self--center h--[3cqh] w--[2cqw]" data-sw-part="loc" data-sw-sq data-sw-i="{% if inm %}0{% else %}1{% endif %}" data-sw-loc="{% if inm %}out{% else %}in{% endif %}"></div>{% if inm and ui.tdial.arrow == 'up' or inm and ui.tdial.arrow == 'down' %}<div class="shrink-0 self--center {{ dgc }}" data-sw-part="arrow" data-sw-i="1" data-sw-arrow="{{ ui.tdial.arrow }}"></div>{% endif %}<span class="value value--small value--tnums {{ dgc }}"{% unless inm %} data-sw-inval{% endunless %}>{% if inm %}{{ ui.tdial.value }}{% else %}{{ inn.temp }}{% endif %}</span><span class="{{ tsb }} {{ dgc }}" data-sw-uu>{{ ui.tdial.unit }}</span></div>{% endif %}
   </div>{{ p_close }}
   {%- endfor %}
  </div></div>
@@ -90,7 +90,7 @@
      <div class="flex flex--row flex--top gap--xsmall"><div class="flex flex--col flex--center gap--xsmall"><div class="{{ fcy }} gap--xsmall{% if tw == 2 and ph.lab %} w--full{% endif %}"><div class="shrink-0 h--[4cqh]" data-sw-part="loc" data-sw-sq data-sw-i="{{ tw | minus: 1 }}" data-sw-loc="{{ tw_k }}" data-sw-lz></div>{% if tw == 2 and ph.lab %}<div style="contain:inline-size;flex:1;min-width:0" data-sw-lw><span class="label text--bold" style="line-height:1.1" data-clamp="1" data-sw-slab>{{ ph.lab }}</span></div>{% endif %}{% if tw == 1 %}{{ cbadge | replace: 'data-sw-part="cue"', 'data-sw-part="cue" data-sw-cb' }}{% endif %}</div><div class="h--[{{ tw_dm | times: hm | times: tm | round | at_most: 100 }}cqh] lg:h--[{{ tw_dl | times: hl | times: tf | round | at_most: 100 }}cqh] lg:portrait:h--[6cqh]" data-sw-part="{% if tw == 1 %}temp{% else %}itemp{% endif %}"></div></div><div class="flex flex--col gap--xsmall"><div class="shrink-0 h--[4cqh]" data-sw-lsp></div><span class="value value--small" data-sw-unit="{% if tw == 2 %}in{% endif %}">{{ ui.unit }}</span></div></div>
      {%- if tw == 2 %}<span class="label label--small flex flex--row flex--center-y gap--xsmall">{{ inn_hum }}</span>{% else %}<span class="label label--small">&nbsp;</span>{% endif %}{% comment %} an empty line under BUITEN keeps {% endcomment %}
     </div>{% endfor %}{% else %}
-    <div class="flex flex--row flex--top gap--xsmall shrink-0 {{ tg_h }}"><div class="h--full" data-sw-part="temp"{% if view < 3 %} data-sw-tm{% endif %}></div><span class="value value--small" data-sw-unit>{{ ui.unit }}</span></div>{% if ui.cue and ui.cue.size > 0 %}<div data-sw-div class="border--v-60 shrink-0 h--full"></div>{% endif %}{% comment %} owner: the thin divider between the {% endcomment %}
+    <div class="flex flex--row flex--top gap--xsmall shrink-0 {{ tg_h }}"><div class="h--full" data-sw-part="temp"{% if view < 3 %} data-sw-tm{% endif %}></div><span class="value value--small" data-sw-unit data-sw-uu>{{ ui.unit }}</span></div>{% if ui.cue and ui.cue.size > 0 %}<div data-sw-div class="border--v-60 shrink-0 h--full"></div>{% endif %}{% comment %} owner: the thin divider between the {% endcomment %}
     {% if view < 3 %}{{ cbadge | replace: 'data-sw-part="cue"', 'data-sw-part="cue" data-sw-cs="0.52"' }}{% else %}{{ cbadge }}{% endif %}{% endif %}
    </div>
   </div>{% endcapture %}{% capture c_right %}{% comment %}Rain unit (owner){% endcomment %}{% assign rr = 2 %}{% if ui.rain.rows == 3 %}{% assign rr = 3 %}{% endif %}{% assign rr_m = rr %}{% if view == 2 %}{% assign rr_m = 2 %}{% endif %}{% assign k_m = 7 %}{% assign k_l = 4 %}{% if rr_m == 3 %}{% assign k_m = 6 %}{% endif %}{% comment %} X quadrant, 2-row calendar (it {% endcomment %}{% assign kw = 1 %}{% if rr == 3 %}{% assign k_l = 3.4 %}{% assign kw = 0.75 %}{% endif %}{% assign rc_m = k_m | times: hm | round %}{% assign rc_l = k_l | times: hl | round %}{% assign cal_m = rc_m | times: rr_m | at_most: 100 %}{% assign cal_l = k_l | times: hl | times: rr | round | at_most: 100 %}{% assign cal_p = 3 | times: rr %}{% if view == 1 %}{% assign cal_p = 5 | times: rr | divided_by: 2 %}{% endif %}{% if view == 2 %}{% assign cal_p = 5 | times: rr %}{% endif %}{% assign ib_l = cal_l %}{% assign ib_m = cal_m %}{% capture ib_cls %}aspect--1/1 h--[{{ ib_m }}cqh] lg:h--[{{ ib_l }}cqh] {% if view == 2 %}lg:portrait:h--[6cqh]{% elsif view == 1 %}lg:portrait:h--[{{ cal_p }}cqh]{% else %}lg:portrait:h--[7cqh]{% endif %} shrink-0{% endcapture %}{% comment %} X half vertical portrait (owner {% endcomment %}{% comment %} Calm quadrant {% endcomment %}
@@ -124,9 +124,9 @@
   <div class="{{ fcy }} flex--center-x w--full" data-sw-srow="main">
    {%- comment %} Owner 2026-11-14: with an indoor reading the big number is indoor (house icon in front), outdoor a small readout first in the side column where it fits. {% endcomment %}
    {%- capture s_lab %}{% if ph.lab %}<span class="label text--bold shrink-0" data-clamp="1" data-sw-slab data-sw-lt="{{ ph.lab }}">{{ ph.lab }}</span>{% endif %}{% endcapture %}{% assign lk_m = 'out' %}{% assign li_m = 0 %}{% assign lk_2 = 'in' %}{% assign li_2 = 1 %}{% assign t_m = 'temp' %}{% assign t_2 = 'itemp' %}{% if inn and inm %}{% assign lk_m = 'in' %}{% assign li_m = 1 %}{% assign lk_2 = 'out' %}{% assign li_2 = 0 %}{% assign t_m = 'itemp' %}{% assign t_2 = 'temp' %}{% endif %}
-   <div class="flex flex--row flex--top shrink-0 gap--none" data-sw-sgrp="temp">{% if inn %}<div class="shrink-0" data-sw-part="loc" data-sw-sq data-sw-i="{{ li_m }}" data-sw-loc="{{ lk_m }}" data-sw-sloc></div>{% if inm %}{{ s_lab }}{% endif %}{% endif %}<div class="shrink-0" data-sw-part="{{ t_m }}"></div><span class="{{ tsb }} shrink-0" data-sw-unit data-sw-sunit>{{ ui.unit }}</span></div>
+   <div class="flex flex--row flex--top shrink-0 gap--none" data-sw-sgrp="temp">{% if inn %}<div class="shrink-0" data-sw-part="loc" data-sw-sq data-sw-i="{{ li_m }}" data-sw-loc="{{ lk_m }}" data-sw-sloc></div>{% if inm %}{{ s_lab }}{% endif %}{% endif %}<div class="shrink-0" data-sw-part="{{ t_m }}"></div><span class="{{ tsb }} shrink-0" data-sw-unit data-sw-sunit data-sw-uu>{{ ui.unit }}</span></div>
    <div class="flex flex--col flex--center shrink-0" data-sw-sgrp="side">
-    {%- if inn %}<div class="flex flex--row flex--top shrink-0 gap--none" data-sw-sout><div class="shrink-0 self--center" data-sw-part="loc" data-sw-sq data-sw-i="{{ li_2 }}" data-sw-loc="{{ lk_2 }}"></div>{% if inm and ui.cue and ui.cue.size > 0 %}<div class="shrink-0 self--center" data-sw-part="cue" data-sw-cb data-sw-socue data-sw-cue="{{ ui.cue | join: '+' }}"></div>{% endif %}<div class="shrink-0" data-sw-part="{{ t_2 }}" data-sw-tr></div><span class="{{ tsb }} shrink-0" data-sw-sounit>{{ ui.unit }}</span></div>{% endif %}
+    {%- if inn %}<div class="flex flex--row flex--top shrink-0 gap--none" data-sw-sout><div class="shrink-0 self--center" data-sw-part="loc" data-sw-sq data-sw-i="{{ li_2 }}" data-sw-loc="{{ lk_2 }}"></div>{% if inm and ui.cue and ui.cue.size > 0 %}<div class="shrink-0 self--center" data-sw-part="cue" data-sw-cb data-sw-socue data-sw-cue="{{ ui.cue | join: '+' }}"></div>{% endif %}<div class="shrink-0" data-sw-part="{{ t_2 }}" data-sw-tr></div><span class="{{ tsb }} shrink-0" data-sw-sounit data-sw-uu>{{ ui.unit }}</span></div>{% endif %}
     {%- if ui.cue and ui.cue.size > 0 %}<div class="shrink-0" data-sw-part="cue" data-sw-cue="{{ ui.cue | join: '+' }}"></div>{% endif %}
     {%- if ui.rain %}<div class="{{ fcy }} shrink-0" data-sw-unit="rain"><img class="{{ iia }} shrink-0" src="{{ ui.rain.icon }}" alt="" data-sw-icon data-sw-sricon><div class="shrink-0" data-sw-part="rain" data-sw-rows="2,2"></div></div>
     {%- elsif ui.days[0] %}<span class="{{ tsb }} shrink-0" data-sw-slohi="{{ ui.days[0].lo }}|{{ ui.days[0].hi }}">{{ ui.days[0].lo }} {{ ui.days[0].hi }}</span>{% endif %}
@@ -215,6 +215,16 @@ function swCv() { return document.createElement('canvas').getContext('2d'); }   
 function px(v, n) { return v.toFixed(n) + 'px'; }   /* B20 (size): a length written 45 times */
 /* B20: the Framework Clamp (data-clamp) measures once, when the page loads; the label's size and width are set by this script afterwards, so the clamp runs again whenever they change */
 /* B27 (owner photo, BOVEN): the sensor's name takes the icon's colour and its caps are centred on the icon's ink (render check B20: colour, centre within 1 px) */
+/* B27 (owner 2026-11-16): a unit after a number is the shared secondary grey (SWDraw.inc, black on 1-bit); a temperature unit's top meets the number's cap top (render check UNIT) */
+function swUnits() {
+var cx = swCv(), gc = SWDraw.inc();
+document.querySelectorAll('[data-sw-uu]').forEach(function (e) {
+if (gc && !e.className.includes('text--gray-30')) e.classList.add(gc);
+var nm = e.previousElementSibling, b = e.getBoundingClientRect(); e.style.transform = ''; if (!b.width || !nm || nm.tagName !== 'SPAN' || !/^°/.test(e.textContent)) return;
+var cap = function (x, ch) { var cs = getComputedStyle(x), r = document.createRange(); cx.font = cs.fontWeight + ' ' + parseFloat(cs.fontSize) + 'px ' + cs.fontFamily; var m = cx.measureText(ch), k = (x.offsetWidth && x.getBoundingClientRect().width / x.offsetWidth) || 1; r.selectNodeContents(x); return r.getClientRects()[0].top + (m.fontBoundingBoxAscent - m.actualBoundingBoxAscent) * k; };
+var dy = cap(nm, '0') - cap(e, '°'); e.style.transform = 'translateY(' + dy.toFixed(2) + 'px)';
+});
+}
 function swNameFit() {
 var cx = swCv();
 document.querySelectorAll('[data-sw-slab]').forEach(function (e) {
@@ -388,7 +398,7 @@ return { html: svg(vw * k, HH * k, glow(body, GPX / k), '0 0 ' + vw + ' ' + HH).
 var LOC = { out: "<path d='M8 17a4.5 4.5 0 0 1 .5-8.8A5.5 5.5 0 0 1 19.5 8.2 4.5 4.5 0 0 1 20 17z'/><path d='M14 17v8M10.5 25h7'/>", st: "<path fill='currentColor' stroke='none' d='M12.8 12.5h2.4V21l2.3 4H10.5l2.3-4zM11.3 9.2h5.4v3.3h-5.4zM8 7.6h12v1.8H8zM9 4.2a4.3 4.3 0 0 0 0 8.6zM19 4.2a4.3 4.2 0 0 1 0 8.6zM13.3.8a2.4 3.4 0 0 1 0 6.8z'/>", in: "<path d='M3 14L14 4l11 10'/><path d='M6 12v12h16V12'/><path d='M12 24v-7h4v7'/>" };
 function loc(k, W, H) { return svg(W, H, locAt(k, (W - Math.min(W, H)) / 2, (H - Math.min(W, H)) / 2, Math.min(W, H))); }
 var swSec = () => typeof SW !== 'undefined' && SW.sim === false;   /* B13: the sensor is the second reading */
-function locAt(k, x, y, s) { return g(!API.mk && (swSec() ? k === 'in' : k === 'out') ? inc() : '', '<svg x="' + n1(x) + '" y="' + n1(y) + '" ' + wh(s, s) + ' viewBox="0 0 28 28" overflow="visible"><g fill="none" ' + SK + n1(Math.max(1.8, 1.5 * 28 / Math.max(1, s)) * 100) / 100 + '"' + LR + ' data-sw-loc="' + k + '">' + LOC[k === 'in' && typeof SW !== 'undefined' && SW.po ? 'st' : k] + '</g></svg>'); }
+function locAt(k, x, y, s) { return g(!API.mk && !API.big && (swSec() ? k === 'in' : k === 'out') ? inc() : '', '<svg x="' + n1(x) + '" y="' + n1(y) + '" ' + wh(s, s) + ' viewBox="0 0 28 28" overflow="visible"><g fill="none" ' + SK + n1(Math.max(1.8, 1.5 * 28 / Math.max(1, s)) * 100) / 100 + '"' + LR + ' data-sw-loc="' + k + '">' + LOC[k === 'in' && typeof SW !== 'undefined' && SW.po ? 'st' : k] + '</g></svg>'); }
 var inc = () => b1() ? '' : (B2() ? 'text--gray-30' : dgr()), dgr = () => 'text--gray-' + (b1() || B2() ? (DKM() ? 45 : 50) : (DKM() ? 40 : 35));   /* B18 owner 2026-11-15: the dial's outdoor grey (arc, marks, needle) on the greyscale X: gray-35 (102, 5.7:1 on white) light, gray-40 (136, 5.9:1 on black) dark; still far from the black main needle; 1-bit and 2-bit keep inb() */
 function cells(frac, n) { return frac === null || frac === undefined || !(frac > 0) ? 0 : Math.max(1, Math.round(Math.min(1, frac) * n)); }
 function cellStates(m, n) {
@@ -419,15 +429,17 @@ else off += DK ? rect(x, 0, w, ch, 2, ' data-sw-c="' + i + '"') : rect(x + 1, 1,
 var PV = DKM() ? 'text--gray-45' : (b1() ? 'text--gray-75' : 'text--gray-' + (B2() ? 65 : 40));   /* B26: the X's empty outline is gray-50 (153, 85 from the panel's 238), the forecast fill gray-40 (119); owner 2026-11-14: lighter grey for the forecast cells; B18: gray-75 equals the X's panel grey (238), the OG's 170 shows */
 return ('<g data-sw-lit="' + lit + '" data-sw-ncell="' + n + '"></g>' + (lc ? '' : g(SHADOW + ' text--gray-65', sh)) + '<g data-sw-st="e">' + g(OC(), off) + '</g>' + '<g data-sw-st="p">' + g(PV, pv) + '</g><g data-sw-st="l">' + g(PV, lt) + (lo ? g(OC(), lo) : '') + '</g><g data-sw-on data-sw-st="a">' + (lc ? g(lc, on) : API.mode && !DKM() && !b1() ? '<g data-sw-dg>' + g(act(), on) + '</g>' : glow(on, GPX)) +   /* owner: 2-bit+ light dark grey, 1-bit black, dark white */ (zc[1] ? hg('yellow', zc[1]) : '') + (zc[2] ? hg('red', zc[2]) : '') + '</g>' + gk);
 }
+/* B27 (owner photo): the rain amount's number is at least as big as a meter label (the unit 0.6 of it, grey, one baseline), else the gauge goes; the number's width plus the unit's fits the column left of the bar */
+function gfs(lab, x0, lp) { var p = lab.split(' '); return Math.min(1.15 * (lp || 16), x0 / (p[0].length * 0.62 + p[1].length * 0.37 + 0.45)); }
 function gauge(gq, W, H) {
 if (!gq) return '';
-var lab = String(gq.label), x0 = API.gx0 || 0, bw = W - x0, fs = Math.min((API.lp || 16) * 0.7, x0 / (lab.length * 0.62 + 0.5)), n = 3, cw = bw / n, gp = API.gp || Math.max(2, Math.min(cw, H) * 0.06), on = '', sh = '', off = '', DK = DKM() && API.mode.bits >= 2;
+var lab = String(gq.label), x0 = API.gx0 || 0, bw = W - x0, fs = gfs(lab, x0, API.lp), n = 3, cw = bw / n, gp = API.gp || Math.max(2, Math.min(cw, H) * 0.06), on = '', sh = '', off = '', DK = DKM() && API.mode.bits >= 2;
 for (var i = 0; i < n; i++) {
 var x = x0 + i * cw + gp / 2, w = cw - gp;
 if (i < gq.segs) { on += rect(x, 0, w, H, 2, ' data-sw-c="' + i + '"'); sh += rect(x + SO, SO, w, H, 2); }
 else off += DK ? rect(x, 0, w, H, 2, ' data-sw-c="' + i + '"') : rect(x + 1, 1, w - 2, H - 2, 2, FS + '2" data-sw-c="' + i + '"');
 }
-return svg(W, H, '<g data-sw-gauge="' + gq.segs + '"></g>' + g(SHADOW + ' text--gray-65', sh) + '<g data-sw-st="e">' + g(OC(), off) + '</g><g data-sw-on data-sw-st="a">' + (API.mode && !DKM() && !b1() ? '<g data-sw-dg>' + g(act(), on) + '</g>' : glow(on, GPX)) + '</g>' + text(x0 / 2, H / 2, lab, fs, 'middle', 'central', ' data-sw-glabel'));
+return svg(W, H, '<g data-sw-gauge="' + gq.segs + '"></g>' + g(SHADOW + ' text--gray-65', sh) + '<g data-sw-st="e">' + g(OC(), off) + '</g><g data-sw-on data-sw-st="a">' + (API.mode && !DKM() && !b1() ? '<g data-sw-dg>' + g(act(), on) + '</g>' : glow(on, GPX)) + '</g>' + '<text x="' + n1(x0 / 2) + '" y="' + n1(H / 2 + 0.36 * fs) + '" font-size="' + n1(fs) + '" font-weight="700" text-anchor="middle" data-sw-glabel>' + lab.split(' ')[0] + '<tspan font-size="' + n1(0.6 * fs) + '"' + (inc() ? ' class="' + inc() + '"' : '') + '> ' + lab.split(' ')[1] + '</tspan></text>');
 }
 function tick(v) { return String(v === 0 ? 0 : v); }
 function lfs(sc) { var f = API.nfs ? (API.lp && API.nfs > API.lp && API.ogfull ? API.lp : Math.max(API.nfs, API.lp || 0)) : Math.max((API.scaleH || 20) * 0.7, API.lp || 0); return API.lhf ? Math.min(f, 1.28 * API.lhf) : f; }   // B12: scale labels at most 1.28 x the low/high digits (render check PORT; Kobo Forma, Voyage, X portrait)
@@ -697,7 +709,7 @@ return svg(W, H, '<defs><clipPath id="' + cp + '">' + rect(0, 0, W, H, rx) + '</
 }
 return '';
 }
-Object.assign(API, { cellStates: cellStates, part: part, hscale: hscale, icon: icon, digits: digits, segtime: segtime, meter: meter, day: day, rain: rain, dial: dial, moon: moon });   // what the page and the model tests call
+Object.assign(API, { cellStates: cellStates, part: part, hscale: hscale, icon: icon, digits: digits, segtime: segtime, meter: meter, day: day, rain: rain, dial: dial, moon: moon, gfs: gfs, inc: inc });   // what the page and the model tests call
 return API;
 })();
 // ==== DRAW_END ====
@@ -1065,10 +1077,10 @@ document.querySelectorAll('[data-sw-part="gauge"]').forEach(function (el) {
 var un = el.previousElementSibling, cal = un && un.querySelector('[data-sw-part="rain"]'); if (!cal) return;
 var ml = swVis('[data-sw-mlabel]')[0], lp = ml ? parseFloat(getComputedStyle(ml).fontSize) * (ml.getBoundingClientRect().width / (ml.offsetWidth || 1)) : 0;
 var lab = ((SW.rain || {}).gauge || {}).label || '', rw = (cal.getAttribute('data-sw-rows') || '').split(','), rows = +(rw[SWS[4] ? 1 : 0]) || 2, cb = cal.getBoundingClientRect(), ub = un.getBoundingClientRect();
-var cw = cb.width / 3, ch = cb.height / rows, gp = Math.max(2, Math.min(cw, ch) * 0.06), fs = Math.min(lp * 0.7 || 12, (cb.left - ub.left) / (lab.length * 0.62 + 0.5));
+var cw = cb.width / 3, ch = cb.height / rows, gp = Math.max(2, Math.min(cw, ch) * 0.06), fs = SWDraw.gfs(lab, cb.left - ub.left, lp);
 el.style.width = px(cb.right - ub.left, 2); el.style.height = px(Math.max(4, ch * 0.3), 2); el.setAttribute('data-sw-gp', gp.toFixed(2)); el.setAttribute('data-sw-x0', (cb.left - ub.left).toFixed(2));
 var rc = el.closest('[data-sw-right]'), pn = rc && rc.closest('[data-sw-panel]'), pb = pn && pn.getBoundingClientRect(), ps = pn && getComputedStyle(pn), rb = rc && rc.getBoundingClientRect();
-if (!cb.width || cw / ch < 0.85 || cw * 0.7 < lp || fs < (lp * 0.7 || 12) * 0.6 || (rb && pb && (rb.bottom > pb.bottom - parseFloat(ps.paddingBottom) + 0.5 || rb.top < pb.top + parseFloat(ps.paddingTop) - 0.5))) el.classList.add('hidden');
+if (!cb.width || cw / ch < 0.85 || cw * 0.7 < lp || fs < (lp || 12) || (rb && pb && (rb.bottom > pb.bottom - parseFloat(ps.paddingBottom) + 0.5 || rb.top < pb.top + parseFloat(ps.paddingTop) - 0.5))) el.classList.add('hidden');
 });
 var qvm = swVis('[data-sw-part^="meter"]'), qhv = qvm.filter(function (q) { return q.getAttribute('data-sw-part') === 'meterin'; })[0];
 if (qhv) { var qcol = qhv.parentElement.parentElement, qpn = qcol.closest('[data-sw-panel]') || qcol.parentElement, qcs = getComputedStyle(qpn), qin = qpn.getBoundingClientRect().height - (parseFloat(qcs.paddingTop) + parseFloat(qcs.paddingBottom)) * ((qpn.offsetHeight && qpn.getBoundingClientRect().height / qpn.offsetHeight) || 1);
@@ -1092,7 +1104,7 @@ if (lzu && r.height) { var lzk = (el.offsetHeight && r.height / el.offsetHeight)
 if (el.hasAttribute('data-sw-sq') && r.height) { var k0 = (el.offsetHeight && r.height / el.offsetHeight) || 1, tf = el.getAttribute('data-sw-part') === 'tri' ? parseFloat(getComputedStyle(el.parentElement).fontSize) * 0.8 : 0; if (tf) el.style.setProperty('height', px(tf, 2), 'important'); el.style.setProperty('width', px(tf || r.height / k0, 2), 'important'); r = el.getBoundingClientRect(); }
 if (tf) swTri();   // the mark's own size settles here: centre it again
 if (!r.width && !r.height) return;
-SWDraw.tr = el.hasAttribute('data-sw-tr') || (el.hasAttribute('data-sw-tm') && !sc.contains('screen--lg') && !sc.contains('screen--portrait')); SWDraw.gp = +(el.getAttribute('data-sw-gp') || 0); SWDraw.gx0 = +(el.getAttribute('data-sw-x0') || 0); SWDraw.mk = el.hasAttribute('data-sw-for'); SWDraw.n = +(el.getAttribute('data-sw-n') || 0) || null; SWDraw.j = +(el.getAttribute('data-sw-j') || 0);
+SWDraw.tr = el.hasAttribute('data-sw-tr') || (el.hasAttribute('data-sw-tm') && !sc.contains('screen--lg') && !sc.contains('screen--portrait')); SWDraw.gp = +(el.getAttribute('data-sw-gp') || 0); SWDraw.gx0 = +(el.getAttribute('data-sw-x0') || 0); SWDraw.mk = el.hasAttribute('data-sw-for'); SWDraw.big = el.hasAttribute('data-sw-lz') || el.hasAttribute('data-sw-sloc');   /* B27: a big reading's icon is plain black (owner), only the dial corner's and the meter marks' follow the secondary grey */ SWDraw.n = +(el.getAttribute('data-sw-n') || 0) || null; SWDraw.j = +(el.getAttribute('data-sw-j') || 0);
 var ml = swVis('[data-sw-mlabel]')[0]; SWDraw.lp = ml ? parseFloat(getComputedStyle(ml).fontSize) * (ml.getBoundingClientRect().width / (ml.offsetWidth || 1)) : 0;
 var ogp = SWS[5] && (!SWS[4] || SWS[6] == 3), nm = ogp && swVis('[data-sw-row="day"] span.title')[0]; SWDraw.nfs = nm ? parseFloat(getComputedStyle(nm).fontSize) : 0; var lh = swVis('[data-sw-row="day"] span.title:not([data-sw-dname])')[0]; SWDraw.lhf = lh ? parseFloat(getComputedStyle(lh).fontSize) : 0; SWDraw.ogfull = ogp && !sc.contains('screen--lg') && SWS[6] == 1;
 var rw = (el.getAttribute('data-sw-rows') || '').split(','); SWDraw.rows = +(rw[SWS[4] ? 1 : 0]) || null;
@@ -1125,8 +1137,8 @@ swAlign();
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(swAlign);
 if (window.ResizeObserver) { var ro = new ResizeObserver(function () { swAlign(); }); document.querySelectorAll('[data-sw-unit=""], [data-sw-part="temp"], [data-sw-cond]').forEach(function (q) { ro.observe(q); ro.observe(q.parentElement); }); }
 if (window.MutationObserver) { var mo = new MutationObserver(function () { swAlign(); }); document.querySelectorAll('[data-sw-cond]').forEach(function (q) { mo.observe(q, { attributes: true, childList: true, characterData: true, subtree: true }); }); }
-[200, 800, 2000].forEach(function (ms) { setTimeout(function () { swN = 0; swAlign(); swNameFit(); }, ms);   /* the framework's clamp settles after the first pass */ });
-swNameFit();
+[200, 800, 2000].forEach(function (ms) { setTimeout(function () { swN = 0; swAlign(); swNameFit(); swUnits(); }, ms);   /* the framework's clamp settles after the first pass */ });
+swNameFit(); swUnits();
 document.body.setAttribute('data-sw-drawn', '1');
 });
 })();

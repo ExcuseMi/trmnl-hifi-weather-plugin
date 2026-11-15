@@ -250,6 +250,23 @@ return rows.map(function(q){return q.map(function(v){return v===null?'-':v.toFix
           expect(bad).to eq([])
         end
       end
+      # B27 (owner 2026-11-16): every unit after a number is the shared unit grey on 2-bit and deeper screens (SWDraw.inc, 4.5:1 against the page), black on 1-bit;
+      # a temperature unit's top meets the number's cap top (1 px) at the readouts that have a number span; the rain amount's number is at least a meter label's size, its unit smaller.
+      ug = s.evaluate(%q{(function(){var bad=[],b1=!!document.querySelector('.screen--1bit'),dk=!!document.querySelector('.screen--dark-mode')||document.documentElement.classList.contains('dark'),cx=document.createElement('canvas').getContext('2d'),
+col=function(c){var d=document.createElement('span');d.className=c;(document.querySelector('.screen')||document.body).appendChild(d);var v=getComputedStyle(d).color;d.remove();return v},rgb=function(c){return(c.match(/[\d.]+/g)||[]).slice(0,3).map(Number)},lum=function(a){var f=function(v){v/=255;return v<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4)};return 0.2126*f(a[0])+0.7152*f(a[1])+0.0722*f(a[2])},
+tok=SWDraw.inc?SWDraw.inc():'',want=tok?[col(tok),col('text--gray-30')]:[],page=dk?0:255,
+cap=function(x,ch){var cs=getComputedStyle(x),r=document.createRange();cx.font=cs.fontWeight+' '+parseFloat(cs.fontSize)+'px '+cs.fontFamily;var m=cx.measureText(ch),k=(x.offsetWidth&&x.getBoundingClientRect().width/x.offsetWidth)||1;r.selectNodeContents(x);return r.getClientRects()[0].top+(m.fontBoundingBoxAscent-m.actualBoundingBoxAscent)*k};
+[].filter.call(document.querySelectorAll('[data-sw-uu]'),function(e){var b=e.getBoundingClientRect();return b.width>0&&b.height>0}).forEach(function(e){var cc=getComputedStyle(e).color,nm=e.previousElementSibling,u=e.textContent.trim();
+if(b1){if(cc!==(dk?'rgb(255, 255, 255)':'rgb(0, 0, 0)'))bad.push('unit '+u+' '+cc+' on 1-bit, want plain')}else{if(want.indexOf(cc)<0)bad.push('unit '+u+' '+cc+' not the unit grey '+want.join('/'));var q=lum(rgb(cc)),p=lum([page,page,page]),cr=(Math.max(q,p)+0.05)/(Math.min(q,p)+0.05);if(cr<4.5)bad.push('unit '+u+' contrast '+cr.toFixed(1))}
+if(nm&&nm.tagName==='SPAN'&&/^°/.test(u)&&nm.getBoundingClientRect().width>0){var d=cap(nm,'0')-cap(e,'°');if(Math.abs(d)>1)bad.push('unit '+u+' top off by '+d.toFixed(1))}});
+var gl=[].filter.call(document.querySelectorAll('[data-sw-glabel]'),function(e){return e.getBoundingClientRect().width>0}),ml=[].filter.call(document.querySelectorAll('[data-sw-mlabel]'),function(e){return e.getBoundingClientRect().width>0})[0];
+gl.forEach(function(e){var sv=e.ownerSVGElement,ks=sv.getBoundingClientRect().width/(+sv.getAttribute('width')||1),fs=parseFloat(e.getAttribute('font-size'))*ks,ts=e.querySelector('tspan');
+if(ml){var lf=parseFloat(getComputedStyle(ml).fontSize)*(ml.getBoundingClientRect().width/(ml.offsetWidth||1));if(fs<lf-0.5)bad.push('rain amount '+fs.toFixed(1)+' px under the meter label '+lf.toFixed(1))}
+if(!ts||parseFloat(ts.getAttribute('font-size'))>=parseFloat(e.getAttribute('font-size')))bad.push('rain unit not smaller');
+else if(!b1&&want.indexOf(getComputedStyle(ts).color)<0)bad.push('rain unit '+getComputedStyle(ts).color+' not the unit grey')});
+return bad.slice(0,4).join('; ')})()})
+      puts "UNIT #{c['name']}: #{ug}" unless ug.empty?
+      expect(ug).to eq('')
       # B27 (owner 2026-11-15, option B): a small console shows no meter row or at least two, never a lone row. (Seen red at 9715cc4: the one-row fallback.)
       lone = s.evaluate(%q{(function(){var n=[].filter.call(document.querySelectorAll('[data-sw-small] [data-sw-srow="meter"]'),function(e){var b=e.getBoundingClientRect();return b.width>0&&b.height>0}).length;return n===1?'a lone meter row':''})()})
       puts "LONEROW #{c['name']}: #{lone}" unless lone.empty?
@@ -322,7 +339,7 @@ return bad.join('; ');})()}.sub('WANT_MAIN', c['want_main'].to_s.to_json).sub('W
 if(!ic||!ib||!ib.height){bad.push('no icon beside the label');return}var ik=((ic.querySelector('[data-sw-ink]')||ic).getAttribute('data-sw-ink')||'0,1').split(',').map(Number),ih=ik[1]*ib.height,q=cap/ih,t=(e.textContent||'').trim();
 info.push('cap '+cap.toFixed(1)+' icon '+ih.toFixed(1)+' ratio '+q.toFixed(2)+' text '+t);if(q<0.38)bad.push('label caps '+cap.toFixed(1)+' / icon ink '+ih.toFixed(1)+' = '+q.toFixed(2)+' under 0.38');if(WANT_WHOLE&&t!==full)bad.push('label '+t+' cut, must show whole');
 /* B27 (owner photo 2026-11-15, BOVEN): the name is drawn in the icon's colour and its caps are centred on the icon's ink, 1 px */var ip=ic.querySelector('path,circle,rect,line,polygon'),icol=ip?getComputedStyle(ip).stroke:'',icf=ip?getComputedStyle(ip).fill:'',ncol=n===e?cs.color:cs.fill,rr=document.createRange();rr.selectNodeContents(e);var rb=rr.getClientRects()[0]||e.getBoundingClientRect(),m0=cx.measureText('H'),tc=rb.top+(m0.fontBoundingBoxAscent-m0.actualBoundingBoxAscent/2)*kk,icen=ib.top+(ik[0]+ik[1]/2)*ib.height;
-if(window.SW&&SW.inn&&SW.sim!==false&&ncol!=='rgb(0, 0, 0)'&&ncol!=='rgb(255, 255, 255)')bad.push('name at the main reading is '+ncol+', not black or white');if(ncol!==icol&&ncol!==icf)bad.push('name colour '+ncol+' is not the icon colour '+icol+'/'+icf);if(Math.abs(tc-icen)>1)bad.push('name centre '+tc.toFixed(1)+' vs icon centre '+icen.toFixed(1));
+if(ncol!=='rgb(0, 0, 0)'&&ncol!=='rgb(255, 255, 255)')bad.push('name at a big reading is '+ncol+', not black or white');if(ncol!==icol&&ncol!==icf)bad.push('name colour '+ncol+' is not the icon colour '+icol+'/'+icf);if(Math.abs(tc-icen)>1)bad.push('name centre '+tc.toFixed(1)+' vs icon centre '+icen.toFixed(1));
 var p=e.closest('[data-sw-twin],[data-sw-sbox]'),pb=p&&p.getBoundingClientRect(),b=e.getBoundingClientRect();if(pb&&(b.right>pb.right+1||b.left<pb.left-1))bad.push('label outside its panel');
 var rg=document.createRange();rg.selectNodeContents(e);if(rg.getBoundingClientRect().right>wr.getBoundingClientRect().right+1)bad.push('label wider than its box');if(t!==full&&!/(…|\.\.\.)$/.test(t))bad.push('label '+t+' cut without an ellipsis')});
 return (bad.length?'RED ':'')+info.join(' | ')+(bad.length?' :: '+bad.join('; '):'');})()}.sub('WANT_LABEL', c['want_label'].to_s.to_json).sub('WANT_WHOLE', (c['want_whole'] ? true : false).to_s))
