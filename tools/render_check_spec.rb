@@ -225,6 +225,7 @@ return rows.map(function(q){return q.map(function(v){return v===null?'-':v.toFix
       # (the X: gray 170 light / 85 dark +/- 8, the other screens: clearly darker than the page, in 1-bit dotted black). Seen red on 7836632 (outlined panels, no dividers).
       pf = s.evaluate(%q{(function(){var F=[].filter.call(document.querySelectorAll('[data-sw-part="face"]'),function(e){var b=e.getBoundingClientRect();return b.width>40&&b.height>40}).map(function(e){return e.getBoundingClientRect()});return F.map(function(r){var o={l:r.left,t:r.top,r:r.right,b:r.bottom,gb:-1,gr:-1,ga:-1,gl:-1};F.forEach(function(q){if(q===r)return;var ox=Math.min(r.right,q.right)-Math.max(r.left,q.left),oy=Math.min(r.bottom,q.bottom)-Math.max(r.top,q.top);if(ox>10&&q.top-r.bottom>-1)o.gb=o.gb<0?q.top-r.bottom:Math.min(o.gb,q.top-r.bottom);if(oy>10&&q.left-r.right>-1)o.gr=o.gr<0?q.left-r.right:Math.min(o.gr,q.left-r.right);if(ox>10&&r.top-q.bottom>-1)o.ga=o.ga<0?r.top-q.bottom:Math.min(o.ga,r.top-q.bottom);if(oy>10&&r.left-q.right>-1)o.gl=o.gl<0?r.left-q.right:Math.min(o.gl,r.left-q.right)});return [o.l,o.t,o.r,o.b,o.gb,o.gr,o.ga,o.gl].join(',')}).join(';')+'|'+innerWidth+'|'+(document.querySelector('.screen--dark-mode')||document.documentElement.classList.contains('dark')?'dark':'light')+'|'+(document.querySelector('.screen--1bit')?1:(document.querySelector('.screen--2bit')?2:4))})()})
       faces, iw2, pmode, pbits = pf.split('|')
+      pbits = '2' unless c['device'] == 'v2' && !c['palette'] && !c['orientation']   # only the X has the exact 170 / 85 greys; the other screens (1-bit, 2-bit, colour): clearly off the page
       unless faces.to_s.empty?
         require 'chunky_png'
         png = ChunkyPNG::Image.from_file(s.png_path)
@@ -263,7 +264,7 @@ return rows.map(function(q){return q.map(function(v){return v===null?'-':v.toFix
       end
       # B27 (owner 2026-11-16): every unit after a number is the shared unit grey on 2-bit and deeper screens (SWDraw.inc, 4.5:1 against the page), black on 1-bit;
       # (a temperature unit's top meets the number's cap top: DIALCORNER); the rain amount's number is at least a meter label's size, its unit smaller.
-      ug = s.evaluate(%q{(function(){var bad=[],b1=!!document.querySelector('.screen--1bit'),dk=!!document.querySelector('.screen--dark-mode')||document.documentElement.classList.contains('dark'),cx=document.createElement('canvas').getContext('2d'),
+      ug = s.evaluate(%q{(function(){var bad=[],sc0=document.querySelector('.screen'),b1=!!document.querySelector('.screen--1bit')||!!(sc0&&/screen--color-/.test(sc0.className)&&!/screen--color-full/.test(sc0.className)),dk=!!document.querySelector('.screen--dark-mode')||document.documentElement.classList.contains('dark'),cx=document.createElement('canvas').getContext('2d'),
 col=function(c){var d=document.createElement('span');d.className=c;(document.querySelector('.screen')||document.body).appendChild(d);var v=getComputedStyle(d).color;d.remove();return v},rgb=function(c){return(c.match(/[\d.]+/g)||[]).slice(0,3).map(Number)},lum=function(a){var f=function(v){v/=255;return v<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4)};return 0.2126*f(a[0])+0.7152*f(a[1])+0.0722*f(a[2])},
 tok=SWDraw.inc?SWDraw.inc():'',want=tok?[col(tok),col('text--gray-30')]:[],page=dk?0:255;
 
