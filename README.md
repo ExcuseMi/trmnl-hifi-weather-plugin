@@ -7,9 +7,10 @@
 The weather as a calm early-80s hi-fi receiver, for [TRMNL](https://trmnl.com) e-paper displays:
 
 - **Dials** (TRMNL X): a barometer with the pressure trend, and a temperature dial with today's low and high.
-- **Console**: the temperature in segment digits with what to wear (clothing, umbrella, sunglasses); block meters for wind and gusts, UV, air quality, humidity, pollen and pressure when they matter, grey cells for what is still to come today.
+- **Console**: the temperature in segment digits with what to wear (parka, jacket, sweater or T-shirt, and an umbrella); block meters for wind and gusts, UV, air quality, humidity, pollen and pressure when they matter, grey cells for what is still to come today.
 - **Rain or sun**: an hour calendar when rain is coming; otherwise sunrise, sunset and the moon as it looks from your location.
 - **Bottom strip**: the coming days or hours.
+- **Look**: no panels or frames, thin divider lines where two sections meet (grey on greyscale screens, dotted black on 1-bit). Units (°C, hPa, mm) are grey and small; the °C sits at the top of its number. Small views show two meter rows or none, never a single one.
 - **Indoor sensor**: with a TRMNL temperature sensor on the screen, indoor becomes the big reading and outdoor moves beside it, or show another TRMNL's sensor (a hallway upstairs) with outside as the big reading. Readings older than 3 hours are ignored. Other sources: Home Assistant, Awair, AirGradient, Sensibo, Ecowitt, Adafruit IO or any JSON link (below).
 
 Every view (full, half horizontal, half vertical, quadrant), 1-bit, greyscale and colour screens, dark mode, 24 or 12 hour time. When Open-Meteo is slow or down, the last saved forecast shows with its time.
@@ -28,7 +29,7 @@ Every view (full, half horizontal, half vertical, quadrant), 1-bit, greyscale an
 | Sensor from another TRMNL | Shows for Another TRMNL only: the digits in the address of its page on trmnl.com. Empty or not found: this TRMNL's own sensor. |
 | Sensor icon | The icon in front of the sensor's reading: House (default), or Anemometer (a mast with cups) for a sensor outside, such as a weather station or a balcony sensor. Only the icon changes; room for more icons later. |
 | Sensor name | Optional short name, for example Upstairs, shown beside the sensor's icon and on the temperature dial. Empty: the icon alone. |
-| Main reading | Which reading comes first, in black: Automatic (the sensor when it is this screen's own, outside when it comes from another TRMNL), Sensor, or Outside. The other one follows in grey, its meters after. Both temperatures are the same size. |
+| Main reading | Which reading comes first: Automatic (the sensor when it is this screen's own, outside when it comes from another TRMNL), Sensor, or Outside. The other follows beside it, its meters after. Both temperatures are the same size. |
 
 ### Indoor sensor sources
 

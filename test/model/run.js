@@ -982,3 +982,14 @@ test('About text (B17): HTML, 100+ words in English (TRMNL search), all six lang
   const r = require('child_process').spawnSync('node', [path.join(__dirname, '../../tools/site/build.js'), '--check'], { encoding: 'utf-8' });
   eq(r.status, 0, 'docs/ is up to date (run tools/site/build.sh): ' + r.stderr);
 });
+test('site favicon (owner 2026-11-16): the page links the plugin icon as SVG, a 32x32 PNG and an apple-touch-icon, and the files are in the site source and in docs/', () => {
+  const root = path.join(__dirname, '../..'), html = fs.readFileSync(path.join(root, 'tools/site/page/index.html'), 'utf8');
+  ok(/<link rel="icon" type="image\/svg\+xml" href="favicon\.svg">/.test(html), 'svg icon link');
+  ok(/<link rel="icon" type="image\/png" sizes="32x32" href="favicon-32\.png">/.test(html), '32x32 png link');
+  ok(/<link rel="apple-touch-icon" href="apple-touch-icon\.png">/.test(html), 'apple-touch-icon link');
+  ['favicon.svg', 'favicon-32.png', 'apple-touch-icon.png'].forEach((f) => {
+    ok(fs.existsSync(path.join(root, 'tools/site/page', f)) && fs.statSync(path.join(root, 'tools/site/page', f)).size > 100, f + ' in the site source');
+    ok(fs.existsSync(path.join(root, 'docs', f)), f + ' in docs/');
+  });
+  eq(fs.readFileSync(path.join(root, 'tools/site/page/favicon.svg'), 'utf8'), fs.readFileSync(path.join(root, 'assets/icon.svg'), 'utf8'), 'favicon.svg is the plugin icon');
+});

@@ -20,6 +20,7 @@ files['plugin/transform.js'] = fs.readFileSync(path.join(root, 'plugin/src/trans
 files['engine.js'] = fs.readFileSync(path.join(__dirname, 'engine.js'), 'utf8');
 for (const f of ['index.html', 'app.js']) files[f] = fs.readFileSync(path.join(__dirname, 'page', f), 'utf8');
 for (const f of fs.readdirSync(path.join(__dirname, 'page', 'guide'))) files['guide/' + f] = fs.readFileSync(path.join(__dirname, 'page', 'guide', f));   // the guide's rendered screens, binary
+for (const f of ['favicon.svg', 'favicon-32.png', 'apple-touch-icon.png']) files[f] = fs.readFileSync(path.join(__dirname, 'page', f));   // the plugin icon as the site's favicon
 files['data/scenarios.json'] = execFileSync('python3', [path.join(__dirname, 'scenarios.py'), '--stdout'], { encoding: 'utf8' });
 
 let bad = 0;

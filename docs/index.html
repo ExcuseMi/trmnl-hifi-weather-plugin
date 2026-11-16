@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Radio Weather for TRMNL: try it</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="description" content="Radio Weather is the weather as a calm early-80s hi-fi receiver for TRMNL e-paper displays. Try the real plugin here with live weather, different days, devices and settings.">
 <style>
 :root{--bg:#eceae4;--panel:#f6f5f1;--ink:#16161a;--mute:#5d5d63;--rule:#c9c6bd;--lamp:#16161a;--seg:#16161a;color-scheme:light}
@@ -113,7 +116,7 @@ ol.legend li{padding:5px 0;font-size:.92rem}
   <h2>What it shows</h2>
   <ul class="feat cols">
     <li><b>Dials</b> on the TRMNL X: a barometer with the pressure trend, a temperature dial with today's low and high.</li>
-    <li><b>Console</b>: the temperature in segment digits, and what to wear: clothing, umbrella, sunglasses.</li>
+    <li><b>Console</b>: the temperature in segment digits, and what to wear: parka, jacket, sweater or T-shirt, and an umbrella.</li>
     <li><b>Meters</b> for wind and gusts, UV, air quality, humidity, pollen and pressure, only when they matter.</li>
     <li><b>Rain or sun</b>: an hour calendar when rain is coming, otherwise sunrise, sunset and the moon as seen from your place.</li>
     <li><b>Bottom strip</b>: the coming days or hours.</li>
@@ -135,10 +138,10 @@ ol.legend li{padding:5px 0;font-size:.92rem}
       <li data-guide="tdial"><b>Temperature dial</b> (X): the black needle is the temperature now.</li>
       <li data-guide="marks"><b>Low and high marks</b>: the outlined triangle is today's lowest temperature, the filled one today's highest; the thick arc between them is today's range. The barometer has the same marks for the lowest and highest pressure of the next 24 hours.</li>
       <li data-guide="trend"><b>Temperature and arrow</b>: the arrow compares now with 3 hours ahead (up or down from 1 degree C, 2 degrees F, otherwise level).</li>
-      <li data-guide="meters"><b>Meters</b>: up to four rows, chosen by what matters now (UV only from a day maximum of 3, pollen only when there is some, air quality, wind, humidity; the barometer row only fills a spare place). 10 blocks on large screens, 5 on small ones. Bands are in the table below.</li>
+      <li data-guide="meters"><b>Meters</b>: up to four rows, chosen by what matters now (UV only from a day maximum of 3, pollen only when there is some, air quality, wind, humidity; the barometer row only fills a spare place). 10 blocks on large screens, 5 on small ones. In the small views (half vertical, quadrant) the console shows two meter rows or none, never a single row. Bands are in the table below.</li>
       <li data-guide="cells"><b>Light grey blocks</b>: the highest value still to come today (the rest of today up to midnight).</li>
       <li data-guide="title"><b>Condition</b>: icon and words for the weather now, in your language; a moon icon at night.</li>
-      <li data-guide="digits"><b>Temperature digits</b> in the unit you chose. The last digit is the tenths.</li>
+      <li data-guide="digits"><b>Temperature digits</b> in the unit you chose. The last digit is the tenths. Units (°C, hPa, mm) are grey and small everywhere on greyscale screens, black on 1-bit; the °C sits at the top of its number.</li>
       <li data-guide="cues"><b>What to wear</b>: one garment by the felt temperature from now to 3 hours ahead (coldest and warmest hour): parka under 3 C (37 F), jacket under 12 C (54 F), sweater under 18 C (64 F), otherwise a T-shirt. An umbrella is added when any hour until 19:00 (at least 3 hours) has a rain chance of 50 % or more. The garment changes only once the felt temperature is 1 degree C (2 F) past the line, so it does not flip back and forth.</li>
       <li data-guide="sun"><b>Sun times</b>: the next sunrise and sunset; once today's has passed, tomorrow's shows.</li>
       <li data-guide="moon"><b>Moon</b>: the phase as it looks from your place today.</li>
@@ -150,7 +153,7 @@ ol.legend li{padding:5px 0;font-size:.92rem}
   <div class="fig">
     <div class="pic"><div class="im"><img src="guide/g2.png" alt="Radio Weather with rain coming, with numbered parts" width="758" height="614" loading="lazy"><b class="bd" style="left:69.7%;top:39.1%">1</b><b class="bd" style="left:88.1%;top:35.2%">2</b><b class="bd" style="left:88.1%;top:42.7%">3</b><b class="bd" style="left:12.1%;top:62.2%">4</b><b class="bd" style="left:25.6%;top:33.9%">5</b></div></div>
     <ol class="legend">
-      <li data-guide="rain"><b>Rain column</b>: replaces the sun and moon while rain is expected in the next 12 hours. The icon says what falls: rain, snow or hail.</li>
+      <li data-guide="rain"><b>Rain column</b>: replaces the sun and moon while rain is expected in the next 12 hours. The icon says what falls: rain, snow or hail. Under the calendar, the amount (for example 3 mm) and the gauge: 1 block drizzle, 2 rain, 3 heavy rain.</li>
       <li data-guide="calendar"><b>Hour calendar</b>: the next 6 or 9 hours. A dark tile is an hour with a rain chance of 50 % or more (or a wet weather code).</li>
       <li data-guide="m-rain"><b>Rain gauge</b>: 3 blocks by the heaviest hour of the next 12: 1 drizzle (under 1 mm/h, 0.04 in/h), 2 rain, 3 heavy rain (4 mm/h, 0.16 in/h and up). The number is the 12 hour total, at most 10+ mm (0.4+ in).</li>
       <li data-guide="hours-wet"><b>Hours strip</b>: the dark time stamps show the same wet hours over the next day.</li>
@@ -161,7 +164,7 @@ ol.legend li{padding:5px 0;font-size:.92rem}
   <div class="fig">
     <div class="pic"><div class="im"><img src="guide/g3.png" alt="Radio Weather with an indoor sensor, with numbered parts" width="758" height="614" loading="lazy"><b class="bd" style="left:34.6%;top:42.7%">1</b><b class="bd" style="left:54.1%;top:40.2%">2</b><b class="bd" style="left:62.0%;top:20.8%">3</b><b class="bd" style="left:11.1%;top:37.1%">4</b><b class="bd" style="left:89.2%;top:15.0%">5</b></div></div>
     <ol class="legend">
-      <li data-guide="sensor"><b>Indoor sensor</b>: the house icon (an anemometer, a mast with cups, with Sensor icon Anemometer) marks the sensor's reading (your own TRMNL's or another one's), the tree icon the outside weather. One of them is the big black reading (setting Main reading), the other is grey beside it. An optional short label (for example Upstairs) shows beside the house icon and on the dial.</li>
+      <li data-guide="sensor"><b>Indoor sensor</b>: the sensor icon (a house, or with Sensor icon Anemometer a mast with cups) marks the sensor's reading (your own TRMNL's or another one's), the tree icon the outside weather. One of them is the first big reading (setting Main reading), the other follows beside it; both icons and the sensor name are black (white on dark). The small reading in the corner of the temperature dial is black too, with a grey unit; only the dial's second needle is grey. An optional short label (for example Upstairs) shows beside the sensor icon.</li>
       <li data-guide="outside"><b>Outside reading with its cues</b>: the garment and umbrella always belong to the outside weather.</li>
       <li data-guide="twin"><b>Second needle</b>: the grey needle is the other reading. The marks and range on the dial belong to the outside temperature.</li>
       <li data-guide="m-co2"><b>CO2</b> (sensor with CO2): comes first with the sensor, and moves up the list past 1400 ppm. Indoor humidity is a second block row next to the outside one, marked with the house and the tree.</li>
@@ -215,7 +218,7 @@ ol.legend li{padding:5px 0;font-size:.92rem}
     <tr><th>Sensor</th><td>None (outside weather only), This TRMNL, Another TRMNL, or a provider: Home Assistant, Awair, AirGradient, Sensibo, Ecowitt, Adafruit IO or a JSON link. Readings older than 3 hours are ignored. See Indoor sensor sources below. On this page: "Sensor on" and "Sensor".</td></tr>
     <tr><th>Sensor from another TRMNL</th><td>Shows for Another TRMNL only: the digits in the address of its page on trmnl.com. Empty or not found: this TRMNL's own sensor.</td></tr>
     <tr><th>Sensor name</th><td>Optional short name, for example Upstairs, next to the sensor's icon and on the temperature dial.</td></tr>
-    <tr><th>Main reading</th><td>Which reading comes first, in black: Automatic, Sensor or Outside. The other follows in grey.</td></tr>
+    <tr><th>Main reading</th><td>Which reading comes first: Automatic, Sensor or Outside. The other follows beside it.</td></tr>
   </table>
   <p class="note">The language follows your TRMNL account language (English, German, French, Spanish, Dutch, Japanese and the languages TRMNL translates).</p>
 </section>
