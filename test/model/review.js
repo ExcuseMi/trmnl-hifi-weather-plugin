@@ -57,4 +57,10 @@ module.exports = async ({ T, fx, SWModel, check, eq, ok }) => {
     walk(ast, (n) => { if (isFn(n) && n.body) scope(n, n.body); }, false);
     eq(bad, [], 'variables read before their var');
   });
+  await check('Digital week captions follow the language (Fable review: HI/LO were fixed Latin): ui.hl, and the page draws ui.hl', async () => {
+    const f = fx('mixed'), cap = (l) => T.buildView(SWModel.build(f, {}), T.buildI18n(l), f.daily, null, 0.3, { hourly: f.hourly }).hl;
+    eq([cap('en'), cap('de'), cap('ja'), cap('xx')], [['HI', 'LO'], ['MAX', 'MIN'], ['最高', '最低'], ['HI', 'LO']], 'English keeps HI / LO, the other languages their own words (unknown: English)');
+    const draw = require('fs').readFileSync(require('path').join(__dirname, '../../source/shared.liquid'), 'utf8');
+    ok(!/mk\('HI'|mk\('LO'/.test(draw) && /SW\.hl/.test(draw), 'the captions are not literals in the page script');
+  });
 };

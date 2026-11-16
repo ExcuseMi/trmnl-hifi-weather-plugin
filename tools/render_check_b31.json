@@ -496,5 +496,24 @@
    "bottom": "days"
   },
   "expect_error": "NO SIGNAL"
+ },
+ {
+  "name": "b31-x-ja-dig",
+  "device": "v2",
+  "view": "full",
+  "locale": "ja",
+  "fields": {
+   "bottom": "days",
+   "week_style": "digital"
+  }
+ },
+ {
+  "name": "b31-og-de-dig",
+  "device": "og_plus",
+  "view": "full",
+  "locale": "de",
+  "fields": {
+   "bottom": "days"
+  }
  }
 ]

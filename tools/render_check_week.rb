@@ -21,7 +21,7 @@ module WeekChecks
     var lab=document.querySelector('[data-sw-part="wlab"]'),zl=document.querySelector('[data-sw-part="wzero"] line');
     return JSON.stringify({week:R(wk),cls:cl,w:innerWidth,cols:cols,n:SW.days.length,today:SW.days[0]&&SW.days[0].today,sunCue:(SW.cue||[]).join('+'),dayCue:SW.days[0]?(SW.days[0].cue||[]).join('+'):'',
       cueParts:A('[data-sw-part="cue"],[data-sw-part="wcue"]').length,wcueTotal:A('[data-sw-part="wcue"]').length,
-      lab:lab&&vis(lab)?{box:R(lab),texts:[].map.call(lab.querySelectorAll('text'),function(t){var b=t.getBoundingClientRect();return [t.textContent,(b.top+b.bottom)/2]})}:null,
+      lab:lab&&vis(lab)?{box:R(lab),texts:[].map.call(lab.querySelectorAll('text'),function(t){var b=t.getBoundingClientRect();return [t.textContent,(b.top+b.bottom)/2,b.left,b.right]})}:null,
       zero:zl?R(zl):null,small:!!document.querySelector('[data-sw-small]')})})()
   JS
 
@@ -88,6 +88,11 @@ module WeekChecks
     elsif g['today'] && g['sunCue'] != g['dayCue']
       out['WEEKCUE'] << "console cue #{g['sunCue']} vs today's column #{g['dayCue']}"
     end
+    # WEEKCAP (digital): the HI / LO captions (in the page's language) stay inside their column
+    if style == 'dig' && g['lab']
+      lb = g['lab']['box']
+      g['lab']['texts'].each { |(t, _y, l, r)| out['WEEKCAP'] << "caption #{t} #{l.round}-#{r.round} outside its column #{lb[0].round}-#{lb[2].round}" if l < lb[0] - 1 || r > lb[2] + 1 }
+    end
     # eq: one shared scale (same height and top for every part, the same tick y in every column, the labels on ticks)
     if style == 'eq'
       parts = cols.map { |q| q['part'] }.compact
@@ -99,7 +104,7 @@ module WeekChecks
       if lab && !tk.empty? && !parts.empty?
         z = cols[0]['z']
         ys = tk[0].map { |v| parts[0][1] + v * z }
-        lab['texts'].each { |(t, yc)| out['WEEKSCALE'] << "label #{t} at #{yc.round(1)} not on a tick #{ys.map { |v| v.round(1) }.inspect}" if ys.map { |v| (v - yc).abs }.min > 3.0 }
+        lab['texts'].each { |(t, yc, _l, _r)| out['WEEKSCALE'] << "label #{t} at #{yc.round(1)} not on a tick #{ys.map { |v| v.round(1) }.inspect}" if ys.map { |v| (v - yc).abs }.min > 3.0 }
       end
     end
     # WEEKZERO: the 0 line is one element across the strip; every pixel of it is ink except inside a track, range bar or knob;
