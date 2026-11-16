@@ -115,7 +115,7 @@
   <div class="{{ fcy }} flex--center-x w--full" data-sw-srow="main">
    {%- comment %} Owner 2026-11-14: with an indoor reading the big number is indoor (house icon in front), outdoor a small readout first in the side column where it fits. {% endcomment %}
    {%- capture s_lab %}{% if ph.lab %}<span class="label text--bold shrink-0" data-clamp="1" data-sw-slab data-sw-lt="{{ ph.lab }}">{{ ph.lab }}</span>{% endif %}{% endcapture %}{% assign lk_m = 'out' %}{% assign li_m = 0 %}{% assign lk_2 = 'in' %}{% assign li_2 = 1 %}{% assign t_m = 'temp' %}{% assign t_2 = 'itemp' %}{% if inn and inm %}{% assign lk_m = 'in' %}{% assign li_m = 1 %}{% assign lk_2 = 'out' %}{% assign li_2 = 0 %}{% assign t_m = 'itemp' %}{% assign t_2 = 'temp' %}{% endif %}
-   <div class="flex flex--row flex--top shrink-0 gap--none" data-sw-sgrp="temp">{% if inn %}<div class="shrink-0" data-sw-part="loc" data-sw-sq data-sw-i="{{ li_m }}" data-sw-loc="{{ lk_m }}" data-sw-sloc></div>{% if inm %}{{ s_lab }}{% endif %}{% endif %}<div class="shrink-0" data-sw-part="{{ t_m }}"></div><span class="{{ tsb }} shrink-0" data-sw-unit data-sw-sunit data-sw-uu>{{ ui.unit }}</span></div>
+   <div class="flex flex--row flex--top shrink-0 gap--none" data-sw-sgrp="temp">{% if inn %}<div class="shrink-0" data-sw-part="loc" data-sw-sq data-sw-i="{{ li_m }}" data-sw-loc="{{ lk_m }}" data-sw-sloc></div>{% if inm %}{{ s_lab }}{% endif %}{% endif %}<div class="shrink-0" data-sw-part="{{ t_m }}" data-sw-tr></div><span class="{{ tsb }} shrink-0" data-sw-unit data-sw-sunit data-sw-uu>{{ ui.unit }}</span></div>
    <div class="flex flex--col flex--center shrink-0" data-sw-sgrp="side">
     {%- if inn %}<div class="flex flex--row flex--top shrink-0 gap--none" data-sw-sout><div class="shrink-0 self--center" data-sw-part="loc" data-sw-sq data-sw-i="{{ li_2 }}" data-sw-loc="{{ lk_2 }}"></div>{% if inm and ui.cue and ui.cue.size > 0 %}<div class="shrink-0 self--center" data-sw-part="cue" data-sw-cb data-sw-socue data-sw-cue="{{ ui.cue | join: '+' }}"></div>{% endif %}<div class="shrink-0" data-sw-part="{{ t_2 }}" data-sw-tr></div><span class="{{ tsb }} shrink-0" data-sw-sounit data-sw-uu>{{ ui.unit }}</span></div>{% endif %}
     {%- if ui.cue and ui.cue.size > 0 %}<div class="shrink-0" data-sw-part="cue" data-sw-cue="{{ ui.cue | join: '+' }}"></div>{% endif %}
@@ -356,7 +356,7 @@ return { a: hseg(xl + gp, xr - gp, yt, t), g: hseg(xl + gp, xr - gp, ym, t), d: 
 f: vseg(xl, yt + gp, ym - gp, t), b: vseg(xr, yt + gp, ym - gp, t), e: vseg(xl, ym + gp, yb - gp, t), c: vseg(xr, ym + gp, yb - gp, t) };
 }
 function digits(str, H, tr, al) {   /* al = { n, dr }: B31 the week's Digital, n cells (the ones digit in the last, an unused cell empty, a minus is the middle bar of the cell before the first digit), dr = how far the degree sign sits further right (the low row's sign lines up with the high row's); the same box for every value */
-var W = 56, HH = 100, T = 13, G = 14, x = 0, body = '', post = false, DK = 0.58;
+var W = 56, HH = 100, T = 13, G = 14, x = 0, body = '', post = false, DK = 0.58, lead = 0;
 // Owner 2026-11-16: the point and the decimal digit after it are black like the integer; the decimal digit is smaller (0.58 of its height, bottom-aligned like the seconds of an LCD clock), the point stays at the baseline.
 // Owner 2026-11-14: fixed-width digit cells like an LCD: the 1 sits in a full cell and the integer part always reserves two cells (a minus takes the empty one), so 1.6 and 21.6 have the same width.
 var ip = (/^-?\d*/.exec(str) || [''])[0], idg = ip.replace('-', '').length, neg = ip.charAt(0) === '-';
@@ -369,13 +369,14 @@ if (ch === '-' && !i && al) { body += '<g data-sw-glyph="-">' + poly(shapes(x - 
 if (ch === '-' && !i) { var d1 = GLYPH[str.charAt(1)] || '', cs = idg < 2 && !tr ? W + G : 46 + G * 0.3; body += '<g data-sw-glyph="-">' + poly(shapes(cs + (/[fe]/.test(d1) ? 0 : (/[adg]/.test(d1) ? T / 2 + 2 : W - T)) - G * 0.3 - 46 + T / 2 + 2, 46, HH, T).g) + '</g>'; x = cs; continue; }
 if (ch === '.') { post = true; body += rect(x - G + 3, HH - T, T, T); x += 20 - G; continue; }
 if (ch === '°') { post = false; body += '<circle cx="' + (x + 9 + (al ? al.dr || 0 : 0)) + '" cy="10" r="7" fill="none" ' + SK + '5"/>'; x += 22 + G; continue; }
+if (tr && !al && ch === '1' && !post && !lead && !/\d/.test(str.slice(0, i))) lead = x + W - T;   /* tr: a leading 1 has its ink on the right of its cell, the empty left part is cut so the visible digits can be centred */
 var kk = post ? DK : 1, w = (ch === '-' ? 46 : W) * kk, on = GLYPH[ch] || '', sh = shapes(x, w, HH * kk, T * kk), gb = '';
 'abcdefg'.split('').forEach((s) => { if (on.indexOf(s) >= 0) gb += poly(sh[s]); });
 body += '<g data-sw-glyph="' + ch + '"' + (post ? ' data-sw-dec transform="translate(0 ' + n1(HH * (1 - DK)) + ')"' : '') + '>' + gb + '</g>';
 x += w + G;
 }
-var vw = al ? al.n * (W + G) + 22 + (al.dr || 0) : Math.max(1, x - G);
-return svg(H * vw / HH, H, glow(body, GPX * HH / H), '0 0 ' + vw + ' ' + HH);
+var vw = al ? al.n * (W + G) + 22 + (al.dr || 0) : Math.max(1, x - G - lead);
+return svg(H * vw / HH, H, glow(body, GPX * HH / H), (lead ? lead : 0) + ' 0 ' + vw + ' ' + HH);
 }
 function segtime(str, cap) {   /* B31 (owner 2026-11-16): the sun times in the page's own 7-segment digits (the cells of digits(): a plain 7 is a, b, c and a 1 is b, c full height), the colon two dots, no ghosts */
 var T = 13, W = 56, G = 14, HH = 100, s = String(str).trim();
@@ -799,7 +800,7 @@ function mw(t, fs) { cx.font = wt + ' ' + fs.toFixed(2) + 'px ' + fam; return cx
 function capk() { cx.font = wt + ' 100px ' + fam; return (asc(cx) || 72) / 100; }
 var CK = capk(), at = 0.8, ik = ((ico && ico.querySelector('[data-sw-ink]')) || ico || { getAttribute: function () { return null; } }).getAttribute('data-sw-ink') || '0,1', IY = +ik.split(',')[0] || 0, IH = Math.max(0.3, +ik.split(',')[1] || 1);
 function dw(t, tr) { try { return parseFloat(SWDraw.digits(String(t), 100, tr).match(/width="([\d.]+)"/)[1]) / 100; } catch (e) { return 0.6 * String(t).length; } }
-at = dw(big); var ao = so ? dw(oTx, 1) : 0;
+at = dw(big, 1);   /* B31: the small console centres the visible digits and the unit; the empty leading cell is dropped (the week keeps fixed cells) */ var ao = so ? dw(oTx, 1) : 0;
 var cjk = /[⺀-鿿가-힯＀-￯]/.test(ct), toks = cjk ? ct.split('') : ct.split(/\s+/);
 function wrap(fs, avail) { var out = ['']; toks.forEach(function (w) { var cur = out[out.length - 1], tr = cur ? cur + (cjk ? '' : ' ') + w : w; if (cur && mw(tr, fs) > avail) out.push(w); else out[out.length - 1] = tr; }); return out; }
 var mlabT = mrows.map(function (r) { var l = r.querySelector('[data-sw-mlabel]'), t = l.getAttribute('data-sw-t0'); return t === null ? l.textContent.trim() : t; }), mlw = mlabT.length ? Math.max.apply(null, mlabT.map(function (t) { return mw(t, 100) / 100; })) : 0;
