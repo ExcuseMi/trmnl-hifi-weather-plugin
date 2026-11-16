@@ -265,7 +265,7 @@ return rows.map(function(q){return q.map(function(v){return v===null?'-':v.toFix
           bad << "panel fill #{ins.round} is not the page #{page}" if (ins - page).abs > 3
           [[:bottom, gb, xm, (fbm + gb / 2) * kk, true], [:right, gr, (fr + gr / 2) * kk, ym, false], [:top, ga, xm, (ft - ga / 2) * kk, true], [:left, gl, (fl - gl / 2) * kk, ym, false]].each do |name, g, cx, cy, horiz|
             if g >= 0
-              half = [(g * kk / 2).floor - 1, 5].max
+              half = [(g * kk / 2).ceil + 2, 5].max   # the whole gap and the two edges: the line sits at its panel's edge
               v = line.call(cx, cy, horiz, half)
               ref = rlum || (c['device'] == 'v2' && !c['palette'] ? want : nil)   # no console divider in this view: only the X has a fixed grey to compare with
               next unless ref
