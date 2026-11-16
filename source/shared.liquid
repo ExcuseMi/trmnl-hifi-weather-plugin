@@ -479,19 +479,19 @@ y = n1(API.wzt + wy(sc, API.wzh, 0));
 return svg(W, H, g(b1() ? '' : 'text--gray-40', '<line x1="' + n1(API.wzx) + '" x2="' + n1(W) + '" y1="' + y + '" y2="' + y + '" ' + SK + '1.5"/>'));
 }
 function eqcol(SW, i, W, H) {
-var d = SW.days[i] || {}, sc = wsc(SW), m = wm(H), fs = m.fs, kh = m.kh, gp = fs * 0.3, lw = fs * 0.62 * 3.2, kw = Math.max(kh, Math.min(W * 0.4, kh * 3, W - 2 * (lw + gp) - 2)), cx = W / 2, tw = Math.max(5, kh * 0.45), sw = Math.max(1.5, kh * 0.14), tl = Math.max(3, fs * 0.4), tg = Math.max(2, sw * 1.2), tk = '', body = '';
+var d = SW.days[i] || {}, sc = wsc(SW), m = wm(H), fs = m.fs, kh = m.kh, gp = fs * 0.3, lw = fs * 0.62 * 3.2, kw = Math.max(kh, Math.min(W * 0.4, kh * 3, W - 2 * (lw + gp) - 2)), cx = W / 2, tw = Math.max(5, kh * 0.4), sw = Math.max(1.5, kh * 0.14), gw = Math.max(1.5, kh * 0.09), tl = Math.max(3, fs * 0.4), tg = Math.max(2, sw * 1.2), tk = '', body = '';
 /* B31 mix (owner 2026-11-16): short tick marks on both sides of the track at every scale step; the 0 line is one element across the week (wzero), the labels move clear of it */
 for (var v = sc.a; v <= sc.b + 1e-9; v += sc.st) { var ty = n1(wy(sc, H, v)); tk += '<line x1="' + n1(cx - tw / 2 - tg - tl) + '" x2="' + n1(cx - tw / 2 - tg) + '" y1="' + ty + '" y2="' + ty + '"/><line x1="' + n1(cx + tw / 2 + tg) + '" x2="' + n1(cx + tw / 2 + tg + tl) + '" y1="' + ty + '" y2="' + ty + '"/>'; }
-body = '<g' + FS.replace(' fill="none"', '') + '1.5">' + tk + '</g>' + rect(cx - tw / 2, m.pad - kh / 2, tw, H - 2 * m.pad + kh, tw / 2, FS + n1(sw) + '"');
+body = '<g' + FS.replace(' fill="none"', '') + '1.5">' + tk + '</g>' + '<line data-sw-groove x1="' + n1(cx) + '" x2="' + n1(cx) + '" y1="' + n1(m.pad - kh / 2) + '" y2="' + n1(H - m.pad + kh / 2) + '" ' + SK + n1(gw) + '"/>';   /* the groove: one thin line; the range between the knobs is a wider bar */
 var ok = d.hiV !== null && d.hiV !== undefined && d.loV !== null && d.loV !== undefined, yh = ok ? wy(sc, H, Math.round(d.hiV)) : 0, yl = ok ? wy(sc, H, Math.round(d.loV)) : 0, sep = fs * 1.05, ly = [yh, yl], lx = cx + kw / 2 + gp, y0 = wy(sc, H, 0);
 if (yl - yh < sep) { var c = (yl + yh) / 2; ly = [c - sep / 2, c + sep / 2]; }
 if (ok && sc.a <= 0 && sc.b >= 0) {
-var vs = [Math.round(d.hiV), Math.round(d.loV)]; ly.forEach((c, q) => { if (Math.abs(y0 - c) < fs * 0.62) ly[q] = y0 + (vs[q] >= 0 ? -1 : 1) * (fs * 0.55 + 1.5); });   /* a label touching the line goes just clear of it: above for a value of 0 or more, below for less */
+var vs = [Math.round(d.hiV), Math.round(d.loV)]; ly.forEach((c, q) => { if (Math.abs(y0 - c) < fs * 0.5 + 2.5) ly[q] = y0 + (vs[q] >= 0 ? -1 : 1) * (fs * 0.5 + 3); });   /* a label whose box (half a font size each way, and 2.5 px margin) would touch the line goes whole clear of it: above for a value of 0 or more, below for less */
 if (ly[1] - ly[0] < sep) { if (vs[1] >= 0) ly[0] = ly[1] - sep; else ly[1] = ly[0] + sep; }
 }
 if (!ok) return svg(W, H, body);
-var pc = (API.paint && (API.paint('white') || {}).color) || '#fff', knob = (y, hi) => g(SHADOW + ' text--gray-65', rect(cx - kw / 2 + SO, y - kh / 2 + SO, kw, kh, kh * 0.2)) + rect(cx - kw / 2, y - kh / 2, kw, kh, kh * 0.2, hi ? '' : ' fill="' + pc + '" stroke="currentColor" stroke-width="' + n1(sw) + '"') + '<line x1="' + n1(cx - kw * 0.32) + '" x2="' + n1(cx + kw * 0.32) + '" y1="' + n1(y) + '" y2="' + n1(y) + '" stroke="' + (hi ? pc : 'currentColor') + '" stroke-width="' + n1(Math.max(1.5, sw * 1.2)) + '"/>';
-body += g(d.today || B2() ? blk(true) : mid(), rect(cx - tw / 2 + sw / 2, yh, tw - sw, Math.max(0, yl - yh)));   /* 2-bit and 1-bit: every range black, today is the pill */
+var pc = (API.paint && (API.paint('white') || {}).color) || '#fff', knob = (y, hi) => rect(cx - kw / 2, y - kh / 2, kw, kh, kh * 0.2, hi ? '' : ' fill="' + pc + '" stroke="currentColor" stroke-width="' + n1(sw) + '"') + '<line x1="' + n1(cx - kw * 0.32) + '" x2="' + n1(cx + kw * 0.32) + '" y1="' + n1(y) + '" y2="' + n1(y) + '" stroke="' + (hi ? pc : 'currentColor') + '" stroke-width="' + n1(Math.max(1.5, sw * 1.2)) + '"/>';
+body += g(d.today || B2() ? blk(true) : mid(), rect(cx - tw / 2, yh, tw, Math.max(0, yl - yh)));   /* 2-bit and 1-bit: every range black, today is the pill */
 body += knob(yl, 0) + knob(yh, 1);
 body += text(lx, ly[0] + 0.36 * fs, d.hi, fs, 'start') + g(inc(), text(lx, ly[1] + 0.36 * fs, d.lo, fs, 'start'));
 return svg(W, H, body);
