@@ -907,16 +907,16 @@ var a=gl[i-1].getBoundingClientRect(),b=gl[i].getBoundingClientRect(),gp=((gl[i]
 if(gp>30)bad.push(gl[i-1].getAttribute('data-sw-glyph')+gl[i].getAttribute('data-sw-glyph')+' gap '+gp.toFixed(0));}});return bad.join('; ');})()})
       puts "DIGITGAP #{c['name']}: #{sp}" unless sp.empty?
       expect(sp).to eq('')
-      # Sun times in page digits (owner 2026-11-16, "07:2 1" and a leading space in "16:35"): a 1 takes a narrow cell (its own ink), so no
-      # ink gap between neighbouring digits is over 30 of the 100-unit height (the colon between allowed), the first digit starts at the
-      # edge of the widest time, and both times end on one right edge.
-      su = s.evaluate(%q{(function(){var bad=[],vs=[].filter.call(document.querySelectorAll('[data-sw-suntime] svg'),function(v){return v.getBoundingClientRect().width>0}),R=[],Lf=[];
-vs.forEach(function(v){var r=v.getBoundingClientRect(),k=100/r.height,gl=[].filter.call(v.querySelectorAll('g[data-sw-glyph]'),function(g){return /[0-9]/.test(g.getAttribute('data-sw-glyph'))}),b=gl.map(function(g){return g.getBoundingClientRect()}),cl=[].map.call(v.querySelectorAll(':scope > rect, :scope > g > rect'),function(q){return q.getBoundingClientRect()}).filter(function(q){return q.width>0});
-if(!gl.length)return;gl.forEach(function(g,i){if(g.getAttribute('data-sw-glyph')==='1'&&b[i].width*k>30)bad.push('wide 1 ('+(b[i].width*k).toFixed(0)+')')});
-for(var i=1;i<gl.length;i++){var gp=(b[i].left-b[i-1].right)*k,col=cl.some(function(q){return q.left>=b[i-1].right-1&&q.right<=b[i].left+1});if(!col&&gp>30)bad.push(gl[i-1].getAttribute('data-sw-glyph')+gl[i].getAttribute('data-sw-glyph')+' gap '+gp.toFixed(0));}
-R.push(b[b.length-1].right);Lf.push([b[0].left-r.left,r.width,k]);});
-if(R.length>1&&Math.max.apply(null,R)-Math.min.apply(null,R)>1.5)bad.push('right edges differ '+(Math.max.apply(null,R)-Math.min.apply(null,R)).toFixed(1));
-if(Lf.length&&Math.min.apply(null,Lf.map(function(q){return q[0]*q[2]}))>3)bad.push('leading space '+Math.min.apply(null,Lf.map(function(q){return q[0]*q[2]})).toFixed(0));
+      # Sun times in page digits (owner 2026-11-16, review 3 C1): fixed digit cells (a 1 is the cell's two right segments, as in the week digits), so the
+      # colons of the two times stand on one x (1 px) when they have the same length, both times start at the same x after their icons, and no ink gap
+      # between neighbouring digits is over 46 of the 100-unit height (the colon between allowed).
+      su = s.evaluate(%q{(function(){var bad=[],vs=[].filter.call(document.querySelectorAll('[data-sw-suntime] svg'),function(v){return v.getBoundingClientRect().width>0}),C=[],Lf=[],N=[];
+vs.forEach(function(v){var r=v.getBoundingClientRect(),k=100/r.height,gl=[].filter.call(v.querySelectorAll('g[data-sw-glyph]'),function(g){return /[0-9]/.test(g.getAttribute('data-sw-glyph'))}),b=gl.map(function(g){return g.getBoundingClientRect()}),cl=[].map.call(v.querySelectorAll('[data-sw-colon]'),function(q){return q.getBoundingClientRect()}).filter(function(q){return q.width>0});
+if(!gl.length)return;
+for(var i=1;i<gl.length;i++){var gp=(b[i].left-b[i-1].right)*k,col=cl.some(function(q){return q.left>=b[i-1].right-1&&q.right<=b[i].left+1});if(!col&&gp>46)bad.push(gl[i-1].getAttribute('data-sw-glyph')+gl[i].getAttribute('data-sw-glyph')+' gap '+gp.toFixed(0));}
+Lf.push(r.left);N.push(String(v.parentElement.getAttribute('data-sw-t')||'').length);C.push(cl.length?cl[0].left:null);});
+if(Lf.length>1&&Math.max.apply(null,Lf)-Math.min.apply(null,Lf)>1)bad.push('the times start '+(Math.max.apply(null,Lf)-Math.min.apply(null,Lf)).toFixed(1)+' px apart');
+if(C.length>1&&C.every(function(x){return x!==null})&&N.every(function(n){return n===N[0]})&&Math.max.apply(null,C)-Math.min.apply(null,C)>1)bad.push('colons '+(Math.max.apply(null,C)-Math.min.apply(null,C)).toFixed(1)+' px apart');
 return bad.slice(0,4).join('; ')})()})
       puts "SUNTIGHT #{c['name']}: #{su}" unless su.empty?
       expect(su).to eq('')

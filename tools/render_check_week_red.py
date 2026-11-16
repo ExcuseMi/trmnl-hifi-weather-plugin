@@ -26,8 +26,8 @@ muts=[
  ('HZERO-noline','source/shared.liquid',"if (!G.below || !API.hbarW) return svg(W, H, '');","return svg(W, H, '');",['b31-x-hours-neg']),
  ('HZERO-broken','source/shared.liquid',"<line data-sw-hzline x1=","<line data-sw-hzline stroke-dasharray=\"300 12\" x1=",['b31-x-hours-neg']),
  ('HZERO-label','source/shared.liquid',": G.y0 - G.e - gp / 2;   /* a value below 0",": G.y0 + 3 + fs * 0.36 + 0 * gp;   /* a value below 0",['b31-x-hours-neg']),
- ('SUNTIGHT-wide1','source/shared.liquid',"nar = c === '1',","nar = false,",['b31-x-hours-neg','b31-x-sun-ones']),
- ('SUNTIGHT-pad','source/shared.liquid',"pw = Math.max(vw, minW || 0);","pw = vw;",['b31-x-sun-ones','b31-og-sun-ones']),
+ 
+ ('SUNTIGHT-narrow','source/shared.liquid',"'</g>'; x += W + G; }\n});","'</g>'; x += (c === '1' ? T : W) + G; }\n});",['b31-x-sun-ones']),
  ('ROWBAND-count','source/shared.liquid',"{%- assign wr_md = 4 %}{% assign wr_lg = 7 %}","{%- assign wr_md = 3 %}{% assign wr_lg = 7 %}",['b31-og1-port-full-dry']),
  ('ROWBAND-fill','source/shared.liquid','<div class="relative grow basis--0 w--full h--min-0 {% if i < wr_md %}block','<div class="relative shrink-0 w--full h--[9cqh] {% if i < wr_md %}block',['b31-og1-port-full-dry']),
  ('ROWGAP-pad','source/shared.liquid',"Math.max(3 / k, 0.15 * b.offsetHeight)","Math.max(3 / k, 0.01 * b.offsetHeight)",['b31-og1-port-full-rain']),
