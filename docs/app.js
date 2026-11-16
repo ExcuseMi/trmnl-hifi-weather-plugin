@@ -27,7 +27,7 @@
   // ---- state
   var S = {
     source: 'live', city: V.city, device: 'og', view: 'full', language: V.language, dark: false, hw: 'none',
-    f: { unit: V.us ? 'fahrenheit' : 'celsius', time_format: V.us ? '12' : '24', bottom: 'auto', bottom_switch: '18', sensor_icon: 'house', hide_title_bar: 'false', week_style: 'auto', show_wear: 'true', sensor_show: 'show', sensor_label: '', sensor_primary: 'auto' }
+    f: { unit: V.us ? 'fahrenheit' : 'celsius', time_format: V.us ? '12' : '24', bottom: 'auto', bottom_switch: '18', sensor_icon: 'house', hide_title_bar: 'false', week_style: 'blocks', show_wear: 'true', sensor_show: 'show', sensor_label: '', sensor_primary: 'auto' }
   };
   var scenarios = [], engine = null, token = 0, lastUrl = null, timer = 0, liveCache = {};
 

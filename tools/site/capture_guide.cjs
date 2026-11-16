@@ -13,7 +13,7 @@ const PICS = {
   g1: { id: 'heat', f: { bottom: 'hours' }, parts: { baro: '[data-sw-part="baro"]', pressure: '[data-sw-part="baro"] ~ [data-sw-cap]', tdial: '[data-sw-part="tdial"]', marks: 'text[data-sw-mark]', trend: '[data-sw-part="tdial"] ~ div[data-sw-cap]', meters: '[data-sw-part^="meter"]', cells: '[data-sw-st="l"]', title: '[data-sw-cond]', digits: '[data-sw-part="temp"]', cues: '[data-sw-part="cue"]', sun: '[data-sw-suntime]', moon: '[data-sw-part="moon"]', hours: '[data-sw-part="hbar"]', footer: '.title_bar' } },
   g2: { id: 'rain', f: { bottom: 'days' }, parts: { rain: '[data-sw-unit="rain"] img', calendar: '[data-sw-part="rain"]', gust: '[data-sw-part^="meter"] [data-sw-st="a"]' } },
   g3: { id: 'sensor', f: { bottom: 'days' }, parts: { sensor: '[data-sw-twin="in"] [data-sw-part="loc"]', outside: '[data-sw-twin="out"] [data-sw-part="cue"]', twin: '[data-sw-part="tdial"]', small: '[data-sw-twin="out"] [data-sw-part="temp"]' } },
-  g4: { id: 'snow', f: { bottom: 'days', week_style: 'eq', unit: 'celsius' }, parts: { days: '[data-sw-week]', today: '[data-sw-today]', range: '[data-sw-part="wday"]', zero: '[data-sw-part="wzero"] line', daycues: '[data-sw-part="wcue"]' } },
+  g4: { id: 'snow', f: { bottom: 'days', unit: 'celsius' }, parts: { days: '[data-sw-wkblocks]', today: '[data-sw-today]', range: '[data-sw-part="day"]', numbers: '[data-sw-row="day"] span.title:not([data-sw-dname])', daycues: '[data-sw-part="dcue"]' } },
 };
 function serve() {
   const types = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.json': 'application/json', '.liquid': 'text/plain; charset=utf-8' };
