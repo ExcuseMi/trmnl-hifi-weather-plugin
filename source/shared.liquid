@@ -473,7 +473,7 @@ var fs = Math.max(8, Math.min(W / (lw * 0.62), HH * 0.2, 30)), R = Math.round(fs
 o = { hs: hs, fs: fs, C: C, below: !!hs && hs.a + 1 < 0 };
 if (!o.below) return o;
 var cap = Math.max(2, Math.min(6, Math.floor(C / 6))), per = 1, U, D, bD = -(hs.a + 1);   /* B31 hours (owner 2026-11-16): bars from the 0 line, up for 0 and more (a nub at 0), down below it, one block per degree while they fit */
-for (; per < 100; per++) { U = hs.b < 0 ? 0 : Math.floor(hs.b / per) + 1; D = Math.ceil(bD / per); if (U + D <= cap) break; }
+for (; per < 100; per++) { U = hs.b <= 0 ? 0 : Math.ceil(hs.b / per); D = Math.ceil(bD / per); if (U + D <= cap) break; }
 o.per = per; o.U = U; o.D = D; o.e = 1.5; o.lh = (C - 2 * o.e) / (U + D); o.y0 = H - C + U * o.lh + o.e;
 return o;
 }
@@ -483,11 +483,11 @@ if (!q || q.tV === null || q.tV === undefined || !hs) return svg(W, H, '');
 var fs = G.fs, C = G.C, cells = '', n, ty, fill = blk(hi || B2());   /* no offset shadows; black on 2-bit and 1-bit (the 4-bit panel keeps the lighter grey for the hours that are not now) */
 if (G.below) {
 var v = Math.round(q.tV), up = v >= 0, lh = G.lh, gp = Math.max(2, lh * 0.2), top;
-n = up ? Math.floor(v / G.per) + 1 : Math.ceil(-v / G.per);
+n = up ? Math.ceil(v / G.per) : Math.ceil(-v / G.per);   /* 0 draws no segment (its label stands on the line); the bars start at the first degree in both directions */
 for (var k = 0; k < n; k++) cells += rect(0, up ? G.y0 - G.e - (k + 1) * lh + gp / 2 : G.y0 + G.e + k * lh + gp / 2, W, lh - gp, 2);
-top = up ? G.y0 - G.e - n * lh + gp / 2 : G.y0 - G.e - gp / 2;   /* a value below 0 has its label above the line, clear of it */
+top = n > 0 && up ? G.y0 - G.e - n * lh + gp / 2 : G.y0 - G.e - gp / 2;   /* a value below 0 has its label above the line, clear of it */
 ty = top - 3 - fs * 0.36;
-return svg(W, H, '<g data-sw-cells="' + n + '" data-sw-area="' + n1(G.U * lh) + '"' + (up ? '' : ' data-sw-below="1"') + '>' + g(fill, cells) + '</g>' + text(W / 2, ty, q.t, fs, 'middle', 0, ' data-sw-htemp'));
+return svg(W, H, '<g data-sw-cells="' + n + '" data-sw-area="' + n1(G.U * lh) + '"' + (v >= 0 ? '' : ' data-sw-below="1"') + '>' + g(fill, cells) + '</g>' + text(W / 2, ty, q.t, fs, 'middle', 0, ' data-sw-htemp'));
 }
 var L = hlevels(hs, C), per = hper(hs, Math.max(1, Math.min(6, Math.floor(C / 6))));
 n = Math.max(1, Math.min(L, per > 1 ? Math.ceil((Math.round(q.tV) - hs.a) / per) : Math.round((Math.round(q.tV) - hs.a) / (hs.b - hs.a) * L)));
