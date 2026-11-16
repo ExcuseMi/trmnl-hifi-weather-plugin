@@ -507,7 +507,7 @@ return { h1: h1, h2: h2, y1: y1, y2: y1 + h1 * 1.18, al: al, xr: W / 2 + ((al.n 
 }
 function wdig(s, h, L, y, lo) { var n = L.al.n, v = digits(s, h, 0, lo ? { n: n, dr: 13.5 * (L.h1 / L.h2 - 1) } : L.al); v = v.replace('<svg ', '<svg x="' + n1(L.xr - ((n - 1) * 70 + 56) * h / 100) + '" y="' + n1(y) + '" '); return lo ? g(blk(true), v) : v; }   /* the low row: ones cell right edge and degree sign left edge on the high row's */
 function digcol(SW, i, W, H) {
-var d = SW.days[i] || {}, L = wdl(SW, W, H), body = i ? g('text--gray-40', '<line x1="1" x2="1" y1="' + n1(Math.max(0, L.y1 - L.h1 * 0.2)) + '" y2="' + n1(Math.min(H, L.y2 + L.h2 * 1.2)) + '" ' + SK + '3" stroke-dasharray="3 7"/>') : '';
+var d = SW.days[i] || {}, L = wdl(SW, W, H), body = i ? g(b1() ? '' : 'text--gray-40', '<line x1="1" x2="1" y1="' + n1(Math.max(0, L.y1 - L.h1 * 0.2)) + '" y2="' + n1(Math.min(H, L.y2 + L.h2 * 1.2)) + '" ' + SK + (b1() ? '2" stroke-dasharray="2 4"' : '3" stroke-dasharray="3 7"') + '/>') : '';   /* 1-bit: black dots like the panel dividers (a grey dither pattern at this width vanished) */
 if (d.hiV !== null && d.hiV !== undefined) body += wdig(d.hi, L.h1, L, L.y1) + wdig(d.lo, L.h2, L, L.y2, 1);
 return svg(W, H, body);
 }
