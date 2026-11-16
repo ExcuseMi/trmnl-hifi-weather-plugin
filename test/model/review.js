@@ -36,4 +36,25 @@ module.exports = async ({ T, fx, SWModel, check, eq, ok }) => {
     eq(T.fromSnap(sn, sn.at + 24 * 3600 + 60), null, 'older than 24 h: NO SIGNAL');
     ok(JSON.stringify(sn).length < 6000, 'the saved state stays small (8 KB budget): ' + JSON.stringify(sn).length);
   });
+  // no variable is read before its var in the same function (eslint no-use-before-define is not in this repo, there is no eslint: this is its check
+  // for var in the transform; the nested functions run later and are left out). Fable review: inT read 14 lines before its var in buildView.
+  await check('no var is read before its declaration in the same function of transform.js', async () => {
+    const acorn = require('acorn'), src = require('fs').readFileSync(require('path').join(__dirname, '../../plugin/src/transform.js'), 'utf8');
+    const ast = acorn.parse(src, { ecmaVersion: 'latest', sourceType: 'script' }), bad = [];
+    const isFn = (n) => n && /^(FunctionDeclaration|FunctionExpression|ArrowFunctionExpression)$/.test(n.type);
+    const ids = (p, out) => { if (!p) return; if (p.type === 'Identifier') out.push(p); else if (p.type === 'ObjectPattern') p.properties.forEach((q) => ids(q.value || q.argument, out)); else if (p.type === 'ArrayPattern') p.elements.forEach((q) => ids(q, out)); else if (p.type === 'AssignmentPattern') ids(p.left, out); else if (p.type === 'RestElement') ids(p.argument, out); };
+    const walk = (n, f, skipFn, parent, key) => { if (!n || typeof n.type !== 'string') return; f(n, parent, key); Object.keys(n).forEach((k) => { const v = n[k]; if (k === 'type') return; (Array.isArray(v) ? v : [v]).forEach((c) => { if (c && typeof c.type === 'string' && !(skipFn && isFn(c))) walk(c, f, skipFn, n, k); }); }); };
+    const scope = (node, body) => {
+      const decl = {}, declIds = new Set();
+      walk(body, (n) => { if (n.type === 'VariableDeclaration' && n.kind === 'var') n.declarations.forEach((d) => { const o = []; ids(d.id, o); o.forEach((i) => { declIds.add(i); if (!(i.name in decl)) decl[i.name] = i.start; }); }); }, true);
+      walk(body, (n, parent, key) => {
+        if (n.type !== 'Identifier' || declIds.has(n) || !(n.name in decl) || n.start >= decl[n.name]) return;
+        if (parent && ((parent.type === 'MemberExpression' && key === 'property' && !parent.computed) || (parent.type === 'Property' && key === 'key' && !parent.computed) || (parent.type === 'FunctionDeclaration' || parent.type === 'FunctionExpression'))) return;
+        bad.push(n.name + ' at ' + src.slice(0, n.start).split('\n').length);
+      }, true);
+    };
+    scope(ast, ast);
+    walk(ast, (n) => { if (isFn(n) && n.body) scope(n, n.body); }, false);
+    eq(bad, [], 'variables read before their var');
+  });
 };

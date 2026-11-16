@@ -483,6 +483,7 @@ var meters = keys.map((k, i) => ({ key: k, label: RO[k][0], frac: RO[k][1], past
 // B30 (owner 2026-11-16): a meter in its top (red) zone lights its label. With a margin of 2 % of the scale, as the other flags: it enters at the zone's start + 2 % and leaves at its start - 2 % (saved state pm.bad).
 var pb = pm.bad && typeof pm.bad === 'object' ? pm.bad : {};
 meters.forEach((m) => { if (m.zones && m.frac !== null && m.frac !== undefined) m.bad = flag(m.frac, m.zones[1], 0.02, pb[m.key]); });
+var inT = M.inn.temp === null ? null : (F_ ? M.inn.temp * 1.8 + 32 : M.inn.temp);   // sensors report Celsius
 var hm = meters.filter((m) => m.key === 'humidity')[0];
 if (hm && inT !== null && M.inn.hum !== null) hm.tw = { out: O.outdoor, in: O.indoor, m: { frac: bar(M.inn.hum, 0, 100) } };   // owner 2026-11-13: with the indoor sensor the humidity row is a twin meter (indoor in grey)
 var t1 = (v) => { var s = (Math.round(v * 10) / 10).toFixed(1), r = Math.round(v); return s.split('.')[0].length >= 3 ? String(r === 0 ? 0 : r) : s; };   // owner (step 12): no decimal once the whole part has 3+ characters (104°, -12°)
@@ -498,7 +499,6 @@ var a = { a: Math.floor(Math.min.apply(null, vals.length ? vals : [0]) / st) * s
 if (a.b - a.a < 2 * st) a.b = a.a + 2 * st; return a; };
 var sc = axis(7), scales = [null, 1, 2, 3, 4, 5, 6, 7].map((n) => n && axis(n));
 var pr = n.press;   // no warning lamps (owner 2026-11-12): the rain unit's icon shows rain, snow or hail
-var inT = M.inn.temp === null ? null : (F_ ? M.inn.temp * 1.8 + 32 : M.inn.temp);   // sensors report Celsius
 var tl = t.lo, th = t.hi, tvals = [tl, th, tv, inT].filter((v) => v !== null), tst = F_ ? 10 : 5;
 // B31 review: at most 7 numbers on the arc (a 14 to 95 F day gave 10 numbers that ran together): the step doubles until they fit
 if (tvals.length) { var tlo = Math.min.apply(null, tvals), thi = Math.max.apply(null, tvals); for (var tk = 0; tk < 3 && (Math.ceil(thi / tst) * tst - Math.floor(tlo / tst) * tst) / tst + 1 > 7; tk++) tst *= 2; }
