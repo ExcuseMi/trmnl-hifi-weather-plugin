@@ -500,6 +500,8 @@ var sc = axis(7), scales = [null, 1, 2, 3, 4, 5, 6, 7].map((n) => n && axis(n));
 var pr = n.press;   // no warning lamps (owner 2026-11-12): the rain unit's icon shows rain, snow or hail
 var inT = M.inn.temp === null ? null : (F_ ? M.inn.temp * 1.8 + 32 : M.inn.temp);   // sensors report Celsius
 var tl = t.lo, th = t.hi, tvals = [tl, th, tv, inT].filter((v) => v !== null), tst = F_ ? 10 : 5;
+// B31 review: at most 7 numbers on the arc (a 14 to 95 F day gave 10 numbers that ran together): the step doubles until they fit
+if (tvals.length) { var tlo = Math.min.apply(null, tvals), thi = Math.max.apply(null, tvals); for (var tk = 0; tk < 3 && (Math.ceil(thi / tst) * tst - Math.floor(tlo / tst) * tst) / tst + 1 > 7; tk++) tst *= 2; }
 var tsc = tvals.length ? { a: Math.floor(Math.min.apply(null, tvals) / tst) * tst, b: Math.ceil(Math.max.apply(null, tvals) / tst) * tst } : null;
 if (tsc && tsc.b - tsc.a < 3 * tst) tsc.b = tsc.a + 3 * tst;
 var ps = (M.hours || []).slice(0, 24).map((q) => q.pr).filter((q) => q !== null && q !== undefined); if (pr !== null) ps.push(pr);

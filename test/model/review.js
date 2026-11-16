@@ -1,5 +1,5 @@
 // Tests added after the Fable functional review of 41f111e (2026-11-16): each was seen red on the code before its fix.
-module.exports = async ({ T, fx, check, eq, ok }) => {
+module.exports = async ({ T, fx, SWModel, check, eq, ok }) => {
   const AT = Date.UTC(2026, 10, 8, 12, 0) / 1000;
   // a forecast like Open-Meteo's with the past hours of today (past_hours): 72 hourly values from 00:00 of the first day
   const forecast = (curHour, felt) => {
@@ -21,5 +21,13 @@ module.exports = async ({ T, fx, check, eq, ok }) => {
       const r = await runAt(forecast(hour, felt));
       eq([hour, r.ui.cue[0], r.ui.days[0].cue[0]], [hour, 'jacket', 'jacket'], 'cue at ' + hour + ':00 from the full day, the same in the console and in today\'s column');
     }
+  });
+  await check('temperature dial scale: at most 7 numbers on the arc, in Fahrenheit and Celsius (Fable review: 405060 ran together)', async () => {
+    const view = (name, unit) => { const f = fx(name), m = SWModel.build(f, { unit }); return T.buildView(m, T.buildI18n('en'), f.daily, null, 0.3, { hourly: f.hourly }).tdial; };
+    [['extreme_f', 'fahrenheit'], ['extreme', 'celsius'], ['mixed', 'celsius'], ['hail', 'celsius']].forEach(([n, u]) => {
+      const t = view(n, u), labels = Math.floor((t.b - t.a) / t.step) + 1;
+      ok(labels <= 7, n + ': ' + labels + ' numbers on the dial (' + t.a + ' to ' + t.b + ' step ' + t.step + ')');
+      ok(t.step === 5 || t.step === 10 || t.step === 20 || t.step === 40, n + ': a round step ' + t.step);
+    });
   });
 };

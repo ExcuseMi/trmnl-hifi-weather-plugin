@@ -931,7 +931,7 @@ test('location icons (owner 2026-11-14, B10): the outdoor icon is ink on 1-bit (
   ok(/data-sw-part="loc"[^>]*data-sw-lz/.test(sh) && /data-sw-lsp/.test(sh) && /1\.4 \* parseFloat\(getComputedStyle\(lzu\)\.fontSize\)/.test(sh), 'twin readout icons: marked, spacer marked, 1.4 unit fonts in swPaint');
 });
 async function aTest(name, fn) { try { await fn(); passed++; } catch (e) { failed++; console.log('FAIL ' + name + ': ' + e.message); } }
-sensorSettingsTests().then(() => require('./sensors.js')({ T, fx, check: aTest, eq, ok })).then(stateTests).then(() => require('./review.js')({ T, fx, check: aTest, eq, ok })).then(() => aTest('a hanging request ends within TRMNL\'s 5 s', hangTest)).then(() => aTest('a request deaf to its abort signal', deafTest)).then(() => aTest('no polling URLs; IDX data used when present', pollTest)).then(() => {
+sensorSettingsTests().then(() => require('./sensors.js')({ T, fx, check: aTest, eq, ok })).then(stateTests).then(() => require('./review.js')({ T, fx, SWModel, check: aTest, eq, ok })).then(() => aTest('a hanging request ends within TRMNL\'s 5 s', hangTest)).then(() => aTest('a request deaf to its abort signal', deafTest)).then(() => aTest('no polling URLs; IDX data used when present', pollTest)).then(() => {
   console.log(passed + ' passed, ' + failed + ' failed');
   process.exit(failed ? 1 : 0);
 });
