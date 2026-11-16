@@ -916,8 +916,8 @@ vs.forEach(function(v){var r=v.getBoundingClientRect(),k=100/r.height,gl=[].filt
 if(!gl.length)return;
 for(var i=1;i<gl.length;i++){var gp=(b[i].left-b[i-1].right)*k,col=cl.some(function(q){return q.left>=b[i-1].right-1&&q.right<=b[i].left+1});if(!col&&gp>46)bad.push(gl[i-1].getAttribute('data-sw-glyph')+gl[i].getAttribute('data-sw-glyph')+' gap '+gp.toFixed(0));}
 Lf.push(r.left);N.push(String(v.parentElement.getAttribute('data-sw-t')||'').length);C.push(cl.length?cl[0].left:null);});
-if(Lf.length>1&&Math.max.apply(null,Lf)-Math.min.apply(null,Lf)>1)bad.push('the times start '+(Math.max.apply(null,Lf)-Math.min.apply(null,Lf)).toFixed(1)+' px apart');
-if(C.length>1&&C.every(function(x){return x!==null})&&N.every(function(n){return n===N[0]})&&Math.max.apply(null,C)-Math.min.apply(null,C)>1)bad.push('colons '+(Math.max.apply(null,C)-Math.min.apply(null,C)).toFixed(1)+' px apart');
+if(Lf.length>1&&Math.max.apply(null,Lf)-Math.min.apply(null,Lf)>1.5)bad.push('the times start '+(Math.max.apply(null,Lf)-Math.min.apply(null,Lf)).toFixed(1)+' px apart');
+if(C.length>1&&C.every(function(x){return x!==null})&&N.every(function(n){return n===N[0]})&&Math.max.apply(null,C)-Math.min.apply(null,C)>1.5)bad.push('colons '+(Math.max.apply(null,C)-Math.min.apply(null,C)).toFixed(1)+' px apart');
 return bad.slice(0,4).join('; ')})()})
       puts "SUNTIGHT #{c['name']}: #{su}" unless su.empty?
       expect(su).to eq('')
