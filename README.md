@@ -10,6 +10,7 @@ The weather as a calm early-80s hi-fi receiver, for [TRMNL](https://trmnl.com) e
 - **Console**: the temperature in segment digits with what to wear (parka, jacket, sweater or T-shirt, and an umbrella); block meters for wind and gusts, UV, air quality, humidity, pollen and pressure when they matter, grey cells for what is still to come today.
 - **Rain or sun**: an hour calendar when rain is coming; otherwise sunrise, sunset and the moon as it looks from your location.
 - **Bottom strip**: the coming days or hours.
+- **Lit labels**: a meter label that turns white on black (mirrored in dark mode) says the value is in its bad range: WIND from 50 km/h (30 mph), UV from 8, AQI from 60, POLLEN from 50, CO2 from 1400 ppm, the sensor's HUM below 30 % or above 60 %.
 - **Look**: no panels or frames, thin divider lines where two sections meet (grey on greyscale screens, dotted black on 1-bit). Units (°C, hPa, mm) are grey and small; the °C sits at the top of its number. Small views show two meter rows or none, never a single one.
 - **Indoor sensor**: with a TRMNL temperature sensor on the screen, indoor becomes the big reading and outdoor moves beside it, or show another TRMNL's sensor (a hallway upstairs) with outside as the big reading. Readings older than 3 hours are ignored. Other sources: Home Assistant, Awair, AirGradient, Sensibo, Ecowitt, Adafruit IO or any JSON link (below).
 

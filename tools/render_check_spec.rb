@@ -176,9 +176,9 @@ nums.forEach(function(t){if(!t.closest('g[data-sw-dlab]')){bad.push('number '+t.
       # Owner 2026-11-15 (replaces the B18 item 4 / B19 item 4 grey secondary rows): every meter row looks the same, main or secondary (outdoor, sensor, CO2): the same label colour, the same
       # bar colours (lit, empty, forecast cell) and the icon in the label's colour; only the icon shape differs. Every device, view and bit depth. (The dial keeps its grey secondary needle.)
       sr = s.evaluate(%q{(function(){var bad=[],vis=function(e){var b=e.getBoundingClientRect();return b.width>0&&b.height>0},cs=function(e,k){return e?getComputedStyle(e)[k]:'-'},labs=[].filter.call(document.querySelectorAll('[data-sw-mlabel]'),vis),bars=[].filter.call(document.querySelectorAll('[data-sw-part^="meter"]'),vis),rows=[];
-labs.forEach(function(l,i){var b=bars[i];if(!b)return;var on=b.querySelector('[data-sw-on] rect'),em=b.querySelector('[data-sw-st="e"] rect'),pv=b.querySelector('[data-sw-st="p"] rect');rows.push({n:l.textContent.trim(),l:cs(l,'color'),s:[cs(on,'fill'),cs(em,'fill'),cs(em,'stroke'),cs(pv,'fill')]})});
+labs.forEach(function(l,i){var b=bars[i];if(!b||l.hasAttribute('data-sw-lit'))return;   /* B30: a lit label is white on black, its icon stays as it is */var on=b.querySelector('[data-sw-on] rect'),em=b.querySelector('[data-sw-st="e"] rect'),pv=b.querySelector('[data-sw-st="p"] rect');rows.push({n:l.textContent.trim(),l:cs(l,'color'),s:[cs(on,'fill'),cs(em,'fill'),cs(em,'stroke'),cs(pv,'fill')]})});
 if(rows.length>1)rows.forEach(function(x){if(x.l!==rows[0].l)bad.push(x.n+' label '+x.l+' differs from '+rows[0].n+' '+rows[0].l);x.s.forEach(function(v,k){var w=rows[0].s[k];/* a part a row has none of (a full row has no empty cell) is not compared */if(v!=='-'&&w!=='-'&&v!==w)bad.push(x.n+' bars['+k+'] '+v+' differ from '+rows[0].n+' '+w)})});
-[].filter.call(document.querySelectorAll('[data-sw-part="loc"][data-sw-for]'),vis).forEach(function(e){var lab=e.parentElement.querySelector('[data-sw-mlabel]'),g=e.querySelector('[data-sw-loc]');if(lab&&g&&cs(g,'stroke')!==cs(lab,'color'))bad.push('icon '+g.getAttribute('data-sw-loc')+' stroke '+cs(g,'stroke')+' not the label colour '+cs(lab,'color'))});
+[].filter.call(document.querySelectorAll('[data-sw-part="loc"][data-sw-for]'),vis).forEach(function(e){var lab=e.parentElement.querySelector('[data-sw-mlabel]'),g=e.querySelector('[data-sw-loc]');if(lab&&g&&!lab.hasAttribute('data-sw-lit')&&cs(g,'stroke')!==cs(lab,'color'))bad.push('icon '+g.getAttribute('data-sw-loc')+' stroke '+cs(g,'stroke')+' not the label colour '+cs(lab,'color'))});
 return bad.join('; ')})()})
       puts "SECROW #{c['name']}: #{sr}" unless sr.empty?
       expect(sr).to eq('')
@@ -308,6 +308,18 @@ else if(!b1&&want.indexOf(getComputedStyle(ts).color)<0)bad.push('rain unit '+ge
 return bad.slice(0,4).join('; ')})()})
       puts "UNIT #{c['name']}: #{ug}" unless ug.empty?
       expect(ug).to eq('')
+      # B30 (owner 2026-11-16): a meter label is lit (data-sw-lit: Framework bg--black text--white, mirrored in dark mode, rounded) exactly when its value is in its bad (top) zone: WIND, UV, AQI, POLLEN and CO2 from their
+      # red zone, the sensor's HUM below 30 or above 60 %; outdoor humidity never. Cases name the lit set in want_lit.
+      lt = s.evaluate(%q{(function(){var bad=[],lit=[];[].filter.call(document.querySelectorAll('[data-sw-lk]'),function(e){var b=e.getBoundingClientRect();return b.width>0&&b.height>0}).forEach(function(e){var k=e.getAttribute('data-sw-lk'),m=SW.meters.filter(function(q){return q.key===k})[0]||{},iv=SW.iv||[],ex;
+if(k==='humidity')ex=e.hasAttribute('data-sw-lin')&&iv[1]!=null&&(iv[1]<30||iv[1]>60);else if(k==='co2')ex=iv[2]!=null&&iv[2]>=1400;else ex=!!(m.zones&&m.frac>=m.zones[1]);
+var on=e.hasAttribute('data-sw-lit');if(on)lit.push(k==='humidity'?'humidity':k);if(on!==!!ex)bad.push(k+(e.hasAttribute('data-sw-lin')?' (sensor)':'')+(on?' lit':' not lit')+' but its value is '+(ex?'in':'not in')+' the bad range')});return bad.join('; ')+'|'+lit.sort().join(',')})()})
+      lt_bad, lt_lit = lt.split('|', 2)
+      puts "LITLABEL #{c['name']}: #{lt_bad}" unless lt_bad.empty?
+      expect(lt_bad).to eq('')
+      if c['want_lit']
+        puts "LITLABEL #{c['name']}: lit #{lt_lit.inspect}, want #{c['want_lit'].sort.join(',').inspect}" unless lt_lit == c['want_lit'].sort.join(',')
+        expect(lt_lit).to eq(c['want_lit'].sort.join(','))
+      end
       # B27 (owner 2026-11-15, option B): a small console shows no meter row or at least two, never a lone row. (Seen red at 9715cc4: the one-row fallback.)
       lone = s.evaluate(%q{(function(){var n=[].filter.call(document.querySelectorAll('[data-sw-small] [data-sw-srow="meter"]'),function(e){var b=e.getBoundingClientRect();return b.width>0&&b.height>0}).length;return n===1?'a lone meter row':''})()})
       puts "LONEROW #{c['name']}: #{lone}" unless lone.empty?

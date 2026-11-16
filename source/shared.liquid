@@ -72,7 +72,7 @@
 {% if calm_q %}{% assign mr_m = 6 %}{% assign mb_m = 4 %}{% endif %}
 {% capture c_meters %}
   <div class="flex flex--col gap--small shrink-0 w--[{% if inn and view < 3 %}{{ 25 | times: wm | round }}{% else %}{{ 30 | times: wm | round }}{% endif %}cqw]{% if view < 3 and inn == nil %} landscape:w--[24cqw] lg:landscape:w--[{{ 22 | times: wm | round }}cqw]{% endif %} lg:w--[{% if inn and view == 2 %}19{% else %}{{ 22 | times: wm | round }}{% endif %}cqw] lg:portrait:w--full">{% comment %} owner: no lamps; the rain unit's {% endcomment %}{% comment %} owner: the meters take the full {% endcomment %}
-   <div class="flex flex--row grow{% if view == 2 %} lg:portrait:flex--stretch-y{% endif %} gap--small w--full">{% capture c_lab %}{% endcapture %}{% capture c_blk %}{% endcapture %}{% for m in ms %}{% if forloop.index > n_lg %}{% break %}{% endif %}{% assign passes = 1 %}{% if m.key == ph_tw %}{% assign passes = 2 %}{% endif %}{% capture rc %}{% if view == 1 and m.key == 'baro' %}{% if forloop.index > n_md %} hidden{% else %} flex lg:hidden{% endif %}{% elsif forloop.index > n_md %} hidden lg:flex{% else %} flex{% endif %} flex--row flex--center-y{% endcapture %}{% capture rh %}h--[{{ mr_m | times: hm | round | at_most: 100 }}cqh] lg:h--[{{ 5 | times: hl | round }}cqh]{% if view == 1 %} lg:portrait:h--[3cqh]{% endif %}{% endcapture %}{% for pass in (1..passes) %}{% assign h2 = '' %}{% assign pk = 'meter' %}{% assign is_in = false %}{% if pass == 2 %}{% assign h2 = ' data-sw-hum2' %}{% endif %}{% if m.key == ph_tw %}{% if pass == 1 and inm %}{% assign is_in = true %}{% elsif pass == 2 and inm == false %}{% assign is_in = true %}{% endif %}{% if is_in %}{% assign pk = 'meterin' %}{% endif %}{% endif %}{% comment %} owner 2026-11-14: the indoor row first {% endcomment %}{% capture c_lab %}{{ c_lab }}<div class="{{ rc }} flex--right w--full gap--xsmall {{ rh }}"{{ h2 }}>{% if m.key == ph_tw %}<div class="shrink-0" data-sw-part="loc" data-sw-sq data-sw-for="{{ m.key }}" data-sw-i="{% if is_in %}1{% else %}0{% endif %}" data-sw-loc="{% if is_in %}in{% else %}out{% endif %}"></div>{% endif %}<span class="title title--base lg:title--small text--bold" data-sw-mlabel>{{ m.label }}</span></div>{% endcapture %}{% capture c_blk %}{{ c_blk }}<div class="{{ rc }} w--full {{ rh }}"{{ h2 }}><div class="w--full h--[{{ mb_m | times: hm | round | at_most: 100 }}cqh] lg:hidden" data-sw-part="{{ pk }}" data-sw-n="5" data-sw-i="{{ m.idx }}" data-sw-key="{{ m.key }}"></div><div class="hidden lg:block w--full h--[{{ 4 | times: hl | round }}cqh]{% if view == 1 %} lg:portrait:h--[3cqh]{% endif %}" data-sw-part="{{ pk }}" data-sw-n="10" data-sw-i="{{ m.idx }}" data-sw-key="{{ m.key }}"></div></div>{% endcapture %}{% endfor %}{% endfor %}{% capture mcol %}flex flex--col flex--between{% endcapture %}
+   <div class="flex flex--row grow{% if view == 2 %} lg:portrait:flex--stretch-y{% endif %} gap--small w--full">{% capture c_lab %}{% endcapture %}{% capture c_blk %}{% endcapture %}{% for m in ms %}{% if forloop.index > n_lg %}{% break %}{% endif %}{% assign passes = 1 %}{% if m.key == ph_tw %}{% assign passes = 2 %}{% endif %}{% capture rc %}{% if view == 1 and m.key == 'baro' %}{% if forloop.index > n_md %} hidden{% else %} flex lg:hidden{% endif %}{% elsif forloop.index > n_md %} hidden lg:flex{% else %} flex{% endif %} flex--row flex--center-y{% endcapture %}{% capture rh %}h--[{{ mr_m | times: hm | round | at_most: 100 }}cqh] lg:h--[{{ 5 | times: hl | round }}cqh]{% if view == 1 %} lg:portrait:h--[3cqh]{% endif %}{% endcapture %}{% for pass in (1..passes) %}{% assign h2 = '' %}{% assign pk = 'meter' %}{% assign is_in = false %}{% if pass == 2 %}{% assign h2 = ' data-sw-hum2' %}{% endif %}{% if m.key == ph_tw %}{% if pass == 1 and inm %}{% assign is_in = true %}{% elsif pass == 2 and inm == false %}{% assign is_in = true %}{% endif %}{% if is_in %}{% assign pk = 'meterin' %}{% endif %}{% endif %}{% comment %} owner 2026-11-14: the indoor row first {% endcomment %}{% capture c_lab %}{{ c_lab }}<div class="{{ rc }} flex--right w--full gap--xsmall {{ rh }}"{{ h2 }}>{% if m.key == ph_tw %}<div class="shrink-0" data-sw-part="loc" data-sw-sq data-sw-for="{{ m.key }}" data-sw-i="{% if is_in %}1{% else %}0{% endif %}" data-sw-loc="{% if is_in %}in{% else %}out{% endif %}"></div>{% endif %}<span class="title title--base lg:title--small text--bold" data-sw-mlabel data-sw-lk="{{ m.key }}"{% if is_in %} data-sw-lin{% endif %}>{{ m.label }}</span></div>{% endcapture %}{% capture c_blk %}{{ c_blk }}<div class="{{ rc }} w--full {{ rh }}"{{ h2 }}><div class="w--full h--[{{ mb_m | times: hm | round | at_most: 100 }}cqh] lg:hidden" data-sw-part="{{ pk }}" data-sw-n="5" data-sw-i="{{ m.idx }}" data-sw-key="{{ m.key }}"></div><div class="hidden lg:block w--full h--[{{ 4 | times: hl | round }}cqh]{% if view == 1 %} lg:portrait:h--[3cqh]{% endif %}" data-sw-part="{{ pk }}" data-sw-n="10" data-sw-i="{{ m.idx }}" data-sw-key="{{ m.key }}"></div></div>{% endcapture %}{% endfor %}{% endfor %}{% capture mcol %}flex flex--col flex--between{% endcapture %}
     <div class="{{ mcol }} shrink-0">{{ c_lab }}</div>
     <div class="{{ mcol }} grow">{{ c_blk }}</div>
    </div>
@@ -135,7 +135,7 @@
   {%- comment %} B20d (owner rule B13): a twin meter (humidity with a sensor) is two rows as in the full view, the main reading's first, the other right after it, so dropping rows for space (swSmall keeps the first n) never keeps the sensor's row while the outdoor one is dropped when outside is main. {% endcomment %}
   {%- for m in sms %}{% if forloop.index > smx %}{% break %}{% endif %}{% assign sk = 'meter' %}{% if m.key == ph_tw %}{% assign sk = 'meter,meterin' %}{% if inm %}{% assign sk = 'meterin,meter' %}{% endif %}{% endif %}{% assign sk = sk | split: ',' %}
   {%- for spk in sk %}
-  <div class="hidden flex--row flex--center-y gap--small w--full" data-sw-srow="meter"><span class="{{ tsb }} shrink-0" data-sw-mlabel>{{ m.label }}</span><div class="grow" data-sw-part="{{ spk }}" data-sw-n="5" data-sw-i="{{ m.idx }}" data-sw-key="{{ m.key }}"></div></div>
+  <div class="hidden flex--row flex--center-y gap--small w--full" data-sw-srow="meter"><span class="{{ tsb }} shrink-0" data-sw-mlabel data-sw-lk="{{ m.key }}">{{ m.label }}</span><div class="grow" data-sw-part="{{ spk }}" data-sw-n="5" data-sw-i="{{ m.idx }}" data-sw-key="{{ m.key }}"></div></div>
   {%- endfor %}
   {%- endfor %}
  </div>{{ p_close }}</div>
@@ -223,6 +223,16 @@ var cap = function (x, ch) { var cs = getComputedStyle(x), r = document.createRa
 var dy = cap(nm, '0') - cap(e, '°'); e.style.transform = 'translateY(' + dy.toFixed(2) + 'px)';
 });
 }
+/* B30 (owner 2026-11-16): a meter whose value is in its bad (top) zone lights its label, inverted like today's day label: WIND, UV, AQI, POLLEN and CO2 from their red zone, the sensor's HUM below 30 % or above 60 %. The weather meters' flag comes with the margin from the transform (m.bad); the sensor's readings are merged here, so their flags use the plain thresholds (render check LITLABEL) */
+function swLit() {
+document.querySelectorAll('[data-sw-lk]').forEach(function (e) {
+var k = e.getAttribute('data-sw-lk'), m = SW.meters.filter(function (q) { return q.key === k; })[0] || {}, v = SW.iv || [], on = false;
+if (k === 'humidity') on = e.hasAttribute('data-sw-lin') && v[1] !== null && (v[1] < 30 || v[1] > 60);
+else if (k === 'co2') on = v[2] !== null && v[2] >= 1400;
+else on = m.bad === undefined ? !!(m.zones && m.frac >= m.zones[1]) : m.bad;
+['bg--black', 'text--white', 'rounded--xsmall'].forEach(function (c) { e.classList.toggle(c, on); }); e.classList.toggle('px--1', on); if (on) e.setAttribute('data-sw-lit', ''); else e.removeAttribute('data-sw-lit');
+});
+}
 function swNameFit() {
 var cx = swCv();
 document.querySelectorAll('[data-sw-slab]').forEach(function (e) {
@@ -246,7 +256,7 @@ var SWP = {% assign swp = false %}{% if ph.inn and i_t != nil %}{% assign swp = 
 if (SWP) {
   SW.po = SWP.out;   /* B24: the sensor is outside: its icon is the weather station (mast with cups), nothing else changes */
   SW.sim = SWP.im !== false;   /* B13: false = the outside reading is the main one, the sensor the second */
-  var SWI = [{{ i_t | default: 'null' }}, {{ i_h | default: 'null' }}, {{ i_c | default: 'null' }}];
+  var SWI = SW.iv = [{{ i_t | default: 'null' }}, {{ i_h | default: 'null' }}, {{ i_c | default: 'null' }}];
   var cL = SWI[2] !== null && SWP.mn ? SWP.mn : SWI[0] !== null && SWI[1] !== null && SWP.hn ? SWP.hn : 0;   /* the indoor order (owner 2026-11-14): the list for this reading, key, label, idx and rank */
   if (cL) {
     var cO = SW.meters;
@@ -1132,8 +1142,8 @@ swAlign();
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(swAlign);
 if (window.ResizeObserver) { var ro = new ResizeObserver(function () { swAlign(); }); document.querySelectorAll('[data-sw-unit=""], [data-sw-part="temp"], [data-sw-cond]').forEach(function (q) { ro.observe(q); ro.observe(q.parentElement); }); }
 if (window.MutationObserver) { var mo = new MutationObserver(function () { swAlign(); }); document.querySelectorAll('[data-sw-cond]').forEach(function (q) { mo.observe(q, { attributes: true, childList: true, characterData: true, subtree: true }); }); }
-[200, 800, 2000].forEach(function (ms) { setTimeout(function () { swN = 0; swAlign(); swNameFit(); swUnits(); }, ms);   /* the framework's clamp settles after the first pass */ });
-swNameFit(); swUnits();
+[200, 800, 2000].forEach(function (ms) { setTimeout(function () { swN = 0; swAlign(); swNameFit(); swUnits(); swLit(); }, ms);   /* the framework's clamp settles after the first pass */ });
+swNameFit(); swUnits(); swLit();
 document.body.setAttribute('data-sw-drawn', '1');
 });
 })();

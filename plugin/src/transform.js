@@ -492,6 +492,9 @@ var mm = (k, e) => SCL[k] && RG[k] && RG[k][e] !== null && RG[k][e] !== undefine
 var top = (a) => { a = a.filter((v) => v !== null && v !== undefined); return a.length ? Math.max.apply(null, a) : null; };
 var pk = (k) => k === 'wind' ? (mm(k, 'hi') !== null ? mm(k, 'hi') : bar(n.gust, 0, F_ ? 40 : 60)) : (SCL[k] ? top([RO[k][1], mm(k, 'past'), mm(k, 'later')]) : null);   // the peak: today's max gust (WIND), else the max of past, now and later
 var meters = keys.map((k, i) => ({ key: k, label: RO[k][0], frac: RO[k][1], past: mm(k, 'past'), later: mm(k, 'later'), peak: pk(k), zones: ZONES[k] || null, idx: i, rank: PRI.indexOf(k) < 0 ? PRI.length : PRI.indexOf(k) }));
+// B30 (owner 2026-11-16): a meter in its top (red) zone lights its label. With a margin of 2 % of the scale, as the other flags: it enters at the zone's start + 2 % and leaves at its start - 2 % (saved state pm.bad).
+var pb = pm.bad && typeof pm.bad === 'object' ? pm.bad : {};
+meters.forEach((m) => { if (m.zones && m.frac !== null && m.frac !== undefined) m.bad = flag(m.frac, m.zones[1], 0.02, pb[m.key]); });
 var hm = meters.filter((m) => m.key === 'humidity')[0];
 if (hm && inT !== null && M.inn.hum !== null) hm.tw = { out: O.outdoor, in: O.indoor, m: { frac: bar(M.inn.hum, 0, 100) } };   // owner 2026-11-13: with the indoor sensor the humidity row is a twin meter (indoor in grey)
 var t1 = (v) => { var s = (Math.round(v * 10) / 10).toFixed(1), r = Math.round(v); return s.split('.')[0].length >= 3 ? String(r === 0 ? 0 : r) : s; };   // owner (step 12): no decimal once the whole part has 3+ characters (104°, -12°)
@@ -531,7 +534,8 @@ tdial: { now: tv, twin: inT, lo: tl, hi: th, a: tsc ? tsc.a : 0, b: tsc ? tsc.b 
 };
 if (hrs) { out.hours = hrs.hours; out.hscale = hrs.scale; }
 var tp = TOPS.indexOf(out.cue[0]) >= 0 ? out.cue[0] : (opt && opt.prevCue && opt.prevCue.top) || null;
-out.keep = { cue: { top: tp }, mt: { uv: t.uvMax === null ? pm.uv : uvOn, co2: M.inn.co2 === null ? pm.co2 : co2Up } };   // what the next run remembers (saved state)
+var kb = Object.assign({}, pb); meters.forEach((m) => { if (typeof m.bad === 'boolean') kb[m.key] = m.bad; });
+out.keep = { cue: { top: tp }, mt: { uv: t.uvMax === null ? pm.uv : uvOn, co2: M.inn.co2 === null ? pm.co2 : co2Up, bad: kb } };   // what the next run remembers (saved state)
 return out;
 }
 

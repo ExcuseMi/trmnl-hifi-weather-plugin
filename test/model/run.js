@@ -781,6 +781,24 @@ test('clothing hysteresis (owner 2026-11-13): the top layer stays until 1 C (2 F
   ok(c(5.5, 20, { top: 'tshirt', bn: true, mit: true }).every((k) => k === 'tshirt' || k === 'umbrella'), 'an old saved {bn} or {mit} is accepted and ignored: no beanie, no mittens');
   eq(c(2.5, 8, { top: 'jacket', bn: true, mit: true })[0], 'jacket', 'old flags do not disturb the top layer');
 });
+test('lit meter labels (owner 2026-11-16): a value in the top zone lights its label, 2 % margin like the other flags, outdoor humidity never', () => {
+  const f = fx('mixed'), view = (mut, prevMt) => { const m = SWModel.build(f, {}); m.now.day = true; mut(m); return T.buildView(m, T.buildI18n('en'), f.daily, null, 0.3, { prevMt: prevMt }); };
+  const bad = (v, k) => (v.meters.filter((m) => m.key === k)[0] || {}).bad;
+  eq(bad(view((m) => { m.now.wind = 55; }), 'wind'), true, 'wind 55 km/h (zone starts at 49.8): lit');
+  eq(bad(view((m) => { m.now.wind = 20; }), 'wind'), false, 'wind 20: not lit');
+  eq(bad(view((m) => { m.now.wind = 49.5; }), 'wind'), false, 'wind 49.5, no memory: not lit (below 49.8)');
+  eq(bad(view((m) => { m.now.wind = 49.5; }, { bad: { wind: true } }), 'wind'), true, 'wind 49.5 after a lit reading: stays lit (margin)');
+  eq(bad(view((m) => { m.now.wind = 50.5; }, { bad: { wind: false } }), 'wind'), false, 'wind 50.5 after an unlit reading: not yet lit (needs 51)');
+  eq(bad(view((m) => { m.now.wind = 53; }, { bad: { wind: false } }), 'wind'), true, 'wind 53 after an unlit reading: lit');
+  eq(bad(view((m) => { m.now.wind = 47; }, { bad: { wind: true } }), 'wind'), false, 'wind 47 after a lit reading: off');
+  eq(bad(view((m) => { m.now.aqi = 70; }), 'aqi'), true, 'AQI 70: lit');
+  eq(bad(view((m) => { m.now.aqi = 30; }), 'aqi'), false, 'AQI 30: not lit');
+  eq(bad(view((m) => { m.now.hum = 10; }), 'humidity'), undefined, 'outdoor humidity 10 %: never flagged');
+  eq(bad(view((m) => { m.now.hum = 99; }), 'humidity'), undefined, 'outdoor humidity 99 %: never flagged');
+  eq(view((m) => { m.now.wind = 55; }).keep.mt.bad.wind, true, 'remembered for the next run');
+  const src = fs.readFileSync(path.join(__dirname, '../../plugin/src/shared.liquid'), 'utf8');
+  ok(/function swLit\(\)/.test(src) || /swLit/.test(src) || /label--inverted/.test(src), 'the page lights the label with the Framework class label--inverted');
+});
 test('meter flags with a margin (owner 2026-11-13): UV from today\'s max 3 (+/-0.5), high CO2 first past 1400 (+/-50)', () => {
   const f = fx('mixed'), view = (uvMax, co2, prevMt) => { const m = SWModel.build(f, {}); m.now.day = true; m.today.uvMax = uvMax; m.now.uv = 1; m.inn.co2 = co2; return T.buildView(m, T.buildI18n('en'), f.daily, null, 0.3, { prevMt: prevMt }); };
   const keys = (v) => v.meters.map((m) => m.key);

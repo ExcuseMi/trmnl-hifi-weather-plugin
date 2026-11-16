@@ -1,0 +1,467 @@
+[
+ {
+  "name": "b30-x-sens",
+  "device": "v2",
+  "view": "full",
+  "locale": "en-US",
+  "vars": {
+   "sensor_readings": {
+    "device_1": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 21.6
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 25
+      }
+     ],
+     "pressure": [],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 1500
+      }
+     ]
+    }
+   }
+  },
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days"
+  },
+  "co2": "yes",
+  "want_lit": [
+   "co2",
+   "humidity"
+  ]
+ },
+ {
+  "name": "b30-x-aqi",
+  "device": "v2",
+  "view": "full",
+  "locale": "en-US",
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days"
+  },
+  "aq": {
+   "current": {
+    "time": "2026-11-12T06:00",
+    "european_aqi": 70
+   }
+  },
+  "want_lit": [
+   "aqi"
+  ]
+ },
+ {
+  "name": "b30-x-ok",
+  "device": "v2",
+  "view": "full",
+  "locale": "en-US",
+  "vars": {
+   "sensor_readings": {
+    "device_1": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 21.6
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 48
+      }
+     ],
+     "pressure": [],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 600
+      }
+     ]
+    }
+   }
+  },
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days"
+  },
+  "co2": "yes",
+  "want_lit": []
+ },
+ {
+  "name": "b30-x-dark-sens",
+  "device": "v2",
+  "view": "full",
+  "locale": "en-US",
+  "vars": {
+   "sensor_readings": {
+    "device_1": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 21.6
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 25
+      }
+     ],
+     "pressure": [],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 1500
+      }
+     ]
+    }
+   }
+  },
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days"
+  },
+  "co2": "yes",
+  "dark": true,
+  "want_lit": [
+   "co2",
+   "humidity"
+  ]
+ },
+ {
+  "name": "b30-x-dark-aqi",
+  "device": "v2",
+  "view": "full",
+  "locale": "en-US",
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days"
+  },
+  "dark": true,
+  "aq": {
+   "current": {
+    "time": "2026-11-12T06:00",
+    "european_aqi": 70
+   }
+  },
+  "want_lit": [
+   "aqi"
+  ]
+ },
+ {
+  "name": "b30-x-dark-ok",
+  "device": "v2",
+  "view": "full",
+  "locale": "en-US",
+  "vars": {
+   "sensor_readings": {
+    "device_1": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 21.6
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 48
+      }
+     ],
+     "pressure": [],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 600
+      }
+     ]
+    }
+   }
+  },
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days"
+  },
+  "co2": "yes",
+  "dark": true,
+  "want_lit": []
+ },
+ {
+  "name": "b30-og-sens",
+  "device": "og_plus",
+  "view": "full",
+  "locale": "en-US",
+  "vars": {
+   "sensor_readings": {
+    "device_1": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 21.6
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 25
+      }
+     ],
+     "pressure": [],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 1500
+      }
+     ]
+    }
+   }
+  },
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days"
+  },
+  "palette": "gray-4",
+  "co2": "yes",
+  "want_lit": [
+   "co2",
+   "humidity"
+  ]
+ },
+ {
+  "name": "b30-og-aqi",
+  "device": "og_plus",
+  "view": "full",
+  "locale": "en-US",
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days"
+  },
+  "palette": "gray-4",
+  "aq": {
+   "current": {
+    "time": "2026-11-12T06:00",
+    "european_aqi": 70
+   }
+  },
+  "want_lit": [
+   "aqi"
+  ]
+ },
+ {
+  "name": "b30-og-ok",
+  "device": "og_plus",
+  "view": "full",
+  "locale": "en-US",
+  "vars": {
+   "sensor_readings": {
+    "device_1": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 21.6
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 48
+      }
+     ],
+     "pressure": [],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 600
+      }
+     ]
+    }
+   }
+  },
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days"
+  },
+  "palette": "gray-4",
+  "co2": "yes",
+  "want_lit": []
+ },
+ {
+  "name": "b30-og-dark-sens",
+  "device": "og_plus",
+  "view": "full",
+  "locale": "en-US",
+  "vars": {
+   "sensor_readings": {
+    "device_1": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 21.6
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 25
+      }
+     ],
+     "pressure": [],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 1500
+      }
+     ]
+    }
+   }
+  },
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days"
+  },
+  "palette": "gray-4",
+  "co2": "yes",
+  "dark": true,
+  "want_lit": [
+   "co2",
+   "humidity"
+  ]
+ },
+ {
+  "name": "b30-og-dark-aqi",
+  "device": "og_plus",
+  "view": "full",
+  "locale": "en-US",
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days"
+  },
+  "palette": "gray-4",
+  "dark": true,
+  "aq": {
+   "current": {
+    "time": "2026-11-12T06:00",
+    "european_aqi": 70
+   }
+  },
+  "want_lit": [
+   "aqi"
+  ]
+ },
+ {
+  "name": "b30-og-dark-ok",
+  "device": "og_plus",
+  "view": "full",
+  "locale": "en-US",
+  "vars": {
+   "sensor_readings": {
+    "device_1": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 21.6
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 48
+      }
+     ],
+     "pressure": [],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 600
+      }
+     ]
+    }
+   }
+  },
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days"
+  },
+  "palette": "gray-4",
+  "co2": "yes",
+  "dark": true,
+  "want_lit": []
+ },
+ {
+  "name": "b30-og1-sens",
+  "device": "og_png",
+  "view": "full",
+  "locale": "en-US",
+  "vars": {
+   "sensor_readings": {
+    "device_1": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 21.6
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 25
+      }
+     ],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 1500
+      }
+     ],
+     "pressure": []
+    }
+   }
+  },
+  "palette": "bw",
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days"
+  },
+  "co2": "yes",
+  "want_lit": [
+   "co2",
+   "humidity"
+  ]
+ },
+ {
+  "name": "b30-og1-aqi",
+  "device": "og_png",
+  "view": "full",
+  "locale": "en-US",
+  "palette": "bw",
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days"
+  },
+  "aq": {
+   "current": {
+    "time": "2026-11-12T06:00",
+    "european_aqi": 70
+   }
+  },
+  "want_lit": [
+   "aqi"
+  ]
+ },
+ {
+  "name": "b30-og1-ok",
+  "device": "og_png",
+  "view": "full",
+  "locale": "en-US",
+  "vars": {
+   "sensor_readings": {
+    "device_1": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 21.6
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 48
+      }
+     ],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 600
+      }
+     ],
+     "pressure": []
+    }
+   }
+  },
+  "palette": "bw",
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days"
+  },
+  "co2": "yes",
+  "want_lit": []
+ }
+]
