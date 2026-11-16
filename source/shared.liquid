@@ -187,7 +187,7 @@
 {%- unless sw_hide == 'true' or sw_hide == 'yes' or view != 1 %}
 <div class="title_bar">
  <img class="{{ iia }} w--[28px] h--[28px]" src="data:image/svg+xml;base64,{{ sw_icon | base64_encode }}" alt="">
- {%- assign sw_name = trmnl.plugin_settings.instance_name %}{% if sw_name == blank or sw_name == 'Radio Weather' %}{% assign sw_name = i18n.ours.app | default: 'Radio Weather' %}{% endif %}{% comment %} owner 2026-11-13 {% endcomment %}
+ {%- assign sw_name = trmnl.plugin_settings.instance_name %}{% if sw_name == blank or sw_name == 'Hi-Fi Weather' or sw_name == 'Radio Weather' %}{% assign sw_name = i18n.ours.app | default: 'Hi-Fi Weather' %}{% endif %}{% comment %} owner 2026-11-13 {% endcomment %}
  <span class="title">{{ sw_name }}</span>
  {%- if ui.stale %}<span class="instance flex flex--row flex--center-y gap--xsmall"><img class="{{ iia }} w--[20px] h--[20px]" src="data:image/svg+xml;base64,{{ sw_stale_icon | base64_encode }}" alt=""><span data-sw-stale>{{ ui.stale }}</span></span>{% elsif clock != blank %}<span class="instance">Open-Meteo · {{ clock }}</span>{% endif %}{% comment %} offline (saved copy): when the {% endcomment %}
 </div>
@@ -224,6 +224,7 @@ function swNameFit() {
 var cx = swCv();
 document.querySelectorAll('[data-sw-slab]').forEach(function (e) {
 var b = e.getBoundingClientRect(); if (!b.width || !b.height) return;
+if (e.parentElement.hasAttribute('data-sw-lw')) { var fs0 = e.style.fontSize, wa = e.parentElement.clientWidth; if (fs0 && wa > 0) { cx.font = getComputedStyle(e).fontWeight + ' ' + parseFloat(fs0) + 'px ' + getComputedStyle(e).fontFamily; var tw0 = cx.measureText(e.getAttribute('data-clamp-original') || e.textContent).width; if (tw0 > wa) { e.style.fontSize = (Math.max(0.6 * parseFloat(fs0), 0.98 * wa / tw0 * parseFloat(fs0))).toFixed(2) + 'px'; b = e.getBoundingClientRect(); } } }   /* B31: the narrower digits (smaller tenths) leave the sensor label less room: it shrinks to fit, never under 0.6 of its size; the Framework clamp is the last resort */
 var wr = e.parentElement.hasAttribute('data-sw-lw') ? e.parentElement : e, ic = wr.previousElementSibling, ib = ic && ic.getBoundingClientRect(), ip = ic && ic.querySelector('path'); if (!ib || !ib.height || !ip) return;
 e.style.transform = ''; e.style.color = getComputedStyle(ip).color;
 var n = e.querySelector('text') || e, cs = getComputedStyle(n), kk = (e.offsetWidth && e.getBoundingClientRect().width / e.offsetWidth) || 1, ik = ((ic.querySelector('[data-sw-ink]') || ic).getAttribute('data-sw-ink') || '0,1').split(',').map(Number), rr = document.createRange();
@@ -369,7 +370,7 @@ if (ch === '-' && !i && al) { body += '<g data-sw-glyph="-">' + poly(shapes(x - 
 if (ch === '-' && !i) { var d1 = GLYPH[str.charAt(1)] || '', cs = idg < 2 && !tr ? W + G : 46 + G * 0.3; body += '<g data-sw-glyph="-">' + poly(shapes(cs + (/[fe]/.test(d1) ? 0 : (/[adg]/.test(d1) ? T / 2 + 2 : W - T)) - G * 0.3 - 46 + T / 2 + 2, 46, HH, T).g) + '</g>'; x = cs; continue; }
 if (ch === '.') { post = true; body += rect(x - G + 3, HH - T, T, T); x += 20 - G; continue; }
 if (ch === '°') { post = false; body += '<circle cx="' + (x + 9 + (al ? al.dr || 0 : 0)) + '" cy="10" r="7" fill="none" ' + SK + '5"/>'; x += 22 + G; continue; }
-if (tr && !al && ch === '1' && !post && !lead && !/\d/.test(str.slice(0, i))) lead = x + W - T;   /* tr: a leading 1 has its ink on the right of its cell, the empty left part is cut so the visible digits can be centred */
+if (tr && !al && ch === '1' && !i) lead = x + W - T;   /* tr: a leading 1 has its ink on the right of its cell, the empty left part is cut so the visible digits can be centred */
 var kk = post ? DK : 1, w = (ch === '-' ? 46 : W) * kk, on = GLYPH[ch] || '', sh = shapes(x, w, HH * kk, T * kk), gb = '';
 'abcdefg'.split('').forEach((s) => { if (on.indexOf(s) >= 0) gb += poly(sh[s]); });
 body += '<g data-sw-glyph="' + ch + '"' + (post ? ' data-sw-dec transform="translate(0 ' + n1(HH * (1 - DK)) + ')"' : '') + '>' + gb + '</g>';
@@ -501,8 +502,8 @@ var n = 2;
 return { n: n };
 }
 function wdl(SW, W, H) {   /* the Digital layout: one box for every value (wal), the high digits' height from its width, the low ones 0.6 of it; xr = the right edge of the ones cell, one x for the high and the low row; shared by the column and the captions */
-var al = wal(SW), vw = al.n * 70 + 22, h1 = Math.min(H * 0.5, W * 0.8 * 100 / vw), h2 = h1 * 0.6, y1 = (H - h1 * 1.78) / 2;
-return { h1: h1, h2: h2, y1: y1, y2: y1 + h1 * 1.18, al: al, xr: W / 2 + ((al.n - 1) * 70 + 56 - vw / 2) * h1 / 100 };
+var al = wal(SW), vw = al.n * 70 + 22, h1 = Math.min(H * 0.5, W * 0.8 * 100 / vw), h2 = h1 * 0.6, fr = H - h1 * 1.78, sp = fr > 0.45 * h1, y1 = sp ? fr * 0.3 : fr / 2;   /* tall and narrow column: the spare height is shared above, between and below the two rows (no big empty band) */
+return { h1: h1, h2: h2, y1: y1, y2: y1 + h1 * 1.18 + (sp ? fr * 0.4 : 0), al: al, xr: W / 2 + ((al.n - 1) * 70 + 56 - vw / 2) * h1 / 100 };
 }
 function wdig(s, h, L, y, lo) { var n = L.al.n, v = digits(s, h, 0, lo ? { n: n, dr: 13.5 * (L.h1 / L.h2 - 1) } : L.al); v = v.replace('<svg ', '<svg x="' + n1(L.xr - ((n - 1) * 70 + 56) * h / 100) + '" y="' + n1(y) + '" '); return lo ? g(blk(true), v) : v; }   /* the low row: ones cell right edge and degree sign left edge on the high row's */
 function digcol(SW, i, W, H) {
@@ -811,7 +812,7 @@ var g = Math.max(4, 0.07 * D), fsC = SWR * D, ic = ico ? 2.3 * CK * fsC / IH : 0
 var ln = wrap(fsC, av), cw = Math.max.apply(null, ln.map(function (l) { return mw(l, fsC); }));
 var r = { D: D, g: g, fsC: fsC, ic: ic, ln: ln, ok: ln.length <= 2 && cw <= av };
 r.condH = Math.max(ic * IH, ln.length * 1.15 * fsC); r.condW = ic + (ico ? gc : 0) + cw;
-r.fsU = 0.3 * D; r.uW = mw(SW.unit || '', r.fsU) + 2; r.gU = 0.05 * D; r.lI = sl ? 0.42 * D : 0; r.lbW = slT ? Math.min(mw(slT, 0.58 * r.lI) + 5, 5 * r.lI) : 0; r.tW = (sl ? r.lI + 1.5 * r.gU : 0) + (slT ? r.lbW + r.gU : 0) + at * D + r.gU + r.uW;
+r.fsU = 0.3 * D; r.uW = mw(SW.unit || '', r.fsU) + 2; r.gU = 0.05 * D; r.lI = sl ? 0.42 * D : 0; r.lbW = slT ? Math.min(mw(slT, 0.58 * r.lI) * 1.04 + 5, 5 * r.lI) : 0;   /* 4 % spare: the canvas measure and the drawn text differ by a pixel or two (B31: a narrower main number made the fit tight) */ r.tW = (sl ? r.lI + 1.5 * r.gU : 0) + (slT ? r.lbW + r.gU : 0) + at * D + r.gU + r.uW;
 var it = [];
 if (so) { r.oD = osz * D; r.oI = Math.min(0.42 * D, 0.8 * r.oD); r.ofU = 0.3 * r.oD; r.ouW = mw(SW.unit || '', r.ofU) + 2; it.push([r.oI + (scue ? 1.6 * r.oI + 0.1 * r.oD : 0) + 0.3 * r.oD + ao * r.oD + 0.05 * r.oD + r.ouW, r.oD]); }
 if (cue) { r.cueH = 0.55 * D; it.push([1.6 * r.cueH, r.cueH]); }
@@ -825,7 +826,8 @@ var tH = r.condH + g + mH + n * (r.mh + g), tW = Math.max(r.condW, mW, n ? mlw *
 r.tH = tH; r.fit = r.ok && tH <= H && tW <= W; r.mainRow = mainRow; r.sideCol = sideCol;
 return r;
 }
-function best(n) { var b = null; [[true, true], [false, true], [false, false], [true, false]].forEach(function (m) { var lo = 8, hi = H, r = null; for (var i = 0; i < 18; i++) { var mid = (lo + hi) / 2, x = geo(mid, m[0], m[1], n); if (x.fit) { lo = mid; r = x; } else hi = mid; } if (r && (!b || r.D > b.D + 0.5 || (tallQ && r.D > b.D - 0.5 && r.tH > b.tH + 1))) b = r; }); return b && n && b.fsM < 11 ? null : b; }
+var KB = 1.5;
+function best(n) { var b = null; [[true, true], [false, true], [false, false], [true, false]].forEach(function (m) { var lo = 8, hi = H, r = null; for (var i = 0; i < 18; i++) { var mid = (lo + hi) / 2, x = geo(mid, m[0], m[1], n); if (x.fit) { lo = mid; r = x; } else hi = mid; } if (r) { r.kb = m[0] ? 1 : KB; if (!b || r.D * r.kb > b.D * b.kb + 0.5 || (tallQ && r.D > b.D - 0.5 && r.tH > b.tH + 1)) b = r; } });   /* B31: the narrower main number (its empty cell is cut) must not flip a stacked layout to a side-by-side one: stacked wins unless side-by-side gives KB times the digit height */ return b && n && b.fsM < 11 ? null : b; }
 var R = best(0);
 // The outdoor readout (with an indoor reading) stays only while it costs the indoor temperature under 15 %.
 if (so) { so = null; var Ro = best(0); so = soE; R = null; [1, 0.7, 0.5, 0.35, 0.22].some(function (f) { osz = f; R = best(0); return R && Ro && R.D >= 0.85 * Ro.D; }); if (!R) { R = Ro; so = null; } }   /* owner 2026-11-14: the outdoor readout never goes, it shrinks to fit */
