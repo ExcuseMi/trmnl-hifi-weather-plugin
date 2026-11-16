@@ -505,7 +505,7 @@ function wdl(SW, W, H) {   /* the Digital layout: one box for every value (wal),
 var al = wal(SW), vw = al.n * 70 + 22, h1 = Math.min(H * 0.5, W * 0.8 * 100 / vw), h2 = h1 * 0.6, y1 = (H - h1 * 1.78) / 2;
 return { h1: h1, h2: h2, y1: y1, y2: y1 + h1 * 1.18, al: al, xr: W / 2 + ((al.n - 1) * 70 + 56 - vw / 2) * h1 / 100 };
 }
-function wdig(s, h, L, y, lo) { var n = L.al.n, v = digits(s, h, 0, lo ? { n: n, dr: 13.5 * (L.h1 / L.h2 - 1) } : L.al); v = v.replace('<svg ', '<svg x="' + n1(L.xr - ((n - 1) * 70 + 56) * h / 100) + '" y="' + n1(y) + '" '); return lo ? g(mid(), v) : v; }   /* the low row: ones cell right edge and degree sign left edge on the high row's */
+function wdig(s, h, L, y, lo) { var n = L.al.n, v = digits(s, h, 0, lo ? { n: n, dr: 13.5 * (L.h1 / L.h2 - 1) } : L.al); v = v.replace('<svg ', '<svg x="' + n1(L.xr - ((n - 1) * 70 + 56) * h / 100) + '" y="' + n1(y) + '" '); return lo ? g(blk(true), v) : v; }   /* the low row: ones cell right edge and degree sign left edge on the high row's */
 function digcol(SW, i, W, H) {
 var d = SW.days[i] || {}, L = wdl(SW, W, H), body = i ? g('text--gray-40', '<line x1="1" x2="1" y1="' + n1(Math.max(0, L.y1 - L.h1 * 0.2)) + '" y2="' + n1(Math.min(H, L.y2 + L.h2 * 1.2)) + '" ' + SK + '3" stroke-dasharray="3 7"/>') : '';
 if (d.hiV !== null && d.hiV !== undefined) body += wdig(d.hi, L.h1, L, L.y1) + wdig(d.lo, L.h2, L, L.y2, 1);
@@ -513,7 +513,7 @@ return svg(W, H, body);
 }
 function diglab(SW, W, H) {
 var L = wdl(SW, API.wcw || W, H), fs = Math.max(8, Math.min(L.h2 * 0.5, W * 0.45)), mk = (t, y, c) => c ? g(c, text(W / 2, y, t, fs, 'middle', 'central')) : text(W / 2, y, t, fs, 'middle', 'central');
-return svg(W, H, mk('HI', L.y1 + L.h1 / 2) + mk('LO', L.y2 + L.h2 / 2, mid()));
+return svg(W, H, mk('HI', L.y1 + L.h1 / 2) + mk('LO', L.y2 + L.h2 / 2, blk(true)));   /* the low row and its caption as dark as the range: darkest grey on 4-bit, black on 2-bit and 1-bit */
 }
 function rain(hours, W, H, rows) {
 var C = 3, fit = (r) => Math.abs(Math.log((W / C) / (H / r) / 1.3)), R = rows === 2 ? 2 : (rows === 3 || fit(3) < fit(2)) && (W / C) / (H / 3) <= 1.95 && Math.min(H / 3 * 0.9, W / C * 0.7) >= (API.lp || 0) ? 3 : 2, cw = W / C, rh = H / R, fs = Math.min(rh * 0.9, cw * 0.7), body = '';
