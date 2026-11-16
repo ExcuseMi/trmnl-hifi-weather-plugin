@@ -901,6 +901,19 @@ for(var i=1;i<gl.length;i++){var a=gl[i-1].getBoundingClientRect(),b=gl[i].getBo
 if(gp>30)bad.push(gl[i-1].getAttribute('data-sw-glyph')+gl[i].getAttribute('data-sw-glyph')+' gap '+gp.toFixed(0));}});return bad.join('; ');})()})
       puts "DIGITGAP #{c['name']}: #{sp}" unless sp.empty?
       expect(sp).to eq('')
+      # Sun times in page digits (owner 2026-11-16, "07:2 1" and a leading space in "16:35"): a 1 takes a narrow cell (its own ink), so no
+      # ink gap between neighbouring digits is over 30 of the 100-unit height (the colon between allowed), the first digit starts at the
+      # edge of the widest time, and both times end on one right edge.
+      su = s.evaluate(%q{(function(){var bad=[],vs=[].filter.call(document.querySelectorAll('[data-sw-suntime] svg'),function(v){return v.getBoundingClientRect().width>0}),R=[],Lf=[];
+vs.forEach(function(v){var r=v.getBoundingClientRect(),k=100/r.height,gl=[].filter.call(v.querySelectorAll('g[data-sw-glyph]'),function(g){return /[0-9]/.test(g.getAttribute('data-sw-glyph'))}),b=gl.map(function(g){return g.getBoundingClientRect()}),cl=[].map.call(v.querySelectorAll(':scope > rect, :scope > g > rect'),function(q){return q.getBoundingClientRect()}).filter(function(q){return q.width>0});
+if(!gl.length)return;gl.forEach(function(g,i){if(g.getAttribute('data-sw-glyph')==='1'&&b[i].width*k>30)bad.push('wide 1 ('+(b[i].width*k).toFixed(0)+')')});
+for(var i=1;i<gl.length;i++){var gp=(b[i].left-b[i-1].right)*k,col=cl.some(function(q){return q.left>=b[i-1].right-1&&q.right<=b[i].left+1});if(!col&&gp>30)bad.push(gl[i-1].getAttribute('data-sw-glyph')+gl[i].getAttribute('data-sw-glyph')+' gap '+gp.toFixed(0));}
+R.push(b[b.length-1].right);Lf.push([b[0].left-r.left,r.width,k]);});
+if(R.length>1&&Math.max.apply(null,R)-Math.min.apply(null,R)>1.5)bad.push('right edges differ '+(Math.max.apply(null,R)-Math.min.apply(null,R)).toFixed(1));
+if(Lf.length&&Math.min.apply(null,Lf.map(function(q){return q[0]*q[2]}))>3)bad.push('leading space '+Math.min.apply(null,Lf.map(function(q){return q[0]*q[2]})).toFixed(0));
+return bad.slice(0,4).join('; ')})()})
+      puts "SUNTIGHT #{c['name']}: #{su}" unless su.empty?
+      expect(su).to eq('')
       # Dial trend arrows (owner 2026-11-13): one trend-line arrow per dial trending up or down (with a sensor the temperature dial's value and arrow are indoor, owner 2026-11-14; barometer from 3 h ago,
       # temperature +3 h), matching the direction, none when level, in front of the value on its line (owner 2026-11-13; was top right, then behind the unit), its 28-unit box about 1.5 x the name caption's cap height.
       # Owner 2026-11-14 (B12, option a): the temperature dial's stacked outdoor readout (right edges level with the indoor value) is for

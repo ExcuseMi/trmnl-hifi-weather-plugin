@@ -26,6 +26,8 @@ muts=[
  ('HZERO-noline','source/shared.liquid',"if (!G.below || !API.hbarW) return svg(W, H, '');","return svg(W, H, '');",['b31-x-hours-neg']),
  ('HZERO-broken','source/shared.liquid',"<line data-sw-hzline x1=","<line data-sw-hzline stroke-dasharray=\"300 12\" x1=",['b31-x-hours-neg']),
  ('HZERO-label','source/shared.liquid',": G.y0 - G.e - gp / 2;   /* a value below 0",": G.y0 + 3 + fs * 0.36 + 0 * gp;   /* a value below 0",['b31-x-hours-neg']),
+ ('SUNTIGHT-wide1','source/shared.liquid',"nar = c === '1',","nar = false,",['b31-x-hours-neg','b31-x-sun-ones']),
+ ('SUNTIGHT-pad','source/shared.liquid',"pw = Math.max(vw, minW || 0);","pw = vw;",['b31-x-sun-ones','b31-og-sun-ones']),
 ]
 which=sys.argv[1:]
 for name,f,old,new,cs in muts:
@@ -40,7 +42,7 @@ for name,f,old,new,cs in muts:
     shutil.copy(B+'redbak.tmp',R+f)
     subprocess.run(['node','tools/build.js'],cwd=R,capture_output=True)
     out=r.stdout
-    keys=sorted(set(re.findall(r'^(WEEK[A-Z]+|HZERO|HCURVE|HOURS) ',out,re.M)))
+    keys=sorted(set(re.findall(r'^(WEEK[A-Z]+|HZERO|HCURVE|HOURS|SUNTIGHT) ',out,re.M)))
     summ=re.findall(r'\d+ examples, \d+ failures?',out)
-    lines=[l[:200] for l in out.split('\n') if l.startswith(('WEEK','HZERO','HCURVE'))][:3]
+    lines=[l[:200] for l in out.split('\n') if l.startswith(('WEEK','HZERO','HCURVE','SUNTIGHT'))][:3]
     print(name,'->',keys,summ,lines,flush=True)
