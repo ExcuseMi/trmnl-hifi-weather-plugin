@@ -33,6 +33,7 @@ muts=[
  ('ROWGAP-pad','source/shared.liquid',"Math.max(3 / k, 0.15 * b.offsetHeight)","Math.max(3 / k, 0.01 * b.offsetHeight)",['b31-og1-port-full-rain']),
  ('ROWONES','source/shared.liquid',"gp = 0.4 * h1, x0 = 0, y1 = (H - h1) / 2, hi, lo;","gp = 0.4 * h1, x0 = i * 3, y1 = (H - h1) / 2, hi, lo;",['b31-og1-port-full-dry']),
  ('ROWSYM','source/shared.liquid',"inn.style.setProperty('padding-bottom', pd, 'important')","inn.style.setProperty('padding-bottom', '0px', 'important')",['b31-og1-port-full-rain','b31-x-port-full-dig']),
+ ('DIALSENS','source/shared.liquid',"for (var tk = 0; tk < 3 && (Math.ceil(Math.max(...iq)","for (var tk = 0; tk < 0 && (Math.ceil(Math.max(...iq)",['b31-x-f-sens-cold']),
 ]
 which=sys.argv[1:]
 for name,f,old,new,cs in muts:
@@ -47,7 +48,7 @@ for name,f,old,new,cs in muts:
     shutil.copy(B+'redbak.tmp',R+f)
     subprocess.run(['node','tools/build.js'],cwd=R,capture_output=True)
     out=r.stdout
-    keys=sorted(set(re.findall(r'^(WEEK[A-Z]+|HZERO|HCURVE|HOURS|SUNTIGHT|ROWGAP|ROWBAND|ROWONES) ',out,re.M)))
+    keys=sorted(set(re.findall(r'^(WEEK[A-Z]+|HZERO|HCURVE|HOURS|SUNTIGHT|ROWGAP|ROWBAND|ROWONES|ARC|DIGITROW) ',out,re.M)))
     summ=re.findall(r'\d+ examples, \d+ failures?',out)
-    lines=[l[:200] for l in out.split('\n') if l.startswith(('WEEK','HZERO','HCURVE','SUNTIGHT','ROWGAP','ROWBAND','ROWONES'))][:3]
+    lines=[l[:200] for l in out.split('\n') if l.startswith(('WEEK','HZERO','HCURVE','SUNTIGHT','ROWGAP','ROWBAND','ROWONES','ARC','DIGITROW'))][:3]
     print(name,'->',keys,summ,lines,flush=True)
