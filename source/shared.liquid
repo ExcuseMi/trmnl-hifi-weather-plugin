@@ -953,11 +953,17 @@ var k = (cap.offsetWidth && cap.getBoundingClientRect().width / cap.offsetWidth)
 if (Math.abs(dl) > 0.2) cap.style.bottom = px(parseFloat(getComputedStyle(cap).bottom) - dl / k, 2);
 });
 }
+/* B31: the week's columns and day names sit on whole device pixels (1-bit: a name at a fractional x rendered heavier or lighter than its neighbours, TUE at x 297.55) */
+function swSnap() {
+var es = document.querySelectorAll('[data-sw-wcol] > div, [data-sw-dname], [data-sw-today]');
+es.forEach(function (e) { e.style.transform = ''; });
+es.forEach(function (e) { var g = document.createRange(), b; g.selectNodeContents(e); b = g.getBoundingClientRect(); var k = (e.offsetWidth && e.getBoundingClientRect().width / e.offsetWidth) || 1, dx = (Math.round(b.left) - b.left) / k; if (b.width && Math.abs(dx) > 0.001) e.style.transform = 'translateX(' + dx.toFixed(3) + 'px)'; });   /* the text's own left edge (a name is centred in a box a fraction wider than its text), not the box's */
+}
 var swN = 0;
 function swAlign() {
 if (++swN > 60) return;
 var cx = swCv();
-swSmall(cx); swSeg(cx); swCond(cx); swFit(); swBadge(cx); swFit(); swBadge(cx);
+swSmall(cx); swSeg(cx); swCond(cx); swFit(); swBadge(cx); swFit(); swBadge(cx); swSnap();
 }
 // The OG portrait layouts serve every portrait screen below lg: md and sm (Kindle 2024, B12)
 function swOGPortrait() {
