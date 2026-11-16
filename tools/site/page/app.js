@@ -27,7 +27,7 @@
   // ---- state
   var S = {
     source: 'live', city: V.city, device: 'og', view: 'full', language: V.language, dark: false, hw: 'none',
-    f: { unit: V.us ? 'fahrenheit' : 'celsius', time_format: V.us ? '12' : '24', bottom: 'auto', bottom_switch: '18', sensor_icon: 'house', hide_title_bar: 'false', sensor_show: 'show', sensor_label: '', sensor_primary: 'auto' }
+    f: { unit: V.us ? 'fahrenheit' : 'celsius', time_format: V.us ? '12' : '24', bottom: 'auto', bottom_switch: '18', sensor_icon: 'house', hide_title_bar: 'false', week_style: 'auto', show_wear: 'true', sensor_show: 'show', sensor_label: '', sensor_primary: 'auto' }
   };
   var scenarios = [], engine = null, token = 0, lastUrl = null, timer = 0, liveCache = {};
 
@@ -46,7 +46,7 @@
     });
     [].forEach.call($('device').children, function (b) { b.setAttribute('aria-pressed', String(b.dataset.v === S.device)); });
     $('view').value = S.view; $('lang').value = S.language; $('dark').checked = S.dark; $('hw').value = S.hw;
-    $('bottom').value = S.f.bottom; $('bottom_switch').value = S.f.bottom_switch; $('bottom_switch').disabled = S.f.bottom !== 'auto'; $('sensor_icon').value = S.f.sensor_icon; $('hide_title_bar').checked = S.f.hide_title_bar === 'true';
+    $('bottom').value = S.f.bottom; $('bottom_switch').value = S.f.bottom_switch; $('bottom_switch').disabled = S.f.bottom !== 'auto'; $('sensor_icon').value = S.f.sensor_icon; $('hide_title_bar').checked = S.f.hide_title_bar === 'true'; $('week_style').value = S.f.week_style; $('show_wear').checked = S.f.show_wear !== 'false';
     $('sensor_label').value = S.f.sensor_label; $('sensor_primary').value = S.f.sensor_primary;
     $('loc').value = S.city; $('loc').disabled = S.source !== 'live';
     [].forEach.call($('chips').children, function (b) { b.setAttribute('aria-pressed', String(b.dataset.id === S.source)); });
@@ -86,6 +86,8 @@
     bind('bottom_switch', function (e) { S.f.bottom_switch = e.value; });
     bind('sensor_icon', function (e) { S.f.sensor_icon = e.value; });
     bind('hide_title_bar', function (e) { S.f.hide_title_bar = e.checked ? 'true' : 'false'; });
+    bind('week_style', function (e) { S.f.week_style = e.value; });
+    bind('show_wear', function (e) { S.f.show_wear = e.checked ? 'true' : 'false'; });
     bind('hw', function (e) { S.hw = e.value; });
     bind('sensor_primary', function (e) { S.f.sensor_primary = e.value; });
     bind('sensor_label', function (e) { S.f.sensor_label = e.value; }, 'input');
@@ -138,7 +140,7 @@
   }
 
   function settingsFor(lat, lon) {
-    var f = S.f, s = { lat_lon: lat + ',' + lon, unit: f.unit, time_format: f.time_format, bottom: f.bottom, bottom_switch: f.bottom_switch, sensor_icon: f.sensor_icon, hide_title_bar: f.hide_title_bar,
+    var f = S.f, s = { lat_lon: lat + ',' + lon, unit: f.unit, time_format: f.time_format, bottom: f.bottom, bottom_switch: f.bottom_switch, sensor_icon: f.sensor_icon, hide_title_bar: f.hide_title_bar, week_style: f.week_style, show_wear: f.show_wear,
       sensor_source: f.sensor_show === 'hide' ? 'none' : (S.hw === 'other' ? 'other' : 'own'), sensor_label: f.sensor_label, sensor_primary: f.sensor_primary, sensor_device_id: S.hw === 'other' ? '2' : '' };
     return s;
   }

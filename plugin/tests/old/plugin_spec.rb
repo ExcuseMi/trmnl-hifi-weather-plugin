@@ -6,7 +6,7 @@ require 'yaml'
 
 # `trmnlp test` (add `--report report` for a page of every screen drawn). The hybrid receiver: two needle
 # meters, the smoked-glass display, the day keys.
-RSpec.describe 'Stereo Weather' do
+RSpec.describe 'Hi-Fi Weather' do
   FIXTURES = File.join(__dir__, 'fixtures')
   VIEWS = %w[full half_horizontal half_vertical quadrant].freeze
   def self.fixture(name) = JSON.parse(File.read(File.join(FIXTURES, "#{name}.json")))

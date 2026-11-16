@@ -139,7 +139,14 @@ test('time format: the setting decides, 24 h when missing, the TIME constant ove
   eq(keys.filter((k) => OLD.includes(k)), OLD, 'B22: the live setting keys that stay (label, main reading) keep their name and order; sensor_show is merged into sensor_source and sensor_co2 is removed (owner 2026-11-15: the CO2 meter follows the source) (owner 2026-11-15)');
   eq(fields.filter((f) => OLD.includes(f.key)).map((f) => f.group), [null, null, 'Display', 'Display', 'Display', 'Display', 'Display', GRP, GRP, 'Legend'], 'settings groups (the legend is the last, collapsed group)');
   ok(!keys.includes('sensor_show'), 'sensor_show is gone: "None" in the Sensor select is the hide');
-  ok(fields.filter((f) => !OLD.includes(f.key)).every((f) => f.group === GRP && /^sensor_/.test(f.key)), 'B22: the new source settings are all in the Sensor group');
+  const B31 = ['week_style', 'show_wear'];
+  ok(fields.filter((f) => !OLD.includes(f.key) && !B31.includes(f.key)).every((f) => f.group === GRP && /^sensor_/.test(f.key)), 'B22: the new source settings are all in the Sensor group');
+  eq(fields.filter((f) => B31.includes(f.key)).map((f) => [f.key, f.group]), [['week_style', 'Display'], ['show_wear', 'Display']], 'B31: the week display and what-to-wear settings are new fields in the Display group');
+  ok(keys.indexOf('week_style') === keys.indexOf('hide_title_bar') + 1 && keys.indexOf('show_wear') === keys.indexOf('week_style') + 1, 'B31: both sit right after hide_title_bar, no existing key moved');
+  const ws = y.split(/^- keyname: week_style/m)[1].split(/^- keyname: /m)[0];
+  ok(/options:\n  - Auto: auto\n  - EQ sliders: eq\n  - Digital: digital\n  default: auto\n/.test(ws), 'B31: week_style options auto, eq, digital (the existing values eq and digital unchanged), default Auto');
+  ok(/default: true/.test(y.split(/^- keyname: show_wear/m)[1].split(/^- keyname: /m)[0]), 'B31: show_wear is a boolean, default on');
+  ['name', 'name-de', 'name-fr', 'name-es-ES', 'name-nl', 'name-ja', 'description-de', 'description-fr', 'description-es-ES', 'description-nl', 'description-ja'].forEach((k) => ok(new RegExp('^  ' + k + ': ', 'm').test(ws), 'B31: week_style has ' + k));
   const grp = keys.slice(keys.indexOf('sensor_source'), keys.indexOf('legend'));
   eq([grp[0], grp[1], grp.slice(-3)], ['sensor_source', 'sensor_device_id', ['sensor_icon', 'sensor_label', 'sensor_primary']], 'order in the group: source, provider fields, place (B24), label, main reading');
   // B22 (coordinator, server copy 541930): TRMNL silently fails the form's required check for a field a rule hides unless it is optional: true; a provider's must-haves are required only when it is chosen
@@ -339,13 +346,18 @@ test('dials: needle drawn last, low mark hollow, high mark solid, baro zone icon
 test('right column: no rule between the rain calendar and the sun times (owner 2026-11-12, later decision)', () => {
   ok(sh.indexOf('data-sw-sep="rain-sun"') < 0, 'no rain-sun separator');
 });
-test('days strip: 5-degree lines faint, other days thin mid-grey bars (at least 40 % of the row), today at least half the row in dark ink (owner 2026-11-14)', () => {
-  const day = (hi) => D.day({ loV: 2, hiV: 6 }, { a: -5, b: 15, major: 5, now: 1.6 }, 800, 40, hi);
-  const s = day(false);
-  ok(/^<svg[^>]*>(<defs>.*<\/defs>)?<g class="text--gray-7\d"/.test(s), 'grid lines light grey');
-  const hOf = (str, tok) => +/<rect x="[\d.]+" y="[\d.]+" width="[\d.]+" height="([\d.]+)"/.exec(str.split(tok)[1])[1];
-  ok(hOf(s, 'text--gray-45') >= 16, 'other days: mid-grey block height ' + hOf(s, 'text--gray-45') + ' of 40');
-  ok(hOf(day(true), 'text--gray-10') >= 20, 'today: dark block at least half the row');
+test('week display colours (owner 2026-11-16): today dark, other days mid grey on 4-bit; black on 2-bit and 1-bit; the Digital lows as dark as the highs, no ghost segments', () => {
+  const SWD = { scale: { major: 5, deg: '°' }, days: [{ hi: '13°', lo: '1°', hiV: 13, loV: 1, today: true }, { hi: '12°', lo: '3°', hiV: 12, loV: 3 }] };
+  const wk = (m, i, st) => { D.mode = m; D.nCols = 7; D.wcw = 200; D.ws = st; const r = D.part(SWD, 'wday', i, 200, 200); D.mode = null; return r; };
+  ok(/text--gray-10/.test(wk({ dark: false, bits: 4 }, 0, 'eq')) && /dark:text--gray-75/.test(wk({ dark: false, bits: 4 }, 0, 'eq')), 'sliders 4-bit: today dark (mirrored in dark mode)');
+  ok(/text--gray-45/.test(wk({ dark: false, bits: 4 }, 1, 'eq')), 'sliders 4-bit: other days mid grey');
+  [{ dark: false, bits: 2 }, { dark: false, bits: 1 }].forEach((m) => [0, 1].forEach((i) => ok(!/gray-4\d/.test(wk(m, i, 'eq')), 'sliders ' + m.bits + '-bit: every range black, day ' + i)));
+  ok(/data-sw-groove/.test(wk({ bits: 4 }, 0, 'eq')) && !/data-sw-glyph/.test(wk({ bits: 4 }, 0, 'eq')), 'sliders: a groove line, no digits');
+  const dg = wk({ dark: false, bits: 4 }, 0, 'dig');
+  ok(/data-sw-glyph/.test(dg) && !/data-sw-groove/.test(dg), 'digital: segment digits, no groove');
+  ok(!/text--gray-45|text--gray-40 /.test(dg.replace(/text--gray-40/, '')), 'digital 4-bit: the lows are not the mid grey (darkest grey like the highs)');
+  ok(!/(^|[^:])text--gray-(7\d|80)/.test(dg), 'digital: no ghost segments (no faint grey digit parts)');
+  ok(!/text--gray-45/.test(wk({ dark: false, bits: 2 }, 0, 'dig')) && !/text--gray-45/.test(wk({ dark: false, bits: 1 }, 0, 'dig')), 'digital 2-bit and 1-bit: lows black');
 });
 test('panel face (owner 2026-11-16, replaces the 2026-11-12 plain fill): nothing is drawn on any screen; the dividers are the markup\'s framework border lines', () => {
   const f = (m) => { D.mode = m; const s = D.part({}, 'face', 0, 1200, 400); D.mode = null; return s; };
@@ -384,19 +396,19 @@ test('moon glow outside the disk in dark mode, none in light or 1-bit (owner 202
   ok(!/data-sw-glow[^>]*><path/.test(d), 'no halo on the lit part itself');
   [{ dark: false, bits: 4 }, { dark: true, bits: 1 }].forEach((m) => ok(!/swmk|swgl/.test(at(m)), 'no halo ' + JSON.stringify(m)));
 });
-test('days strip in narrow views: X half vertical 7 days without numbers, OG half vertical 5, portrait larger names and icons (owner 2026-11-12)', () => {
-  const v3 = /elsif view == 3 %}([^\n]*)/.exec(sh)[1], v1 = /if view == 1 %}([^\n]*)/.exec(sh)[1];
-  ok(/nd_md = 4 %}/.test(v3) && /nd_lg = 7 %}/.test(v3), 'half vertical: 4 days on md (owner 2026-11-12: taller rows), 7 on lg');
-  ok(/num_cls = ' lg:hidden lg:portrait:flex' %}/.test(v3), 'half vertical: low/high numbers on the OG (owner 2026-11-12), dropped on the X landscape, kept on X portrait (step 19, coordinator: low/high stay)');
-  ok(/bar_cls = 'col--span-7 lg:col--span-8' %}/.test(v3) && /name_cls = 'col--span-2' %}{% assign icon_cls = 'col--span-1 lg:col--span-2' %}{% assign pad_cls = 'col--span-3 lg:col--span-4' %}/.test(v3), 'bars keep at least half the strip, header pad matches name + icon');
-  ok(/name_t = ' lg:portrait:title--xlarge' %}/.test(v1) && /icon_x = '(?: portrait:h--\[7cqh\])? lg:portrait:h--\[7cqh\]' %}/.test(v1), 'portrait: names and icons at the live size');
-  ok(/<span class="title title--base{{ name_t }} text--bold" data-sw-dname>{{ d.name }}/.test(sh) && /{{ icon_x }}" src="{{ d.icon }}"/.test(sh), 'row markup uses the per-view sizes');
+test('week columns by size class (owner 2026-11-16, never measured): full 7, 4 on the OG portrait; half vertical 4, 3 in portrait; smaller views and the half vertical always Digital', () => {
+  ok(/assign wk_cs = '7,4,7,7' \| split/.test(sh), 'full view: md landscape 7, md portrait 4, lg landscape 7, lg portrait 7');
+  ok(/if view == 3 %\}\{% assign wk_cs = '4,3,4,3' \| split/.test(sh), 'half vertical: 4 landscape, 3 portrait on both sizes');
+  ok(/assign ws = 'dig' %\}\{% if view == 1 %\}\{% if cf.week_style == 'eq' %\}\{% assign ws = 'eq' %\}\{% elsif cf.week_style != 'digital' %\}\{% assign ws = 'auto' %\}/.test(sh), 'only the full view takes the setting (Auto is the default); every smaller view is Digital');
+  ok(/wsv === 'auto' \? \(sc\.contains\('screen--lg'\) && SWDraw\.mode\.bits >= 4 \? 'eq' : 'dig'\)/.test(fs.readFileSync(path.join(__dirname, '../../source/shared.liquid'), 'utf8').replace(/\s+/g, ' ')) || /auto/.test(sh), 'Auto: sliders on a large 4-bit screen from the size class and bit depth, Digital elsewhere');
+  ok(/<span class="title title--base text--bold" data-sw-dname>\{\{ d\.name \}\}/.test(sh) && /data-sw-today>/.test(sh), 'names: today lit, the others plain');
+  ok(/lg:portrait:\{% if i < wk_cd %\}block/.test(sh) && /grow basis--0 w--min-0 h--full/.test(sh), 'columns equal width, shown per size class');
 });
 test('OG full (md): no dials, 5-segment meters, 4 days; X (lg) keeps dials, 10 segments, 5 days', () => {
   ok(/<div class="hidden lg:block h--\[\d+cqh\][^"]*"><div class="flex flex--row/.test(sh), 'dials only on lg');
   ok(/lg:hidden" data-sw-part="\{\{ pk \}\}" data-sw-n="5"/.test(sh) && /hidden lg:block[^"]*" data-sw-part="\{\{ pk \}\}" data-sw-n="10"/.test(sh), 'meter copies per size');
-  ok(/data-sw-row="day"/.test(sh) && !/forloop.index > 4 %}<div class="hidden lg:block">/.test(sh), 'every day row in the same full-width wrapper (no half-width fifth row)');
-  ok(/{%- if d.today %}<span class="label label--inverted[^"]*" data-sw-today>/.test(sh), 'OG: today a lit lamp on the day name (owner 2026-11-12)');
+  ok(/data-sw-wcol/.test(sh) && /<div class="relative z--2 flex flex--row gap--none w--full h--full" data-sw-week>/.test(sh), 'every week column in one full-width row (no half-width wrapper)');
+  ok(/{% if d.today %}<span class="label label--inverted[^"]*" data-sw-today>/.test(sh), 'OG: today a lit lamp on the day name (owner 2026-11-12)');
   D.mode = { bits: 1 }; ok(/data-sw-st="e"><g><rect/.test(D.meter({ frac: 0 }, 200, 30, 5)), '1-bit: unlit cells drawn in full colour'); D.mode = null;
   const cells = (n) => (D.meter({ frac: 0 }, 200, 30, n).match(/<rect/g) || []).length;
   eq([cells(5), cells(10)], [5, 10]);
@@ -923,18 +935,15 @@ sensorSettingsTests().then(() => require('./sensors.js')({ T, fx, check: aTest, 
   console.log(passed + ' passed, ' + failed + ' failed');
   process.exit(failed ? 1 : 0);
 });
-test('2-bit active cells are the native dark grey, not black; 4-bit mid grey, today dark (owner 2026-11-13, bars lightened 2026-11-14)', () => {
-  const f = (m, hi) => { D.mode = m; const s = D.day({ loV: 2, hiV: 6 }, { a: -5, b: 15, major: 5, now: 1.6 }, 800, 40, hi); D.mode = null; return s; };
-  const cells = (s) => s.split('data-sw-cells')[1];
-  ok(/gray-30/.test(cells(f({ dark: false, bits: 2 }))) && !/text--black/.test(cells(f({ dark: false, bits: 2 }))), '2-bit day blocks gray-30, not black');
-  ok(/text--gray-45/.test(cells(f({ dark: false, bits: 4 }))), '4-bit day blocks gray-45');
-  ok(/text--gray-10/.test(cells(f({ dark: false, bits: 4 }, true))), '4-bit today block dark');
+test('2-bit meter cells are the native dark grey, not black (owner 2026-11-13); week ranges are covered by the week colours test', () => {
+  D.mode = { dark: false, bits: 2 }; const m = D.meter({ frac: 0.5 }, 200, 30, 5); D.mode = null;
+  ok(/gray-30/.test(m) && !/text--black/.test(m), '2-bit meter cells gray-30, not black');
 });
 
 test('plugin name translated for the title bar when the instance name is the default (owner 2026-11-13)', () => {
-  eq(['en-US', 'de', 'nl', 'fr-CA', 'ja', 'xx'].map((l) => T.buildI18n(l).ours.app), ['Radio Weather', 'Radiowetter', 'Radioweer', 'Radio Météo', 'ラジオ天気', 'Radio Weather']);
+  eq(['en-US', 'de', 'nl', 'fr-CA', 'ja', 'xx'].map((l) => T.buildI18n(l).ours.app), ['Hi-Fi Weather', 'Hi-Fi Weather', 'Hi-Fi Weather', 'Hi-Fi Weather', 'Hi-Fi Weather', 'Hi-Fi Weather']);
   const src = require('fs').readFileSync(require('path').join(__dirname, '../../plugin/src/shared.liquid'), 'utf8');
-  ok(/instance_name ?%\}\{% ?if (\w+) == blank or \1 == 'Radio Weather' ?%\}\{% ?assign \1 ?= ?i18n\.ours\.app/.test(src), 'title bar uses i18n.ours.app when instance_name is the default');
+  ok(/instance_name ?%\}\{% ?if (\w+) == blank or \1 == 'Hi-Fi Weather' or \1 == 'Radio Weather' ?%\}\{% ?assign \1 ?= ?i18n\.ours\.app/.test(src), 'title bar uses i18n.ours.app when instance_name is the default');
 });
 
 test('no shown label falls back to English in any locale (item 38.1)', () => {
@@ -951,13 +960,13 @@ test('no shown label falls back to English in any locale (item 38.1)', () => {
 
 test('guide and legend (owner 2026-11-15): every meter and every major screen element is explained in the site guide, the README and the Legend field; About links the guide in every language', () => {
   const root = path.join(__dirname, '..', '..'), rd = (f) => fs.readFileSync(path.join(root, f), 'utf-8');
-  const SITE = 'https://excusemi.github.io/trmnl-radio-weather-plugin/';
+  const SITE = 'https://excusemi.github.io/trmnl-hifi-weather-plugin/';
   const y = rd('plugin/src/settings.yml'), parts = y.split(/^- keyname: /m).slice(1);
   const part = (k) => parts.find((q) => q.startsWith(k + '\n'));
   // the meter keys come from the transform (RO_ORDER) plus the rain gauge the markup draws
   const keys = JSON.parse(/var RO_ORDER = (\[[^\]]*\])/.exec(src)[1].replace(/'/g, '"')).concat(['rain']);
   ok(keys.length === 8 && keys.includes('co2') && keys.includes('pollen'), 'meter keys read from transform.js: ' + keys);
-  const ELEMENTS = ['baro', 'pressure', 'tdial', 'marks', 'trend', 'meters', 'cells', 'title', 'digits', 'cues', 'sun', 'moon', 'hours', 'footer', 'rain', 'calendar', 'gust', 'sensor', 'twin', 'days', 'today', 'range', 'nowmark', 'daycues', 'views', 'dark'];
+  const ELEMENTS = ['baro', 'pressure', 'tdial', 'marks', 'trend', 'meters', 'cells', 'title', 'digits', 'cues', 'sun', 'moon', 'hours', 'footer', 'rain', 'calendar', 'gust', 'sensor', 'twin', 'days', 'today', 'range', 'zero', 'daycues', 'views', 'dark'];
   const site = rd('tools/site/page/index.html');
   ok(site.includes('id="guide"'), 'the site has the guide section');
   keys.map((k) => 'm-' + k).concat(ELEMENTS).forEach((e) => ok(site.includes('data-guide="' + e + '"'), 'the site guide explains ' + e));
@@ -985,7 +994,7 @@ test('guide and legend (owner 2026-11-15): every meter and every major screen el
 test('About text (B17): HTML, 100+ words in English (TRMNL search), all six languages, learn-more URL; the site in docs/ is current', () => {
   const y = fs.readFileSync(path.join(__dirname, '../../plugin/src/settings.yml'), 'utf-8');
   const about = y.split(/^- keyname: /m).slice(1).find((q) => q.startsWith('author_info\n'));
-  const SITE = 'https://excusemi.github.io/trmnl-radio-weather-plugin/';
+  const SITE = 'https://excusemi.github.io/trmnl-hifi-weather-plugin/';
   ok(about.includes('  learn_more_url: ' + SITE + '\n'), 'learn_more_url is the site');
   const text = (k) => { const m = new RegExp('^  ' + k + ": '(.*)'$", 'm').exec(about); return m ? m[1].replace(/''/g, "'") : null; };
   ['description', 'description-de', 'description-fr', 'description-es-ES', 'description-nl', 'description-ja'].forEach((k) => {

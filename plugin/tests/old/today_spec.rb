@@ -8,7 +8,7 @@ require 'fileutils'
 # The design of 2026-11-12: barometer left, temperature right, one console (meter rows, BUITEN/BINNEN, rain or
 # GEEN REGEN with sun and moon), the days strip from tomorrow, serverless transform, TRMNL's own dark mode.
 # Every spec here was seen red once on a deliberately broken copy (see the "red:" note on each).
-RSpec.describe 'Radio Weather, design of 2026-11-12' do
+RSpec.describe 'Hi-Fi Weather, design of 2026-11-12' do
   FX = File.join(__dir__, 'fixtures')
   SRC = File.expand_path('../src', __dir__)
   def fx(name) = JSON.parse(File.read(File.join(FX, "#{name}.json")))

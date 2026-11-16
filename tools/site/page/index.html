@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Radio Weather for TRMNL: try it</title>
+<title>Hi-Fi Weather for TRMNL: try it</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<meta name="description" content="Radio Weather is the weather as a calm early-80s hi-fi receiver for TRMNL e-paper displays. Try the real plugin here with live weather, different days, devices and settings.">
+<meta name="description" content="Hi-Fi Weather is the weather as a calm early-80s hi-fi receiver for TRMNL e-paper displays. Try the real plugin here with live weather, different days, devices and settings.">
 <style>
 :root{--bg:#eceae4;--panel:#f6f5f1;--ink:#16161a;--mute:#5d5d63;--rule:#c9c6bd;--lamp:#16161a;--seg:#16161a;color-scheme:light}
 @media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#141416;--panel:#1c1c1f;--ink:#e9e8e3;--mute:#9a9aa0;--rule:#34343a;--lamp:#e9e8e3;--seg:#e9e8e3;color-scheme:dark}}
@@ -74,8 +74,8 @@ ol.legend li{padding:5px 0;font-size:.92rem}
 <body>
 <div class="wrap">
 <header>
-  <h1>Radio Weather</h1>
-  <nav><a href="#guide">Guide</a><a href="#settings">Settings</a><a href="https://github.com/ExcuseMi/trmnl-radio-weather-plugin">GitHub</a><a href="https://trmnl.com" id="recipe">Get it on TRMNL</a></nav>
+  <h1>Hi-Fi Weather</h1>
+  <nav><a href="#guide">Guide</a><a href="#settings">Settings</a><a href="https://github.com/ExcuseMi/trmnl-hifi-weather-plugin">GitHub</a><a href="https://trmnl.com" id="recipe">Get it on TRMNL</a></nav>
 </header>
 <p class="tag">The weather as a calm early-80s hi-fi receiver, for TRMNL e-paper displays. This is the real plugin running in your browser: pick a day, a device and your settings, or look at the weather where you are.</p>
 
@@ -101,6 +101,8 @@ ol.legend li{padding:5px 0;font-size:.92rem}
       <div class="row"><label for="bottom">Bottom strip</label><select id="bottom"><option value="days">Days</option><option value="hours">Hours</option><option value="auto">Hours, then days</option></select></div>
       <div class="row"><label for="bottom_switch">Switch to days at</label><select id="bottom_switch"><option value="12">12:00</option><option value="13">13:00</option><option value="14">14:00</option><option value="15">15:00</option><option value="16">16:00</option><option value="17">17:00</option><option value="18" selected>18:00</option><option value="19">19:00</option><option value="20">20:00</option><option value="21">21:00</option><option value="22">22:00</option><option value="23">23:00</option></select></div>
       <div class="row"><label for="hide_title_bar">Hide title bar</label><label class="chk"><input type="checkbox" id="hide_title_bar"> on</label></div>
+      <div class="row"><label for="week_style">Week display</label><select id="week_style"><option value="auto">Auto</option><option value="eq">EQ sliders</option><option value="digital">Digital</option></select></div>
+      <div class="row"><label for="show_wear">What to wear</label><label class="chk"><input type="checkbox" id="show_wear" checked> on</label></div>
     </fieldset>
     <fieldset><legend>Sensor</legend>
       <div class="row"><label for="hw">Sensor on</label><select id="hw"><option value="none">No sensor</option><option value="own">This TRMNL</option><option value="other">Another TRMNL</option></select></div>
@@ -119,7 +121,7 @@ ol.legend li{padding:5px 0;font-size:.92rem}
     <li><b>Console</b>: the temperature in segment digits, and what to wear: parka, jacket, sweater or T-shirt, and an umbrella.</li>
     <li><b>Meters</b> for wind and gusts, UV, air quality, humidity, pollen and pressure, only when they matter.</li>
     <li><b>Rain or sun</b>: an hour calendar when rain is coming, otherwise sunrise, sunset and the moon as seen from your place.</li>
-    <li><b>Bottom strip</b>: the coming days or hours.</li>
+    <li><b>Bottom strip</b>: the coming hours, or the coming days as a week display (EQ sliders or Digital).</li>
     <li><b>Indoor sensor</b>: a TRMNL temperature sensor on this screen or on another TRMNL, with an optional label; the CO2 meter shows when the source gives a CO2 reading.</li>
     <li><b>Every view</b>: full, half horizontal, half vertical, quadrant; 1-bit, greyscale and colour screens; dark mode.</li>
     <li><b>Offline</b>: when Open-Meteo is slow or down, the last saved forecast shows with its time.</li>
@@ -131,7 +133,7 @@ ol.legend li{padding:5px 0;font-size:.92rem}
   <p class="note">Four real screens from this page (TRMNL X, full view). Numbers match the lists. Values come from the plugin's code; yellow and red show on colour screens only, on the others count the blocks.</p>
 
   <div class="fig">
-    <div class="pic"><div class="im"><img src="guide/g1.png" alt="Radio Weather, heat wave example, with numbered parts" width="758" height="614" loading="lazy"><b class="bd" style="left:29.7%;top:17.9%">1</b><b class="bd" style="left:49.9%;top:26.1%">2</b><b class="bd" style="left:69.9%;top:17.6%">3</b><b class="bd" style="left:60.9%;top:17.1%">4</b><b class="bd" style="left:89.2%;top:28.7%">5</b><b class="bd" style="left:10.8%;top:40.7%">6</b><b class="bd" style="left:19.8%;top:34.5%">7</b><b class="bd" style="left:39.6%;top:33.4%">8</b><b class="bd" style="left:31.7%;top:48.0%">9</b><b class="bd" style="left:59.1%;top:46.1%">10</b><b class="bd" style="left:75.2%;top:42.7%">11</b><b class="bd" style="left:68.1%;top:41.0%">12</b><b class="bd" style="left:11.9%;top:61.9%">13</b><b class="bd" style="left:35.6%;top:81.9%">14</b></div></div>
+    <div class="pic"><div class="im"><img src="guide/g1.png" alt="Hi-Fi Weather, heat wave example, with numbered parts" width="758" height="614" loading="lazy"><b class="bd" style="left:29.9%;top:17.3%">1</b><b class="bd" style="left:16.8%;top:26.6%">2</b><b class="bd" style="left:70.1%;top:17.3%">3</b><b class="bd" style="left:59.1%;top:15.4%">4</b><b class="bd" style="left:83.8%;top:26.3%">5</b><b class="bd" style="left:22.5%;top:36.7%">6</b><b class="bd" style="left:25.7%;top:45.4%">7</b><b class="bd" style="left:52.3%;top:34.6%">8</b><b class="bd" style="left:39.3%;top:46.8%">9</b><b class="bd" style="left:57.8%;top:46.8%">10</b><b class="bd" style="left:84.6%;top:40.2%">11</b><b class="bd" style="left:71.4%;top:42.4%">12</b><b class="bd" style="left:14.7%;top:70.9%">13</b><b class="bd" style="left:50.0%;top:81.4%">14</b></div></div>
     <ol class="legend">
       <li data-guide="baro"><b>Barometer</b> (X): the needle is the air pressure now, scale 970 to 1050 hPa. The four zones are 20 hPa each: thunderstorm (970 to 990), rain (990 to 1010), changeable (1010 to 1030), sunny (1030 to 1050). Normal is about 1013 hPa.</li>
       <li data-guide="pressure"><b>Pressure and trend</b>: hPa now; the arrow compares with 3 hours ago (rising or falling from 1 hPa, otherwise level).</li>
@@ -141,8 +143,8 @@ ol.legend li{padding:5px 0;font-size:.92rem}
       <li data-guide="meters"><b>Meters</b>: up to four rows, chosen by what matters now (UV only from a day maximum of 3, pollen only when there is some, air quality, wind, humidity; the barometer row only fills a spare place). 10 blocks on large screens, 5 on small ones. A <b>lit label</b> (white on black, mirrored in dark mode) means the value is in its bad range: WIND from 50 km/h (30 mph), UV from 8, AQI from 60, POLLEN from 50, CO2 from 1400 ppm, and the sensor's HUM below 30 % or above 60 % (outdoor humidity never lights). In the small views (half vertical, quadrant) the console shows two meter rows or none, never a single row. Bands are in the table below.</li>
       <li data-guide="cells"><b>Light grey blocks</b>: the highest value still to come today (the rest of today up to midnight).</li>
       <li data-guide="title"><b>Condition</b>: icon and words for the weather now, in your language; a moon icon at night.</li>
-      <li data-guide="digits"><b>Temperature digits</b> in the unit you chose. The last digit is the tenths. Units (°C, hPa, mm) are grey and small everywhere on greyscale screens, black on 1-bit; the °C sits at the top of its number.</li>
-      <li data-guide="cues"><b>What to wear</b>: one garment by the felt temperature from now to 3 hours ahead (coldest and warmest hour): parka under 3 C (37 F), jacket under 12 C (54 F), sweater under 18 C (64 F), otherwise a T-shirt. An umbrella is added when any hour until 19:00 (at least 3 hours) has a rain chance of 50 % or more. The garment changes only once the felt temperature is 1 degree C (2 F) past the line, so it does not flip back and forth.</li>
+      <li data-guide="digits"><b>Temperature digits</b> in the unit you chose. The last digit is the tenths: smaller, black and on the baseline like the seconds of a clock. Units (°C, hPa, mm) are grey and small everywhere on greyscale screens, black on 1-bit; the °C sits at the top of its number.</li>
+      <li data-guide="cues"><b>What to wear</b>: one garment by the felt temperature of today from 07:00 to 19:00 (the same advice as today's column in the week): a parka when the coldest is under 3 C (37 F) and the warmest under 8 C (46 F), otherwise by the warmest: jacket under 12 C (54 F), sweater under 18 C (64 F), else a T-shirt. An umbrella is added when any hour from 07:00 to 19:00 has a rain chance of 50 % or more. The garment changes only once the felt temperature is 1 degree C (2 F) past the line, so it does not flip back and forth.</li>
       <li data-guide="sun"><b>Sun times</b>: the next sunrise and sunset; once today's has passed, tomorrow's shows.</li>
       <li data-guide="moon"><b>Moon</b>: the phase as it looks from your place today.</li>
       <li data-guide="hours"><b>Hours strip</b>: 12 columns of 2 hours from the current even hour, each with its time, icon, and a bar with the temperature. A black time stamp is the first column (now) or a column where it rains (a rain chance of 50 % or more in one of its hours).</li>
@@ -151,7 +153,7 @@ ol.legend li{padding:5px 0;font-size:.92rem}
   </div>
 
   <div class="fig">
-    <div class="pic"><div class="im"><img src="guide/g2.png" alt="Radio Weather with rain coming, with numbered parts" width="758" height="614" loading="lazy"><b class="bd" style="left:69.7%;top:39.1%">1</b><b class="bd" style="left:88.1%;top:35.2%">2</b><b class="bd" style="left:88.1%;top:42.7%">3</b><b class="bd" style="left:12.1%;top:62.2%">4</b><b class="bd" style="left:25.6%;top:33.9%">5</b></div></div>
+    <div class="pic"><div class="im"><img src="guide/g2.png" alt="Hi-Fi Weather with rain coming, with numbered parts" width="758" height="614" loading="lazy"><b class="bd" style="left:72.7%;top:36.4%">1</b><b class="bd" style="left:81.4%;top:36.4%">2</b><b class="bd" style="left:17.1%;top:36.6%">3</b></div></div>
     <ol class="legend">
       <li data-guide="rain"><b>Rain column</b>: replaces the sun and moon while rain is expected in the next 12 hours. The icon says what falls: rain, snow or hail. Under the calendar, the amount (for example 3 mm) and the gauge: 1 block drizzle, 2 rain, 3 heavy rain.</li>
       <li data-guide="calendar"><b>Hour calendar</b>: the next 6 or 9 hours. A dark tile is an hour with a rain chance of 50 % or more (or a wet weather code).</li>
@@ -162,7 +164,7 @@ ol.legend li{padding:5px 0;font-size:.92rem}
   </div>
 
   <div class="fig">
-    <div class="pic"><div class="im"><img src="guide/g3.png" alt="Radio Weather with an indoor sensor, with numbered parts" width="758" height="614" loading="lazy"><b class="bd" style="left:34.6%;top:42.7%">1</b><b class="bd" style="left:54.1%;top:40.2%">2</b><b class="bd" style="left:62.0%;top:20.8%">3</b><b class="bd" style="left:11.1%;top:37.1%">4</b><b class="bd" style="left:89.2%;top:15.0%">5</b></div></div>
+    <div class="pic"><div class="im"><img src="guide/g3.png" alt="Hi-Fi Weather with an indoor sensor, with numbered parts" width="758" height="614" loading="lazy"><b class="bd" style="left:38.5%;top:42.8%">1</b><b class="bd" style="left:57.2%;top:42.5%">2</b><b class="bd" style="left:70.1%;top:17.3%">3</b><b class="bd" style="left:55.6%;top:48.1%">4</b></div></div>
     <ol class="legend">
       <li data-guide="sensor"><b>Indoor sensor</b>: the sensor icon (a house, or with Sensor icon Anemometer a mast with cups) marks the sensor's reading (your own TRMNL's or another one's), the tree icon the outside weather. One of them is the first big reading (setting Main reading), the other follows beside it; both icons and the sensor name are black (white on dark). The small reading in the corner of the temperature dial is black too, with a grey unit; only the dial's second needle is grey. An optional short label (for example Upstairs) shows beside the sensor icon.</li>
       <li data-guide="outside"><b>Outside reading with its cues</b>: the garment and umbrella always belong to the outside weather.</li>
@@ -173,13 +175,13 @@ ol.legend li{padding:5px 0;font-size:.92rem}
   </div>
 
   <div class="fig">
-    <div class="pic"><div class="im"><img src="guide/g4.png" alt="Radio Weather with the days strip, with numbered parts" width="758" height="614" loading="lazy"><b class="bd" style="left:30.1%;top:68.4%">1</b><b class="bd" style="left:10.6%;top:64.5%">2</b><b class="bd" style="left:68.6%;top:68.4%">3</b><b class="bd" style="left:53.4%;top:62.9%">4</b><b class="bd" style="left:88.7%;top:68.4%">5</b></div></div>
+    <div class="pic"><div class="im"><img src="guide/g4.png" alt="Hi-Fi Weather with the week display, with numbered parts" width="758" height="614" loading="lazy"><b class="bd" style="left:50.0%;top:65.8%">1</b><b class="bd" style="left:20.2%;top:75.4%">2</b><b class="bd" style="left:20.1%;top:67.0%">3</b><b class="bd" style="left:51.6%;top:66.5%">4</b><b class="bd" style="left:21.7%;top:60.8%">5</b></div></div>
     <ol class="legend">
-      <li data-guide="days"><b>Days strip</b> (setting Bottom strip): the weekday, the weather icon, and the lowest (outlined triangle) and highest (filled triangle) temperature of each day. 4 to 7 days fit on screen.</li>
-      <li data-guide="today"><b>Today</b>: the first row, its label in black.</li>
-      <li data-guide="range"><b>Range bars</b>: from the day's low to its high, all on one temperature scale.</li>
-      <li data-guide="nowmark"><b>Now marker</b>: the small triangle above today's bar is the temperature now.</li>
-      <li data-guide="daycues"><b>Cue per day</b>: the garment for the day's felt temperatures between 07:00 and 19:00, and an umbrella when the rain chance there is 50 % or more.</li>
+      <li data-guide="days"><b>Week display</b> (setting Bottom strip, then Week display): one column per day, the weather icon and what to wear on top, the weekday below (today as a lit label). <b>EQ sliders</b>: a knob for the high (black) and one for the low (white) on one shared temperature scale at the left, the range between them filled, short tick marks at every scale step and a thin 0 line when 0 is on the scale. <b>Digital</b>: the high in large segment digits and the low smaller, both aligned on the ones digit. <b>Auto</b> (default) takes sliders on the TRMNL X and Digital on smaller and 1-bit or 2-bit screens; the smaller views always show Digital. 4 to 7 days fit on screen.</li>
+      <li data-guide="today"><b>Today</b>: the first column, its label lit (white on black, mirrored in dark mode).</li>
+      <li data-guide="range"><b>Sliders</b>: the black knob is the day's high, the white knob its low, the bar between them the range (black today, grey on the other days on greyscale screens). One temperature scale at the left serves every day; tick marks sit at every scale step. In Digital the high is the large number and the low the smaller one under it, both aligned on the ones digit.</li>
+      <li data-guide="zero"><b>0 line</b>: a thin line across the week when 0 is on the scale; the value labels step clear of it.</li>
+      <li data-guide="daycues"><b>Cue per day</b>: the garment for the day's felt temperature between 07:00 and 19:00 (today's is the console's), and a small umbrella mark from a 50 % rain chance.</li>
     </ol>
   </div>
 
@@ -214,6 +216,8 @@ ol.legend li{padding:5px 0;font-size:.92rem}
     <tr><th>Bottom strip</th><td>Days, hours, or hours then days.</td></tr>
     <tr><th>Switch to days at</th><td>With Hours, then days: the hour (12:00 to 23:00, default 18:00) the hours give way to the days.</td></tr>
     <tr><th>Sensor icon</th><td>The icon in front of the sensor's reading: a house (default) or an anemometer, a mast with cups, for a sensor outside. Only the icon changes.</td></tr>
+    <tr><th>Week display</th><td>Auto (default: EQ sliders on the TRMNL X, Digital on smaller, 1-bit and 2-bit screens), EQ sliders or Digital. Smaller views always show Digital.</td></tr>
+    <tr><th>What to wear</th><td>On by default. Off hides the clothing and umbrella icons everywhere.</td></tr>
     <tr><th>Hide title bar</th><td>Hides the bar with the plugin name and update time on the full view.</td></tr>
     <tr><th>Sensor</th><td>None (outside weather only), This TRMNL, Another TRMNL, or a provider: Home Assistant, Awair, AirGradient, Sensibo, Ecowitt, Adafruit IO or a JSON link. Readings older than 3 hours are ignored. See Indoor sensor sources below. On this page: "Sensor on" and "Sensor".</td></tr>
     <tr><th>Sensor from another TRMNL</th><td>Shows for Another TRMNL only: the digits in the address of its page on trmnl.com. Empty or not found: this TRMNL's own sensor.</td></tr>
@@ -238,7 +242,7 @@ ol.legend li{padding:5px 0;font-size:.92rem}
 </section>
 
 <footer>
-  Weather data: <a href="https://open-meteo.com">Open-Meteo</a>, no key and no tracking; this page sets no cookies and stores nothing. Device frame: TRMNL's <a href="https://github.com/usetrmnl/trmnl-component">trmnl-component</a> (MIT), loaded from trmnl.com. Plugin code: MIT, <a href="https://github.com/ExcuseMi/trmnl-radio-weather-plugin">ExcuseMi/trmnl-radio-weather-plugin</a>. The frame's picture uses TRMNL's framework CSS, script and the Inter font (Google Fonts), as on the device.
+  Weather data: <a href="https://open-meteo.com">Open-Meteo</a>, no key and no tracking; this page sets no cookies and stores nothing. Device frame: TRMNL's <a href="https://github.com/usetrmnl/trmnl-component">trmnl-component</a> (MIT), loaded from trmnl.com. Plugin code: MIT, <a href="https://github.com/ExcuseMi/trmnl-hifi-weather-plugin">ExcuseMi/trmnl-hifi-weather-plugin</a>. The frame's picture uses TRMNL's framework CSS, script and the Inter font (Google Fonts), as on the device.
 </footer>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/liquidjs@10.21.0/dist/liquid.browser.min.js"></script>

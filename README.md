@@ -1,15 +1,15 @@
-# trmnl-radio-weather-plugin
+# trmnl-hifi-weather-plugin
 
-## Radio Weather
+## Hi-Fi Weather
 
-![Radio Weather on the TRMNL X](assets/screenshot.png)
+![Hi-Fi Weather on the TRMNL X](assets/screenshot.png)
 
 The weather as a calm early-80s hi-fi receiver, for [TRMNL](https://trmnl.com) e-paper displays:
 
 - **Dials** (TRMNL X): a barometer with the pressure trend, and a temperature dial with today's low and high.
 - **Console**: the temperature in segment digits with what to wear (parka, jacket, sweater or T-shirt, and an umbrella); block meters for wind and gusts, UV, air quality, humidity, pollen and pressure when they matter, grey cells for what is still to come today.
 - **Rain or sun**: an hour calendar when rain is coming; otherwise sunrise, sunset and the moon as it looks from your location.
-- **Bottom strip**: the coming days or hours.
+- **Bottom strip**: the coming hours, or the coming days as a week display, one column per day: EQ sliders (a knob for the high and one for the low on one shared scale, a thin 0° line when 0 is on the scale) or Digital (high and low in segment digits, aligned on the ones digit). The weather icon and what to wear sit above each column. Auto (the default) takes sliders on the TRMNL X and Digital on smaller and 1-bit or 2-bit screens; the smaller views always show Digital.
 - **Lit labels**: a meter label that turns white on black (mirrored in dark mode) says the value is in its bad range: WIND from 50 km/h (30 mph), UV from 8, AQI from 60, POLLEN from 50, CO2 from 1400 ppm, the sensor's HUM below 30 % or above 60 %.
 - **Look**: no panels or frames, thin divider lines where two sections meet (grey on greyscale screens, dotted black on 1-bit). Units (°C, hPa, mm) are grey and small; the °C sits at the top of its number. Small views show two meter rows or none, never a single one.
 - **Indoor sensor**: with a TRMNL temperature sensor on the screen, indoor becomes the big reading and outdoor moves beside it, or show another TRMNL's sensor (a hallway upstairs) with outside as the big reading. Readings older than 3 hours are ignored. Other sources: Home Assistant, Awair, AirGradient, Sensibo, Ecowitt, Adafruit IO or any JSON link (below).
@@ -26,6 +26,8 @@ Every view (full, half horizontal, half vertical, quadrant), 1-bit, greyscale an
 | Bottom strip | Days, hours, or hours then days |
 | Switch to days at | With Hours, then days: the hour the hours give way to the days, 12:00 to 23:00, default 18:00. |
 | Hide title bar | Hides the title bar on the full view |
+| Week display | Auto (default: EQ sliders on the TRMNL X, Digital on smaller, 1-bit and 2-bit screens), EQ sliders or Digital. Smaller views always show Digital. |
+| What to wear | On by default. Off hides the clothing and umbrella icons everywhere (next to the temperature and in the week). |
 | Sensor | None (outside weather only), This TRMNL (this screen's own sensor), Another TRMNL, or a provider: Home Assistant, Awair, AirGradient, Sensibo, Ecowitt, Adafruit IO, Custom link (JSON). The fields of the chosen option show; see Indoor sensor sources below. |
 | Sensor from another TRMNL | Shows for Another TRMNL only: the digits in the address of its page on trmnl.com. Empty or not found: this TRMNL's own sensor. |
 | Sensor icon | The icon in front of the sensor's reading: House (default), or Anemometer (a mast with cups) for a sensor outside, such as a weather station or a balcony sensor. Only the icon changes; room for more icons later. |
@@ -61,7 +63,7 @@ Beta = built from the provider's API docs, not yet confirmed with a real device;
 
 ### Reading the screen
 
-Every part of the screen is explained with numbered pictures in the [full guide](https://excusemi.github.io/trmnl-radio-weather-plugin/#guide). The meters in short: ten blocks (five on small screens), yellow is a warning and red is alarming on colour screens; light grey blocks are the highest value still to come today, an outlined block is the strongest gust.
+Every part of the screen is explained with numbered pictures in the [full guide](https://excusemi.github.io/trmnl-hifi-weather-plugin/#guide). The meters in short: ten blocks (five on small screens), yellow is a warning and red is alarming on colour screens; light grey blocks are the highest value still to come today, an outlined block is the strongest gust.
 
 | Meter | Full meter | Good | Warning (yellow) | Alarming (red) |
 |---|---|---|---|---|
@@ -115,6 +117,8 @@ The real transform and markup run in the page (LiquidJS), inside TRMNL's `trmnl-
 | Item | Detail |
 |---|---|
 | Palma hh CONDRATIO | Passes at 1.147 against the 1.15 limit (B19 re-measured; the old 1.2 and the full-sens 1.31 no longer show: full-sens has no sibling in its group). Margin is 0.003: a change to the md portrait half horizontal digits or `swOGPortrait` can tip it. |
+| Sun times on small screens | Where the segment digits would be under 24 px (the OG), sunrise and sunset stay in the normal bold font. Known exception, accepted by the owner (2026-11-16); the X draws them in the page's 7-segment digits. |
+| Day label weight on 1-bit | On the OG 1-bit render the day name TUE has 4 px stems where the other names have 3 px (a glyph raster effect of the font at that size, not its position; counts in the B31 notes). |
 | Device tier, own-sensor cases | 4 of the 117 `-sens` cases are red at 3a230e7, all on models with no framework CSS rules under trmnlp (the harness gap, see `tools/check_devices.sh` KNOWN): `kobo_clara_2e__full-sens` (digit height 22.4), `kobo_libra_color__full-port-sens`, `onyx_boox_go_10_3_lumi__full-port-sens`, `tcl_nxtpaper_14__full-port-sens` (row 2 icon meets low, gap 1 px). The avalue_epd_42s, generic_16_9 and palma `-sens` cases are green. |
 
 ## Licence

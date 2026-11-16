@@ -5,7 +5,7 @@ require 'json'
 
 # Renders of the hybrid concept: `trmnlp test tests/review_spec.rb` writes the PNGs into renders/.
 # Cases: the mixed sample day (1.6 C) and the widest readings: 104.5 F, 112 F, -40 F, -23.5 C.
-RSpec.describe 'Stereo Weather hybrid renders' do
+RSpec.describe 'Hi-Fi Weather hybrid renders' do
   base = JSON.parse(File.read(File.join(__dir__, 'fixtures', 'mixed.json')))
   t = base.dig('current', 'time')
   now = (Time.utc(*t.split(/[-T:]/).map(&:to_i)) - base['utc_offset_seconds'].to_i + 600).iso8601

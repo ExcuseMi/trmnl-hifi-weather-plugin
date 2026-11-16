@@ -1,5 +1,5 @@
 {
-  "name": "radio-weather-build",
+  "name": "hifi-weather-build",
   "private": true,
   "description": "Build step only: source/shared.liquid -> plugin/src/shared.liquid",
   "devDependencies": {

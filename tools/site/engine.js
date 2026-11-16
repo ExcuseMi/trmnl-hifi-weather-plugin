@@ -1,4 +1,4 @@
-// Radio Weather site engine: the plugin's own transform (plugin/src/transform.js) and markup (plugin/src/*.liquid, rendered
+// Hi-Fi Weather site engine: the plugin's own transform (plugin/src/transform.js) and markup (plugin/src/*.liquid, rendered
 // with LiquidJS) run in the page. Used by docs/app.js in the browser and by tools/site/check_fidelity.mjs in Node.
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) module.exports = factory(); else root.SWEngine = factory();
@@ -94,7 +94,7 @@
         device: { id: 1, friendly_id: 'ABC123', percent_charged: 85.0, wifi_strength: 90, height: dev.height, width: dev.width, model: dev.model, bit_depth: dev.bit_depth,
           orientation: 'landscape', firmware_version: '1.8.17', refresh_interval_seconds: 900, sleep_mode_enabled: false, sleep_start_time: 1320, sleep_end_time: 480 },
         system: { timestamp_utc: Math.floor(nowMs / 1000) },
-        plugin_settings: { instance_name: 'Radio Weather', refresh_interval_minutes: 5, strategy: 'static', dark_mode: 'no', no_screen_padding: 'no', custom_fields_values: fields }
+        plugin_settings: { instance_name: 'Hi-Fi Weather', refresh_interval_minutes: 5, strategy: 'static', dark_mode: 'no', no_screen_padding: 'no', custom_fields_values: fields }
       };
       var run = transformer(sc ? mockFetch(sc) : o.fetch, sc ? frozenDate(nowMs) : Date);
       var out = await run({ trmnl: { user: trmnl.user, device: trmnl.device, system: { timestamp_utc: trmnl.system.timestamp_utc }, plugin_settings: trmnl.plugin_settings } });
