@@ -356,9 +356,8 @@ return { a: hseg(xl + gp, xr - gp, yt, t), g: hseg(xl + gp, xr - gp, ym, t), d: 
 f: vseg(xl, yt + gp, ym - gp, t), b: vseg(xr, yt + gp, ym - gp, t), e: vseg(xl, ym + gp, yb - gp, t), c: vseg(xr, ym + gp, yb - gp, t) };
 }
 function digits(str, H, tr, al) {   /* al = { n, dr }: B31 the week's Digital, n cells (the ones digit in the last, an unused cell empty, a minus is the middle bar of the cell before the first digit), dr = how far the degree sign sits further right (the low row's sign lines up with the high row's); the same box for every value */
-var W = 56, HH = 100, T = 13, G = 14, x = 0, body = '', dec = '', post = false;
-// Owner 2026-11-14: the point and the decimal digit after it are drawn in a dark grey (light grey on black in dark mode), black stays on 1-bit.
-function put(t) { if (post) dec += t; else body += t; }
+var W = 56, HH = 100, T = 13, G = 14, x = 0, body = '', post = false, DK = 0.58;
+// Owner 2026-11-16: the point and the decimal digit after it are black like the integer; the decimal digit is smaller (0.58 of its height, bottom-aligned like the seconds of an LCD clock), the point stays at the baseline.
 // Owner 2026-11-14: fixed-width digit cells like an LCD: the 1 sits in a full cell and the integer part always reserves two cells (a minus takes the empty one), so 1.6 and 21.6 have the same width.
 var ip = (/^-?\d*/.exec(str) || [''])[0], idg = ip.replace('-', '').length, neg = ip.charAt(0) === '-';
 if (al) x = (al.n - idg) * (W + G);
@@ -368,14 +367,13 @@ var ch = str.charAt(i);
 // Owner 2026-11-15 ("-12" showed as "-  12"): the minus ends 0.3 gaps before the ink of the first digit (a 1 has its ink on the right of its cell), so no empty cell sits between them; the width stays the LCD cells'.
 if (ch === '-' && !i && al) { body += '<g data-sw-glyph="-">' + poly(shapes(x - W - G, W, HH, T).g) + '</g>'; continue; }
 if (ch === '-' && !i) { var d1 = GLYPH[str.charAt(1)] || '', cs = idg < 2 && !tr ? W + G : 46 + G * 0.3; body += '<g data-sw-glyph="-">' + poly(shapes(cs + (/[fe]/.test(d1) ? 0 : (/[adg]/.test(d1) ? T / 2 + 2 : W - T)) - G * 0.3 - 46 + T / 2 + 2, 46, HH, T).g) + '</g>'; x = cs; continue; }
-if (ch === '.') { post = true; put(rect(x - G + 3, HH - T, T, T)); x += 20 - G; continue; }
+if (ch === '.') { post = true; body += rect(x - G + 3, HH - T, T, T); x += 20 - G; continue; }
 if (ch === '°') { post = false; body += '<circle cx="' + (x + 9 + (al ? al.dr || 0 : 0)) + '" cy="10" r="7" fill="none" ' + SK + '5"/>'; x += 22 + G; continue; }
-var w = ch === '-' ? 46 : W, on = GLYPH[ch] || '', sh = shapes(x, w, HH, T), gb = '';
+var kk = post ? DK : 1, w = (ch === '-' ? 46 : W) * kk, on = GLYPH[ch] || '', sh = shapes(x, w, HH * kk, T * kk), gb = '';
 'abcdefg'.split('').forEach((s) => { if (on.indexOf(s) >= 0) gb += poly(sh[s]); });
-put('<g data-sw-glyph="' + ch + '">' + gb + '</g>');
+body += '<g data-sw-glyph="' + ch + '"' + (post ? ' data-sw-dec transform="translate(0 ' + n1(HH * (1 - DK)) + ')"' : '') + '>' + gb + '</g>';
 x += w + G;
 }
-if (dec) body += '<g data-sw-dec>' + g(b1() ? '' : (DKM() ? 'text--gray-30 dark:text--gray-30' : 'text--gray-30'), dec) + '</g>';
 var vw = al ? al.n * (W + G) + 22 + (al.dr || 0) : Math.max(1, x - G);
 return svg(H * vw / HH, H, glow(body, GPX * HH / H), '0 0 ' + vw + ' ' + HH);
 }
