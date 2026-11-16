@@ -176,7 +176,7 @@ module WeekChecks
   # at least a tenth of the row, minimum 3 device px, above and below. Pixel scan of each row box; the divider itself (+-2 px) is not ink.
   ROWS_JS = <<~'JS'
     (function(){var bx=[].filter.call(document.querySelectorAll('[data-sw-wrow-box]'),function(e){var b=e.getBoundingClientRect();return b.width>0&&b.height>0});
-    var tb=document.querySelector('.title_bar'),scr=document.querySelector('.screen'),tr=function(x){var b=x&&x.getBoundingClientRect();return b?[b.left,b.top,b.right,b.bottom].map(Math.round):null};var dv=[].map.call(document.querySelectorAll('[data-sw-part=wrdiv]'),function(e){var v=e.querySelector('svg'),a=e.getBoundingClientRect(),b=v&&v.getBoundingClientRect();return b&&a.width>0?[a.top,b.top,b.height]:null}).filter(Boolean);return JSON.stringify({dv:dv,w:innerWidth,tb:tr(tb),scr:tr(scr),body:tr(document.body),dpr:devicePixelRatio,dbg:bx.map(function(e){var q=function(x){var b=x&&x.getBoundingClientRect();return b?[Math.round(b.top),Math.round(b.bottom)]:null};return [q(e),q(e.querySelector('[data-sw-part=wrdiv]')),q(e.lastElementChild),q(e.querySelector('[data-sw-part=wrow]')),e.lastElementChild.style.paddingTop,(function(){var g=e.querySelector('[data-sw-part=wrow] [data-sw-glyph]'),sv=e.querySelector('[data-sw-part=wrow] svg');return [q(g),q(sv),sv&&sv.getAttribute('height'),sv&&sv.getAttribute('viewBox'),innerHeight]})()]}),rows:bx.map(function(e){var b=e.getBoundingClientRect();return [b.left,b.top,b.right,b.bottom]})})})()
+    var tb=document.querySelector('.title_bar'),scr=document.querySelector('.screen'),tr=function(x){var b=x&&x.getBoundingClientRect();return b?[b.left,b.top,b.right,b.bottom].map(Math.round):null};var dv=[].map.call(document.querySelectorAll('[data-sw-part=wrdiv]'),function(e){var v=e.querySelector('svg'),a=e.getBoundingClientRect(),b=v&&v.getBoundingClientRect();return b&&a.width>0?[a.top,b.top,b.height]:null}).filter(Boolean);var on=[].map.call(document.querySelectorAll('[data-sw-part=wrow]'),function(e){if(!e.getBoundingClientRect().width)return null;var sv=e.querySelectorAll('svg svg');if(sv.length<2)return null;var rr=function(q){var g=q.querySelectorAll('g[data-sw-glyph]');return g.length?g[g.length-1].getBoundingClientRect().right:null};return [rr(sv[0]),rr(sv[1])]}).filter(Boolean);var bd=document.querySelector('[data-sw-wkrows] > div'),bb=bd&&bd.getBoundingClientRect();return JSON.stringify({ones:on,band:bb&&bb.width>0?[bb.left,bb.top,bb.right,bb.bottom]:null,cls:(document.querySelector('.screen')||document.body).className,n:SW.days.length,dv:dv,w:innerWidth,tb:tr(tb),scr:tr(scr),body:tr(document.body),dpr:devicePixelRatio,dbg:bx.map(function(e){var q=function(x){var b=x&&x.getBoundingClientRect();return b?[Math.round(b.top),Math.round(b.bottom)]:null};return [q(e),q(e.querySelector('[data-sw-part=wrdiv]')),q(e.lastElementChild),q(e.querySelector('[data-sw-part=wrow]')),e.lastElementChild.style.paddingTop,(function(){var g=e.querySelector('[data-sw-part=wrow] [data-sw-glyph]'),sv=e.querySelector('[data-sw-part=wrow] svg');return [q(g),q(sv),sv&&sv.getAttribute('height'),sv&&sv.getAttribute('viewBox'),innerHeight]})()]}),rows:bx.map(function(e){var b=e.getBoundingClientRect();return [b.left,b.top,b.right,b.bottom]})})})()
   JS
 
   def self.rowgap(s, png_path, c)
@@ -216,6 +216,23 @@ module WeekChecks
       out << "row #{i}: gap above #{top} px, below #{bot} px, need #{need.round(1)} of a #{h}px row" if top < need || bot < need
     end
     puts "ROWOFF #{c['name']}: picture minus DOM #{off.round(1)} px" if ENV['ROWDBG']
-    [{ 'ROWGAP' => out }.reject { |_, v| v.empty? }, mins.min]
+    # ROWBAND: the rows share the band evenly (heights within 1.5 px) and fill it (first row at its top, last row at its bottom, 2 px), and there are as
+    # many as the size class gives (full and half vertical: 4 md, 7 lg; never more than the days); no empty band.
+    # ROWONES: the ones digits of the highs stand on one vertical line across the rows, and so do the lows (within 1.5 px)
+    ones = []
+    [0, 1].each do |q|
+      xs = (r['ones'] || []).map { |o| o[q] }.compact
+      ones << "#{q.zero? ? 'high' : 'low'} ones digits spread #{(xs.max - xs.min).round(1)} px across the rows" if xs.size > 1 && xs.max - xs.min > 1.5
+    end
+    band = []
+    if r['band']
+      hs = rows.map { |(_, t, _, b)| b - t }
+      band << "rows differ in height (#{hs.map(&:round).inspect})" if hs.max - hs.min > 1.5
+      band << "rows start #{(rows.first[1] - r['band'][1]).round(1)} px below the band top" if (rows.first[1] - r['band'][1]).abs > 2
+      band << "rows end #{(r['band'][3] - rows.last[3]).round(1)} px above the band bottom" if (r['band'][3] - rows.last[3]).abs > 2
+      want = [(r['cls'].include?('screen--lg') ? 7 : 4), r['n']].min
+      band << "#{rows.size} rows, #{want} by the size class" if rows.size != want
+    end
+    [{ 'ROWGAP' => out, 'ROWBAND' => band, 'ROWONES' => ones }.reject { |_, v| v.empty? }, mins.min]
   end
 end

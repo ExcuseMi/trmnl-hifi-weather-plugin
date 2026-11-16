@@ -28,6 +28,10 @@ muts=[
  ('HZERO-label','source/shared.liquid',": G.y0 - G.e - gp / 2;   /* a value below 0",": G.y0 + 3 + fs * 0.36 + 0 * gp;   /* a value below 0",['b31-x-hours-neg']),
  ('SUNTIGHT-wide1','source/shared.liquid',"nar = c === '1',","nar = false,",['b31-x-hours-neg','b31-x-sun-ones']),
  ('SUNTIGHT-pad','source/shared.liquid',"pw = Math.max(vw, minW || 0);","pw = vw;",['b31-x-sun-ones','b31-og-sun-ones']),
+ ('ROWBAND-count','source/shared.liquid',"{%- assign wr_md = 4 %}{% assign wr_lg = 7 %}","{%- assign wr_md = 3 %}{% assign wr_lg = 7 %}",['b31-og1-port-full-dry']),
+ ('ROWBAND-fill','source/shared.liquid','<div class="relative grow basis--0 w--full h--min-0 {% if i < wr_md %}block','<div class="relative shrink-0 w--full h--[9cqh] {% if i < wr_md %}block',['b31-og1-port-full-dry']),
+ ('ROWGAP-pad','source/shared.liquid',"Math.max(3 / k, 0.15 * b.offsetHeight)","Math.max(3 / k, 0.01 * b.offsetHeight)",['b31-og1-port-full-rain']),
+ ('ROWONES','source/shared.liquid',"gp = 0.4 * h1, x0 = 0, y1 = (H - h1) / 2, hi, lo;","gp = 0.4 * h1, x0 = i * 3, y1 = (H - h1) / 2, hi, lo;",['b31-og1-port-full-dry']),
 ]
 which=sys.argv[1:]
 for name,f,old,new,cs in muts:
@@ -42,7 +46,7 @@ for name,f,old,new,cs in muts:
     shutil.copy(B+'redbak.tmp',R+f)
     subprocess.run(['node','tools/build.js'],cwd=R,capture_output=True)
     out=r.stdout
-    keys=sorted(set(re.findall(r'^(WEEK[A-Z]+|HZERO|HCURVE|HOURS|SUNTIGHT) ',out,re.M)))
+    keys=sorted(set(re.findall(r'^(WEEK[A-Z]+|HZERO|HCURVE|HOURS|SUNTIGHT|ROWGAP|ROWBAND|ROWONES) ',out,re.M)))
     summ=re.findall(r'\d+ examples, \d+ failures?',out)
-    lines=[l[:200] for l in out.split('\n') if l.startswith(('WEEK','HZERO','HCURVE','SUNTIGHT'))][:3]
+    lines=[l[:200] for l in out.split('\n') if l.startswith(('WEEK','HZERO','HCURVE','SUNTIGHT','ROWGAP','ROWBAND','ROWONES'))][:3]
     print(name,'->',keys,summ,lines,flush=True)
