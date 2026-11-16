@@ -857,7 +857,7 @@ async function stateTests() {
       answer = bigAnswer(); aq = { current: { time: '2026-11-08T06:00', european_aqi: 33 }, hourly: { time: answer.hourly.time, european_aqi: answer.hourly.time.map((_, i) => 20 + i) } };
       const r = await run({}), n = Buffer.byteLength(JSON.stringify(r.trmnl_state));
       ok(n < 7000, 'state is ' + n + ' bytes');
-      eq(r.trmnl_state.snap.h.temperature_2m.length, 28, '3 past hours, the current one and 24 ahead');
+      eq(r.trmnl_state.snap.h.temperature_2m.length, 51, '3 past hours, the current one and what the answer holds ahead (47; up to 51: 24 h of age plus 6 hours, B31 review)');
       aq = {};
     });
     await check('offline: a failed fetch shows the saved copy at the current hour, stale "as of", the copy written back unchanged', async () => {
@@ -876,9 +876,9 @@ async function stateTests() {
     await check('offline: older than 24 h, under 6 hours left, or no copy gives NO SIGNAL', async () => {
       answer = fx('mixed'); const snap = (await run({})).trmnl_state.snap;
       answer = null;
-      const long = JSON.parse(JSON.stringify(snap)); Object.keys(long.h).forEach((k) => { long.h[k] = long.h[k].concat(long.h[k]); });   // 50 hours: only the age stops it
-      eq((await run({ snap: long }, AT + 86400 - 60)).ui.ok, true, 'just under 24 h');
-      eq((await run({ snap: long }, AT + 86400 + 60)).ui.ok, false, 'older than 24 h');
+      // B31 review: the copy is the one snapOf writes (48 hours ahead), not a hand-made one: the promised 24 h really hold
+      eq((await run({ snap: snap }, AT + 86400 - 60)).ui.ok, true, 'just under 24 h');
+      eq((await run({ snap: snap }, AT + 86400 + 60)).ui.ok, false, 'older than 24 h');
       const short = JSON.parse(JSON.stringify(snap)); Object.keys(short.h).forEach((k) => { short.h[k] = short.h[k].slice(0, 9); });
       eq((await run({ snap: short }, AT + 3 * 3600 + 600)).ui.ok, true, '6 hours left (09:00 to 14:00)');
       eq((await run({ snap: short }, AT + 4 * 3600 + 600)).ui.ok, false, '5 hours left');

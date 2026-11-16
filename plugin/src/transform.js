@@ -551,11 +551,11 @@ function rd(v, k) { return typeof v === 'number' && isFinite(v) ? Math.round(v *
 function isoMs(iso) { var m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(String(iso || '')); return m ? Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]) : null; }
 function msIso(ms) { return new Date(ms).toISOString().slice(0, 16); }
 function hmOf(iso) { var m = /T(\d{2}:\d{2})/.exec(String(iso || '')); return m ? m[1] : null; }
-// The copy from a good answer (before the past hours are cut): 3 past hours (pressure trend) and 24 ahead, 8 days, air quality index.
+// The copy from a good answer (before the past hours are cut): 3 past hours (pressure trend) and 51 ahead (24 h of age plus the 6 hours the view needs, B31 review), 8 days, air quality index.
 function snapOf(wr, aq, pollen) {
   var h = wr.hourly, ht = h.time, cur = String(wr.current.time), off = +wr.utc_offset_seconds || 0, d = wr.daily || {}, hs = {}, ds = {};
   var k = 0; while (k < ht.length && String(ht[k]) < cur.slice(0, 13) + ':00') k++;
-  var s = Math.max(0, k - 3), e = Math.min(ht.length, k + 25);
+  var s = Math.max(0, k - 3), e = Math.min(ht.length, k + 54);   // 3 past hours and 51 ahead: fromSnap needs 6 hours left at 24 h old
   ST_HF.forEach((f) => { if (Array.isArray(h[f])) hs[f] = h[f].slice(s, e).map((v) => rd(v, f === 'precipitation' ? 100 : 10)); });
   ST_DF.forEach((f) => { if (Array.isArray(d[f])) ds[f] = d[f].slice(0, 8).map((v) => rd(v, f === 'precipitation_sum' ? 100 : 10)); });
   var c = {}; Object.keys(wr.current).forEach((q) => { if (typeof wr.current[q] === 'number' && q !== 'interval') c[q] = rd(wr.current[q], 10); });

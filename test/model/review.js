@@ -30,4 +30,10 @@ module.exports = async ({ T, fx, SWModel, check, eq, ok }) => {
       ok(t.step === 5 || t.step === 10 || t.step === 20 || t.step === 40, n + ': a round step ' + t.step);
     });
   });
+  await check('offline copy: what snapOf writes serves 24 h (it kept 25 hours ahead, so about 19 h)', async () => {
+    const f = forecast(13, (h) => 5), sn = T.snapOf(f, {}, null);
+    [1, 12, 23, 24].forEach((hrs) => ok(T.fromSnap(sn, sn.at + hrs * 3600 - 60) !== null, 'the copy at ' + hrs + ' h old is shown'));
+    eq(T.fromSnap(sn, sn.at + 24 * 3600 + 60), null, 'older than 24 h: NO SIGNAL');
+    ok(JSON.stringify(sn).length < 6000, 'the saved state stays small (8 KB budget): ' + JSON.stringify(sn).length);
+  });
 };
