@@ -118,6 +118,7 @@ The real transform and markup run in the page (LiquidJS), inside TRMNL's `trmnl-
 |---|---|
 | Palma hh CONDRATIO | Passes at 1.147 against the 1.15 limit (B19 re-measured; the old 1.2 and the full-sens 1.31 no longer show: full-sens has no sibling in its group). Margin is 0.003: a change to the md portrait half horizontal digits or `swOGPortrait` can tip it. |
 | Sun times on small screens | Where the segment digits would be under 24 px (the OG), sunrise and sunset stay in the normal bold font. Known exception, accepted by the owner (2026-11-16); the X draws them in the page's 7-segment digits. |
+| Unit change while offline | The saved offline copy keeps the numbers in the unit it was saved with. If the unit setting changes while the forecast is unreachable, the copy still shows the old unit until the next good answer (Fable review 2026-11-16, item 4; no fix yet). |
 | Day label weight on 1-bit | On the OG 1-bit render the day name TUE has 4 px stems where the other names have 3 px (a glyph raster effect of the font at that size, not its position; counts in the B31 notes). |
 | Device tier, own-sensor cases | 4 of the 117 `-sens` cases are red at 3a230e7, all on models with no framework CSS rules under trmnlp (the harness gap, see `tools/check_devices.sh` KNOWN): `kobo_clara_2e__full-sens` (digit height 22.4), `kobo_libra_color__full-port-sens`, `onyx_boox_go_10_3_lumi__full-port-sens`, `tcl_nxtpaper_14__full-port-sens` (row 2 icon meets low, gap 1 px). The avalue_epd_42s, generic_16_9 and palma `-sens` cases are green. |
 
