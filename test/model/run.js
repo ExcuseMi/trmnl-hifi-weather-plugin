@@ -144,7 +144,7 @@ test('time format: the setting decides, 24 h when missing, the TIME constant ove
   eq(fields.filter((f) => B31.includes(f.key)).map((f) => [f.key, f.group]), [['week_style', 'Display'], ['show_wear', 'Display']], 'B31: the week display and what-to-wear settings are new fields in the Display group');
   ok(keys.indexOf('week_style') === keys.indexOf('hide_title_bar') + 1 && keys.indexOf('show_wear') === keys.indexOf('week_style') + 1, 'B31: both sit right after hide_title_bar, no existing key moved');
   const ws = y.split(/^- keyname: week_style/m)[1].split(/^- keyname: /m)[0];
-  ok(/options:\n  - Auto: auto\n  - EQ sliders: eq\n  - Digital: digital\n  default: auto\n/.test(ws), 'B31: week_style options auto, eq, digital (the existing values eq and digital unchanged), default Auto');
+  ok(/options:\n  - Auto: auto\n  - EQ sliders: eq\n  - Digital: digital\n  - Blocks: blocks\n  default: auto\n/.test(ws), 'B31/B32: week_style options auto, eq, digital, blocks (the existing values unchanged, Blocks new), default Auto');
   ok(/default: true/.test(y.split(/^- keyname: show_wear/m)[1].split(/^- keyname: /m)[0]), 'B31: show_wear is a boolean, default on');
   ['name', 'name-de', 'name-fr', 'name-es-ES', 'name-nl', 'name-ja', 'description-de', 'description-fr', 'description-es-ES', 'description-nl', 'description-ja'].forEach((k) => ok(new RegExp('^  ' + k + ': ', 'm').test(ws), 'B31: week_style has ' + k));
   const grp = keys.slice(keys.indexOf('sensor_source'), keys.indexOf('legend'));
@@ -324,7 +324,9 @@ test('block meter: any reading above zero lights one cell', () => {
 });
 test('block meter: half lit lights five of ten, no data lights none', () => {
   const lit = (s) => ((s.split('<g data-sw-on data-sw-st="a">')[1] || '').match(/data-sw-c=/g) || []).length;
-  eq([lit(D.meter({ frac: 0.5 }, 300, 40)), lit(D.meter({ frac: null }, 300, 40)), lit(D.meter({ frac: 2 }, 300, 40))], [5, 0, 10]);
+  eq([lit(D.meter({ frac: 0.5 }, 300, 20)), lit(D.meter({ frac: null }, 300, 20)), lit(D.meter({ frac: 2 }, 300, 20))], [5, 0, 10]);
+  const nr = D.meter({ frac: 0.5 }, 120, 40);   // B32: a row whose cells would be taller than wide draws 5 wider cells, the values scale to 5, no offset shadow
+  eq([(nr.match(/data-sw-c=/g) || []).length, lit(nr), /text--gray-65/.test(nr)], [5, 3, false], 'narrow row: 5 cells, half lit = 3 of 5, no shadow');
 });
 test('rain calendar: 12 hours from the first wet hour, rain hours lit', () => {
   const hrs = Array.from({ length: 25 }, (_, i) => ({ h: String(i).padStart(2, '0') }));
@@ -397,9 +399,9 @@ test('moon glow outside the disk in dark mode, none in light or 1-bit (owner 202
   [{ dark: false, bits: 4 }, { dark: true, bits: 1 }].forEach((m) => ok(!/swmk|swgl/.test(at(m)), 'no halo ' + JSON.stringify(m)));
 });
 test('week columns by size class (owner 2026-11-16, never measured): full 7, 4 on the OG portrait; half vertical 4, 3 in portrait; smaller views and the half vertical always Digital', () => {
-  ok(/assign wk_cs = '7,4,7,7' \| split/.test(sh), 'full view: md landscape 7, md portrait 4, lg landscape 7, lg portrait 7');
+  ok(/assign wk_cs = '5,4,7,7' \| split/.test(sh), 'full view: md landscape 5 (owner 2026-11-16: calmer on small screens), md portrait 4, lg landscape 7, lg portrait 7');
   ok(/if view == 3 %\}\{% assign wk_cs = '4,3,4,3' \| split/.test(sh), 'half vertical: 4 landscape, 3 portrait on both sizes');
-  ok(/assign ws = 'dig' %\}\{% if view == 1 %\}\{% if cf.week_style == 'eq' %\}\{% assign ws = 'eq' %\}\{% elsif cf.week_style != 'digital' %\}\{% assign ws = 'auto' %\}/.test(sh), 'only the full view takes the setting (Auto is the default); every smaller view is Digital');
+  ok(/assign ws = 'dig' %\}\{% if view == 1 %\}\{% if cf.week_style == 'eq' %\}\{% assign ws = 'eq' %\}\{% elsif cf.week_style == 'blocks' %\}\{% assign ws = 'blocks' %\}\{% elsif cf.week_style != 'digital' %\}\{% assign ws = 'auto' %\}/.test(sh), 'only the full view takes the setting (Auto is the default); every smaller view is Digital');
   ok(/wsv === 'auto' \? \(sc\.contains\('screen--lg'\) && SWDraw\.mode\.bits >= 4 \? 'eq' : 'dig'\)/.test(fs.readFileSync(path.join(__dirname, '../../source/shared.liquid'), 'utf8').replace(/\s+/g, ' ')) || /auto/.test(sh), 'Auto: sliders on a large 4-bit screen from the size class and bit depth, Digital elsewhere');
   ok(/<span class="title title--base text--bold" data-sw-dname>\{\{ d\.name \}\}/.test(sh) && /data-sw-today>/.test(sh), 'names: today lit, the others plain');
   ok(/lg:portrait:\{% if i < wk_cd %\}block/.test(sh) && /grow basis--0 w--min-0 h--full/.test(sh), 'columns equal width, shown per size class');
@@ -410,7 +412,7 @@ test('OG full (md): no dials, 5-segment meters, 4 days; X (lg) keeps dials, 10 s
   ok(/data-sw-wcol/.test(sh) && /<div class="relative z--2 flex flex--row gap--none w--full h--full" data-sw-week>/.test(sh), 'every week column in one full-width row (no half-width wrapper)');
   ok(/{% if d.today %}<span class="label label--inverted[^"]*" data-sw-today>/.test(sh), 'OG: today a lit lamp on the day name (owner 2026-11-12)');
   D.mode = { bits: 1 }; ok(/data-sw-st="e"><g><rect/.test(D.meter({ frac: 0 }, 200, 30, 5)), '1-bit: unlit cells drawn in full colour'); D.mode = null;
-  const cells = (n) => (D.meter({ frac: 0 }, 200, 30, n).match(/<rect/g) || []).length;
+  const cells = (n) => (D.meter({ frac: 0 }, 400, 30, n).match(/<rect/g) || []).length;
   eq([cells(5), cells(10)], [5, 10]);
   D.mode = { bits: 2 }; ok(/text--gray-30/.test(D.meter({ frac: 0 }, 200, 30, 5)), '2-bit: unlit cells dark enough to show (native dark grey)'); D.mode = null;
 });
@@ -643,9 +645,9 @@ test('plugin/src/shared.liquid is the build of source/shared.liquid: run node to
   const built = fs.readFileSync(out, 'utf8'); fs.rmSync(tmp, { recursive: true });
   ok(built === fs.readFileSync(path.join(__dirname, '../../plugin/src/shared.liquid'), 'utf8'), 'plugin/src/shared.liquid differs from the build of source/shared.liquid: run `node tools/build.js` and commit both');
 });
-test('built shared.liquid stays under 84 KB: a source edit that pushes it over must cut code first (limit 98 KiB above is the hard one)', () => {
+test('built shared.liquid stays under 95 KB (owner 2026-11-16: 95 KB, Blocks style back): a source edit that pushes it over must cut code first (limit 98 KiB above is the hard one)', () => {
   const b = fs.statSync(path.join(__dirname, '../../plugin/src/shared.liquid')).size;
-  ok(b < 84 * 1000, 'plugin/src/shared.liquid is ' + b + ' bytes after the build, budget ' + 84 * 1000 + ': trim source/shared.liquid (dead code, duplicates), not the guard');
+  ok(b < 95 * 1000, 'plugin/src/shared.liquid is ' + b + ' bytes after the build, budget ' + 95 * 1000 + ': trim source/shared.liquid (dead code, duplicates), not the guard');
 });
 async function hangTest() {   // owner 2026-11-14: 'Transform timed out after 5s' (TRMNL limit); a request that never answers must not hold the run
   const of = global.fetch, t0 = Date.now(), keep = setInterval(() => {}, 1000);   // AbortSignal.timeout does not hold the Node loop
