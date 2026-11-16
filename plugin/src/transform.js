@@ -536,6 +536,7 @@ if (hrs) { out.hours = hrs.hours; out.hscale = hrs.scale; }
 var tp = TOPS.indexOf(out.cue[0]) >= 0 ? out.cue[0] : (opt && opt.prevCue && opt.prevCue.top) || null;
 var kb = Object.assign({}, pb); meters.forEach((m) => { if (typeof m.bad === 'boolean') kb[m.key] = m.bad; });
 out.keep = { cue: { top: tp }, mt: { uv: t.uvMax === null ? pm.uv : uvOn, co2: M.inn.co2 === null ? pm.co2 : co2Up, bad: kb } };   // what the next run remembers (saved state)
+if (opt && opt.wear === false) { out.cue = []; out.days.forEach((d) => { d.cue = []; }); }   // B31: What to wear off: no clothing or umbrella cue anywhere (the saved state above keeps the cue's memory)
 return out;
 }
 
@@ -792,7 +793,7 @@ async function run(input) {
     renderedAt: ((input || {}).trmnl && input.trmnl.system && input.trmnl.system.timestamp_utc) || 0 };
   var model = SWModel.build(raw, { unit: fahrenheit ? 'fahrenheit' : 'celsius' }), moon = moonIcon(weather && weather.current && weather.current.time), phase = moonPhase(weather && weather.current && weather.current.time, w.utc_offset_seconds);
   var pc = stObj(st0.cue), pmt = stObj(st0.mt);
-  var vo = { prevCue: pc && typeof pc.top === 'string' ? pc : null, prevMt: pmt, pressAgo: past.ago, prevHour: past.prev, hourly: w.hourly, hours: bottomHours(field(input, 'bottom', 'auto'), w.current && w.current.time, field(input, 'bottom_switch', '18')), limb: moonLimb(Date.parse(((w.current || {}).time || '') + 'Z') - (w.utc_offset_seconds || 0) * 1000, w.latitude, w.longitude) };
+  var vo = { wear: !/^(false|no|0)$/i.test(String(field(input, 'show_wear', true))), prevCue: pc && typeof pc.top === 'string' ? pc : null, prevMt: pmt, pressAgo: past.ago, prevHour: past.prev, hourly: w.hourly, hours: bottomHours(field(input, 'bottom', 'auto'), w.current && w.current.time, field(input, 'bottom_switch', '18')), limb: moonLimb(Date.parse(((w.current || {}).time || '') + 'Z') - (w.utc_offset_seconds || 0) * 1000, w.latitude, w.longitude) };
   var ui = buildView(model, i18n, w.daily, moon, phase, vo);
   if (fb && fb.asOf) ui.stale = i18n.ours.asof + ' ' + clk(fb.asOf.slice(0, 2), fb.asOf.slice(3, 5));
   var st = { v: 1, cue: ui.keep.cue, mt: ui.keep.mt }, keep = snap || stObj(st0.snap); delete ui.keep;

@@ -128,6 +128,42 @@ custom_fields:
   description-nl: 'De balk onderaan met de pluginnaam en de update-tijd verbergen.'
   description-ja: '下部のプラグイン名と更新時刻のバーを非表示にします。'
   default: false
+- keyname: week_style
+  group: Display
+  field_type: select
+  name: 'Week display'
+  name-de: 'Wochenanzeige'
+  name-fr: 'Affichage de la semaine'
+  name-es-ES: 'Vista de la semana'
+  name-nl: 'Weekweergave'
+  name-ja: '週の表示'
+  description: 'The coming days as columns: EQ sliders (a slider per day on one shared temperature scale) or Digital (the high and low in segment digits). Smaller views always show Digital.'
+  description-de: 'Die nächsten Tage als Spalten: EQ-Regler (ein Regler pro Tag auf einer gemeinsamen Temperaturskala) oder Digital (Höchst- und Tiefstwert in Segmentziffern). Kleinere Ansichten zeigen immer Digital.'
+  description-fr: 'Les prochains jours en colonnes : curseurs EQ (un curseur par jour sur une échelle de température commune) ou Numérique (le maximum et le minimum en chiffres à segments). Les vues plus petites affichent toujours Numérique.'
+  description-es-ES: 'Los próximos días en columnas: deslizadores EQ (uno por día en una escala de temperatura común) o Digital (máxima y mínima en dígitos de segmentos). Las vistas más pequeñas siempre muestran Digital.'
+  description-nl: 'De komende dagen als kolommen: EQ-schuiven (een schuif per dag op één gedeelde temperatuurschaal) of Digitaal (hoogste en laagste in segmentcijfers). Kleinere weergaven tonen altijd Digitaal.'
+  description-ja: '今後の数日を列で表示します。EQスライダー（共通の温度目盛り上に1日1本のスライダー）またはデジタル（最高・最低気温をセグメント数字で表示）。小さい表示は常にデジタルです。'
+  options:
+  - EQ sliders: eq
+  - Digital: digital
+  default: eq
+  optional: true
+- keyname: show_wear
+  group: Display
+  field_type: boolean
+  name: 'What to wear'
+  name-de: 'Was anziehen'
+  name-fr: 'Quoi porter'
+  name-es-ES: 'Qué ponerse'
+  name-nl: 'Wat aantrekken'
+  name-ja: '服装のヒント'
+  description: 'Show the clothing and umbrella icons next to the temperature and in the week. Off hides them everywhere.'
+  description-de: 'Die Kleidungs- und Schirm-Symbole neben der Temperatur und in der Woche anzeigen. Aus blendet sie überall aus.'
+  description-fr: 'Afficher les icônes de vêtements et de parapluie à côté de la température et dans la semaine. Désactivé les masque partout.'
+  description-es-ES: 'Mostrar los iconos de ropa y paraguas junto a la temperatura y en la semana. Desactivado los oculta en todas partes.'
+  description-nl: 'Toon de kleding- en paraplu-iconen naast de temperatuur en in de week. Uit verbergt ze overal.'
+  description-ja: '気温の横と週表示に、服装と傘のアイコンを表示します。オフにするとすべて非表示になります。'
+  default: true
 - keyname: sensor_source
   group: Sensor
   field_type: select
