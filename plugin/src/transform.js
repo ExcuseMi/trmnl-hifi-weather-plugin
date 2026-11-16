@@ -438,18 +438,6 @@ var hi = or(pick('apparent_temperature', Math.max), or(dv('apparent_temperature_
 var p = or(pick('precipitation_probability', Math.max), dv('precipitation_probability_max'));
 return { rain: p !== null && p >= 50, lo: lo, hi: hi, uv: dv('uv_index_max'), day: true };
 }
-// Console cue input (owner 2026-11-13): what to wear follows the next hours, what to bring the rest of the day. Garment
-// from the felt temperature now to +3 h (hourly; the hours start at the current one), umbrella when any hour from now to
-// 19:00 today (at least to +3 h) is wet as in the rain calendar (50 %), sunglasses from today's max UV in daytime; the
-// current values where the hourly data is missing.
-function nowCueInput(hourly, hours, now, uvMax) {
-var list = (o, k) => o && Array.isArray(o[k]) ? o[k] : [], num = (v) => typeof v === 'number' && isFinite(v) ? v : null;
-var ft = list(hourly, 'apparent_temperature').slice(0, 4).map(num), at = list(hourly, 'temperature_2m').slice(0, 4).map(num), fv = ft.map((v, k) => v !== null ? v : (at[k] !== undefined ? at[k] : null)).filter((v) => v !== null);
-var cur = now.feels !== null && now.feels !== undefined ? now.feels : now.temp;
-var hs = hours || [], h0 = hs.length ? hs[0].h : null, span = h0 !== null && h0 >= 0 && 19 - h0 > 3 ? 19 - h0 : 3;
-var rain = hs.length ? hs.slice(0, span + 1).some((q) => SWModel.hourWet(q, 50)) : null;
-return { lo: fv.length ? Math.min.apply(null, fv) : cur, hi: fv.length ? Math.max.apply(null, fv) : cur, rain: rain, uv: uvMax, day: now.day !== false };
-}
 function rainRows(c) { return c.slice(6, 9).some((q) => q.wet) ? 3 : 2; }
 // Hours strip (owner): 12 hours from the current one, hour stamp per time format, icon, temperature, rain as in the
 // calendar (hourWet at 50 %), one shared scale with a degree of room under the coldest hour so it still shows a block.
@@ -519,7 +507,7 @@ var sun = { rise: (M.sunT || {}).riseL || '--', set: (M.sunT || {}).setL || '--'
 var trend = pressTrend(n.press, opt && opt.pressAgo);
 var hrs = opt && opt.hours ? hourStrip(M.hours || [], fmt, deg, opt.prevHour) : null;   // owner: bottom strip Hours instead of the days
 var out = {
-ok: M.ok, meters: meters, cue: cueFor((() => { var ci = nowCueInput(opt && opt.hourly, M.hours, n, t.uvMax); if (ci.rain === null) ci.rain = wetIn12; return ci; })(), F_, opt && opt.prevCue),
+ok: M.ok, meters: meters, cue: cueFor(dayCueInput(opt && opt.hourly, daily, d0), F_, opt && opt.prevCue),   // owner 2026-11-16 (Fable review): the console cue is today's column cue, one function on today 07:00 to 19:00 (the saved memory applies to both)
 cond: (i18n.cond[n.code] || [])[n.day === false ? 1 : 0] || '', icon: wiUrl(n.icon, n.day), iconInk: wiInk(n.icon, n.day),
 temp: tStr, unit: deg + M.unit,   // owner 2026-11-13: no felt readout; the felt temperature drives the clothing cue only
 inn: inT === null ? null : { temp: t1(inT), im: M.inn.main !== false, out: O.outdoor, in: O.indoor, hum: M.inn.hum === null || hm ? '' : O.hum + ' ' + Math.round(M.inn.hum) + ' %' },
@@ -533,6 +521,7 @@ icons: ['wi-thunderstorm', 'wi-rain', 'wi-day-cloudy', 'wi-day-sunny'].map((k) =
 tdial: { now: tv, twin: inT, lo: tl, hi: th, a: tsc ? tsc.a : 0, b: tsc ? tsc.b : 15, step: tst, name: O.temperature, unit: deg + M.unit, value: tStr, arrow: tempTrend(tv, ((M.hours || [])[3] || {}).t, F_) }
 };
 if (hrs) { out.hours = hrs.hours; out.hscale = hrs.scale; }
+if (out.days[0] && out.days[0].today) out.days[0].cue = out.cue.slice(0, 3);   // today's column shows exactly the console's advice (hysteresis included)
 var tp = TOPS.indexOf(out.cue[0]) >= 0 ? out.cue[0] : (opt && opt.prevCue && opt.prevCue.top) || null;
 var kb = Object.assign({}, pb); meters.forEach((m) => { if (typeof m.bad === 'boolean') kb[m.key] = m.bad; });
 out.keep = { cue: { top: tp }, mt: { uv: t.uvMax === null ? pm.uv : uvOn, co2: M.inn.co2 === null ? pm.co2 : co2Up, bad: kb } };   // what the next run remembers (saved state)
@@ -827,4 +816,4 @@ async function run(input) {
   return { trmnl_state: fitState(st), ui: ui, model: model, sun: sunO, moon: moon, pollen: pollenV, ph: ph, weather: weather, aq: aq, i18n: i18n, unit: fahrenheit ? 'fahrenheit' : 'celsius', sensor: sres ? { src: prov, ok: sres.ok, err: sres.ok ? null : sres.err, kept: !sres.ok && !!sx } : null, clock: ((m) => m ? clk(m[1], m[2]) : null)(/T(\d{2}):(\d{2})/.exec(String((w.current || {}).time || ''))) };
 }
 
-if (typeof module !== 'undefined') module.exports = { run: run, phOverlay: phOverlay, omUrls: omUrls, readIndoor: readIndoor, sClean: sClean, SENS_PROV: SENS_PROV, WMO_TO_WAPI: WMO_TO_WAPI, snapOf: snapOf, fromSnap: fromSnap, fitState: fitState, bottomHours: bottomHours, tempTrend: tempTrend, hourStrip: hourStrip, dayNames: dayNames, buildView: buildView, rainHours: rainHours, rainRows: rainRows, timeIs12: timeIs12, pressTrend: pressTrend, dropPast: dropPast, cueFor: cueFor, dayCueInput: dayCueInput, nowCueInput: nowCueInput, field: field, buildI18n: buildI18n, normaliseLocale: normaliseLocale, pollenLevel: pollenLevel, sunTimes: sunTimes, moonIcon: moonIcon, moonPhase: moonPhase, moonLimb: moonLimb, moonSky: moonSky };
+if (typeof module !== 'undefined') module.exports = { run: run, phOverlay: phOverlay, omUrls: omUrls, readIndoor: readIndoor, sClean: sClean, SENS_PROV: SENS_PROV, WMO_TO_WAPI: WMO_TO_WAPI, snapOf: snapOf, fromSnap: fromSnap, fitState: fitState, bottomHours: bottomHours, tempTrend: tempTrend, hourStrip: hourStrip, dayNames: dayNames, buildView: buildView, rainHours: rainHours, rainRows: rainRows, timeIs12: timeIs12, pressTrend: pressTrend, dropPast: dropPast, cueFor: cueFor, dayCueInput: dayCueInput, field: field, buildI18n: buildI18n, normaliseLocale: normaliseLocale, pollenLevel: pollenLevel, sunTimes: sunTimes, moonIcon: moonIcon, moonPhase: moonPhase, moonLimb: moonLimb, moonSky: moonSky };

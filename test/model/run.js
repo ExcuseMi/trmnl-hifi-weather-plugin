@@ -234,7 +234,7 @@ test('indoor sensor in the view: BUITEN/BINNEN twin readout, twin needle, CO2 me
   eq([hmt && hmt.tw.out, hmt && hmt.tw.in, hmt && hmt.tw.m.frac > 0.4 && hmt.tw.m.frac < 0.6, none.meters.some((m) => m.tw), view({ temp: 21.6 }).meters.some((m) => m.tw)], ['BUITEN', 'BINNEN', true, false, false], 'owner 2026-11-13: indoor humidity is a second block set on the humidity row, one set without the sensor or without a humidity reading');
   ok(v.tdial.b >= 21.6, 'dial scale holds the indoor needle');
   const out = view({}), M0 = SWModel.build(raw, {}), cold = Object.assign({}, M0, { now: Object.assign({}, M0.now, { temp: 15, feels: 1 }) });
-  eq(['feels' in out, T.buildView(cold, T.buildI18n('nl'), raw.daily).cue[0]], [false, 'parka'], 'owner 2026-11-13: no felt readout without a sensor either; the felt temperature (1) still picks the top layer (parka, not the air temperature 15)');
+  eq(['feels' in out, T.buildView(cold, T.buildI18n('nl'), raw.daily).cue[0]], [false, 'sweater'], 'owner 2026-11-13: no felt readout without a sensor either; owner 2026-11-16: the console cue is today\'s column cue (daily range 1.4 to 13.1: no parka, the warmest 13.1 gives the sweater), not the felt temperature now');
   // owner 2026-11-14 (replaces 'CO2 above 1400 ppm moves up to second place, a normal reading stays last'): with an indoor reading the indoor group comes first, CO2 then the indoor humidity row (the outdoor humidity right after it), then the other outdoor meters in the usual order; no indoor reading: the usual order
   const ks = (inn) => view(inn).meters.map((m) => m.key);
   eq(ks({ temp: 21.6, hum: 48, co2: 900 }).slice(0, 2), ['co2', 'humidity'], 'CO2, then the humidity twin first');
@@ -527,7 +527,7 @@ test('barometer trend over 3 h with +/-1 hPa thresholds; clothing cues for every
   eq(T.buildI18n('xx').ours.p_rising, 'RISING', 'unknown language falls back to English');
   const f = fx('mixed');
   const M = SWModel.build(f, {}), calm = T.buildView(M, i, f.daily, null, 0.3, { pressAgo: 1015 }), none = T.buildView(M, i, f.daily, null, 0.3);
-  eq([calm.cue, calm.baro.trend], [['parka', 'umbrella'], 'DALEND'], 'mixed has rain in the window, 1013.2 now against 1015');
+  eq([calm.cue, calm.baro.trend], [['sweater', 'umbrella'], 'DALEND'], 'mixed has rain in the window, 1013.2 now against 1015; the cue is today\'s column cue (owner 2026-11-16)');
   eq(none.baro.trend, null, 'no pressure 3 h ago: no trend');
 });
 test('past_hours=3: the past hours are cut so every hourly list starts at the current hour; the pressure 3 h ago is kept', () => {
@@ -562,19 +562,6 @@ test('hours strip: 12 hours from now, stamps per time format, rain only on wet h
   ok(T.buildView(SWModel.build(dry, {}), i, f.daily, null, 0.3, { hours: true }).hours.every((q) => !q.wet), 'dry: no rain stamps');
   eq(T.hourStrip([], String, '°'), null);
 });
-test('console cue window (owner 2026-11-13): garment now to +3 h, umbrella to 19:00 today (at least +3 h)', () => {
-  const C = (hourly, hours, now, uv) => T.cueFor(T.nowCueInput(hourly, hours, Object.assign({ temp: 15, feels: 15, day: true }, now || {}), uv === undefined ? 2 : uv), false).join('+');
-  const H = (h0, n, wetAt) => Array.from({ length: n }, (_, k) => ({ h: (h0 + k) % 24, p: (h0 + k) % 24 === wetAt ? 80 : 0, wet: false }));
-  eq(C({ apparent_temperature: [15, 15, 15, 15, -10] }, H(7, 25)), 'sweater', 'a cold hour at +4 h does not count');
-  eq(C({ apparent_temperature: [15, 15, 15, 1, 15] }, H(7, 25)), 'sweater', 'one cold felt hour up to +3 h is no parka when the warmest is 15 (owner 2026-11-16)');
-  eq(C({ apparent_temperature: [5, 6, 4, 1, 15] }, H(7, 25)), 'parka', 'all hours up to +3 h under 8 and the coldest under 3: the parka');
-    eq(C({ apparent_temperature: [20, 20, 20, 20] }, H(7, 25, 15)), 'tshirt+umbrella', 'rain at 15:00 shows the umbrella at 07:30');
-  eq(C({ apparent_temperature: [20, 20, 20, 20] }, H(7, 25, 20)), 'tshirt', 'rain at 20:00 is after 19:00: no umbrella in the morning');
-  eq([C({ apparent_temperature: [20, 20, 20, 20] }, H(21, 25, 0)), C({ apparent_temperature: [20, 20, 20, 20] }, H(21, 25, 1))], ['tshirt+umbrella', 'tshirt'], 'evening (21:00): the umbrella looks to +3 h (00:00), not +4 h');
-  eq(C({ apparent_temperature: [20, 20, 20, 20] }, H(7, 25), { day: true }, 7), 'tshirt', 'no sunglasses (owner), whatever the UV');
-  eq(C({ apparent_temperature: [20, 20, 20, 20] }, H(7, 25), { day: false }, 7), 'tshirt', 'no sunglasses at night');
-  const fb = T.nowCueInput(null, [], { temp: 15, feels: 1, day: true }, 2); eq([fb.lo, fb.hi, fb.rain], [1, 1, null], 'no hourly data: the current felt temperature; rain falls back to the rain window');
-});
 test('meters: forecast only, the later max from today\'s coming hours, the peak (WIND: max gust still to come) (owner 2026-11-13, forecast only 2026-11-14)', () => {
   const f = fx('mixed'), today = (k) => String(f.hourly.time[k]).slice(0, 10) === '2026-11-08';
   const g = JSON.parse(JSON.stringify(f)); g.current.time = '2026-11-08T13:00'; g.current.relative_humidity_2m = 30; g.current.wind_speed_10m = 12; g.current.wind_gusts_10m = 20; g.current.pressure_msl = 1010;
@@ -592,6 +579,17 @@ test('meters: forecast only, the later max from today\'s coming hours, the peak 
   const none = T.buildView(SWModel.build(f, {}), T.buildI18n('nl'), f.daily), h = none.meters.find((q) => q.key === 'humidity');
   eq([h.past, h.later], [null, null], 'no hourly humidity: no earlier or later cells');
   eq(v.meters.filter((q) => q.key === 'co2' || q.key === 'pollen').filter((q) => q.past !== null || q.later !== null || q.peak !== null).length, 0, 'CO2 and pollen: no marks');
+});
+test('today: the console cue and the week column come from one function on today 07:00 to 19:00 (Fable review wip 11: parka in the panel, sweater in the column)', () => {
+  const f = fx('mixed'), M = SWModel.build(f, {}), i = T.buildI18n('nl'), date = f.daily.time[0];
+  const ht = [], at = [];
+  for (let h = 0; h < 24; h++) { ht.push(date + 'T' + String(h).padStart(2, '0') + ':00'); at.push(h < 8 || h > 15 ? 1 : 13); }
+  at[7] = 1;
+  const v = T.buildView(M, i, f.daily, null, 0.3, { hourly: { time: ht, apparent_temperature: at } });
+  eq([v.days[0].today, v.cue.join('+'), v.days[0].cue.join('+')], [true, v.days[0].cue.join('+'), v.days[0].cue.join('+')], 'the panel and today column show the same advice');
+  eq(v.cue[0], 'sweater', 'coldest 1, warmest 13: no parka (the warmest is not under 8), the top follows the warmest');
+  const w = T.buildView(M, i, f.daily, null, 0.3, { hourly: { time: ht, apparent_temperature: at.map((x) => x === 13 ? 6 : x) } });
+  eq([w.cue[0], w.days[0].cue[0]], ['parka', 'parka'], 'coldest 1, warmest 6: the parka in both');
 });
 test('per-day clothing cue: daytime hours 07:00 to 19:00 from the hourly data, daily values where the hours are missing', () => {
   const d = { time: ['2026-11-08', '2026-11-09'], temperature_2m_min: [0, 8], temperature_2m_max: [10, 15], apparent_temperature_min: [-5, 6], apparent_temperature_max: [8, 14], precipitation_probability_max: [90, 10], uv_index_max: [1, 7] };
