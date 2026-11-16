@@ -230,7 +230,7 @@ var k = e.getAttribute('data-sw-lk'), m = SW.meters.filter(function (q) { return
 if (k === 'humidity') on = e.hasAttribute('data-sw-lin') && v[1] !== null && (v[1] < 30 || v[1] > 60);
 else if (k === 'co2') on = v[2] !== null && v[2] >= 1400;
 else on = m.bad === undefined ? !!(m.zones && m.frac >= m.zones[1]) : m.bad;
-['bg--black', 'text--white', 'rounded--xsmall'].forEach(function (c) { e.classList.toggle(c, on); }); e.classList.toggle('px--1', on); if (on) e.setAttribute('data-sw-lit', ''); else e.removeAttribute('data-sw-lit');
+['bg--black', 'text--white', 'rounded--xsmall'].forEach(function (c) { e.classList.toggle(c, on); }); e.classList.toggle('px--1', on && !e.closest('[data-sw-srow]'));   /* the small console's label box has a fixed width: no padding there */ if (on) e.setAttribute('data-sw-lit', ''); else e.removeAttribute('data-sw-lit');
 });
 }
 function swNameFit() {
