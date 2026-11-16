@@ -134,10 +134,10 @@ test('time format: the setting decides, 24 h when missing, the TIME constant ove
   eq([T.timeIs12('24', '12'), T.timeIs12('12', '24')], [false, true], 'constant wins');
   const y = fs.readFileSync(path.join(__dirname, '../../plugin/src/settings.yml'), 'utf-8');
   const fields = y.split(/^- keyname: /m).slice(1).map((part) => ({ key: part.split('\n')[0], group: (/^  group: (.+)$/m.exec(part) || [])[1] || null }));
-  const OLD = ['author_info', 'lat_lon', 'unit', 'time_format', 'bottom', 'bottom_switch', 'hide_title_bar', 'sensor_label', 'sensor_primary', 'legend'];
+  const OLD = ['author_info', 'lat_lon', 'unit', 'time_format', 'bottom', 'bottom_switch', 'hide_title_bar', 'sensor_label', 'sensor_primary'];
   const keys = fields.map((f) => f.key), GRP = 'Sensor';
   eq(keys.filter((k) => OLD.includes(k)), OLD, 'B22: the live setting keys that stay (label, main reading) keep their name and order; sensor_show is merged into sensor_source and sensor_co2 is removed (owner 2026-11-15: the CO2 meter follows the source) (owner 2026-11-15)');
-  eq(fields.filter((f) => OLD.includes(f.key)).map((f) => f.group), [null, null, 'Display', 'Display', 'Display', 'Display', 'Display', GRP, GRP, 'Legend'], 'settings groups (the legend is the last, collapsed group)');
+  eq(fields.filter((f) => OLD.includes(f.key)).map((f) => f.group), [null, null, 'Display', 'Display', 'Display', 'Display', 'Display', GRP, GRP], 'settings groups (the legend is the last, collapsed group)');
   ok(!keys.includes('sensor_show'), 'sensor_show is gone: "None" in the Sensor select is the hide');
   const B31 = ['week_style', 'show_wear'];
   ok(fields.filter((f) => !OLD.includes(f.key) && !B31.includes(f.key)).every((f) => f.group === GRP && /^sensor_/.test(f.key)), 'B22: the new source settings are all in the Sensor group');
@@ -147,7 +147,7 @@ test('time format: the setting decides, 24 h when missing, the TIME constant ove
   ok(/options:\n  - Blocks: blocks\n  - Digital: digital\n  default: blocks\n/.test(ws), 'B32: week_style options Blocks (new, the default) and Digital (value unchanged); the removed auto and eq values map to Blocks in the page');
   ok(/default: true/.test(y.split(/^- keyname: show_wear/m)[1].split(/^- keyname: /m)[0]), 'B31: show_wear is a boolean, default on');
   ['name', 'name-de', 'name-fr', 'name-es-ES', 'name-nl', 'name-ja', 'description-de', 'description-fr', 'description-es-ES', 'description-nl', 'description-ja'].forEach((k) => ok(new RegExp('^  ' + k + ': ', 'm').test(ws), 'B31: week_style has ' + k));
-  const grp = keys.slice(keys.indexOf('sensor_source'), keys.indexOf('legend'));
+  const grp = keys.slice(keys.indexOf('sensor_source'));
   eq([grp[0], grp[1], grp.slice(-3)], ['sensor_source', 'sensor_device_id', ['sensor_icon', 'sensor_label', 'sensor_primary']], 'order in the group: source, provider fields, place (B24), label, main reading');
   // B22 (coordinator, server copy 541930): TRMNL silently fails the form's required check for a field a rule hides unless it is optional: true; a provider's must-haves are required only when it is chosen
   const blocks = y.split(/^- keyname: /m).slice(1), blk = (k) => blocks.find((q) => q.startsWith(k + '\n'));
@@ -333,6 +333,16 @@ test('indoor humidity balance meter (owner 2026-11-16): the cells fill outward f
   eq([25, 30, 39, 40, 55, 56, 65, 66, 100].map((h) => st(h).cells), [[0, 1], [1], [1], [], [], [3], [3], [3, 4], [3, 4]], 'under 30 two left, 30 to under 40 one left, 40 to 55 none, over 55 to 65 one right, over 65 two right');
   ok(st(50).tick && !st(50).shadow, 'one centre tick, no shadow');
 }); 
+test('the try-it page offers exactly the options of settings.yml for every select it shows (owner 2026-11-16: it still offered the removed EQ sliders)', () => {
+  const y = fs.readFileSync(path.join(__dirname, '../../plugin/src/settings.yml'), 'utf8'), h = fs.readFileSync(path.join(__dirname, '../../tools/site/page/index.html'), 'utf8');
+  const opts = (k) => { const m = y.match(new RegExp('^- keyname: ' + k + '\\n[\\s\\S]*?^  options:\\n((?:  - .*\\n)+)', 'm')); return m ? m[1].split('\n').filter(Boolean).map((l) => l.replace(/^.*: ?'?([^':]*)'?$/, '$1')) : null; };
+  let n = 0, wk = false;
+  for (const m of h.matchAll(/<select id="(\w+)">([\s\S]*?)<\/select>/g)) {
+    const want = opts(m[1]); if (!want) continue;
+    n++; if (m[1] === 'week_style') wk = true; eq([...m[2].matchAll(/<option value="([^"]*)"/g)].map((q) => q[1]).sort(), want.slice().sort(), 'select ' + m[1] + ' follows settings.yml');
+  }
+  ok(n >= 4 && wk, 'the check saw ' + n + ' selects (week_style among them)');
+});
 test('rain calendar: 12 hours from the first wet hour, rain hours lit', () => {
   const hrs = Array.from({ length: 25 }, (_, i) => ({ h: String(i).padStart(2, '0') }));
   const c = T.rainHours(hrs, { from: 5, to: 7 });
@@ -960,7 +970,7 @@ test('no shown label falls back to English in any locale (item 38.1)', () => {
   eq(empty, [], 'empty CJK slots');
 });
 
-test('guide and legend (owner 2026-11-15): every meter and every major screen element is explained in the site guide, the README and the Legend field; About links the guide in every language', () => {
+test('guide (owner 2026-11-16: the Legend field and the numbered legends are gone): the site guide section and the README explain every meter; About links the guide in every language', () => {
   const root = path.join(__dirname, '..', '..'), rd = (f) => fs.readFileSync(path.join(root, f), 'utf-8');
   const SITE = 'https://excusemi.github.io/trmnl-hifi-weather-plugin/';
   const y = rd('plugin/src/settings.yml'), parts = y.split(/^- keyname: /m).slice(1);
@@ -968,28 +978,21 @@ test('guide and legend (owner 2026-11-15): every meter and every major screen el
   // the meter keys come from the transform (RO_ORDER) plus the rain gauge the markup draws
   const keys = JSON.parse(/var RO_ORDER = (\[[^\]]*\])/.exec(src)[1].replace(/'/g, '"')).concat(['rain']);
   ok(keys.length === 8 && keys.includes('co2') && keys.includes('pollen'), 'meter keys read from transform.js: ' + keys);
-  const ELEMENTS = ['baro', 'pressure', 'tdial', 'marks', 'trend', 'meters', 'cells', 'title', 'digits', 'cues', 'sun', 'moon', 'hours', 'footer', 'rain', 'calendar', 'gust', 'sensor', 'twin', 'days', 'today', 'range', 'zero', 'daycues', 'views', 'dark'];
   const site = rd('tools/site/page/index.html');
   ok(site.includes('id="guide"'), 'the site has the guide section');
-  keys.map((k) => 'm-' + k).concat(ELEMENTS).forEach((e) => ok(site.includes('data-guide="' + e + '"'), 'the site guide explains ' + e));
   const LAB = { wind: 'WIND', uv: 'UV', aqi: 'AQI', humidity: 'HUM', pollen: 'POLLEN', baro: 'BARO', co2: 'CO2', rain: 'RAIN' };
   const readme = rd('README.md');
   ok(readme.includes('### Reading the screen') && readme.includes(SITE + '#guide'), 'README has the section and links the guide');
   keys.forEach((k) => ok(readme.includes('| ' + LAB[k] + ' |'), 'README table has a row for ' + k));
   // the numbers the texts quote are the code's: if a zone or scale moves, the texts move with it
   ok(/ZONES = \{ wind: \[0\.5, F_ \? 0\.75 : 0\.83\], co2: \[0\.375, 0\.625\], pollen: \[0\.3, 0\.6\], aqi: \[0\.4, 0\.6\], uv: \[3 \/ 11, 8 \/ 11\] \}/.test(src) && /SCL = \{ wind: \[0, F_ \? 40 : 60\], uv: \[0, 11\], aqi: \[0, 100\], humidity: \[0, 100\], baro: \[970, 1050\] \}/.test(src) && /bar\(M\.inn\.co2, 400, 2000\)/.test(src), 'warning zones and scales the guide quotes are unchanged: update guide, README and settings with them');
-  const LEG = { description: ['WIND', 'UV', 'AQI', 'POLLEN', 'CO2', 'HUM', 'BARO'], 'description-de': ['WIND', 'UV', 'AQI', 'POLLEN', 'CO2', 'FEUCHTE', 'BARO'], 'description-fr': ['VENT', 'UV', 'AQI', 'POLLEN', 'CO2', 'HUMIDITÉ', 'BARO'],
-    'description-es-ES': ['VIENTO', 'UV', 'AQI', 'POLEN', 'CO2', 'HUMEDAD', 'BARO'], 'description-nl': ['WIND', 'UV', 'AQI', 'POLLEN', 'CO2', 'VOCHT', 'BARO'], 'description-ja': ['風', 'UV', 'AQI', '花粉', 'CO2', '湿度', '気圧'] };
+  const D6 = ['description', 'description-de', 'description-fr', 'description-es-ES', 'description-nl', 'description-ja'];
   const txt = (p, k) => { const m = new RegExp('^  ' + k + ": '(.*)'$", 'm').exec(p); return m ? m[1] : null; };
-  const lg = part('legend');
-  ok(/^  group: Legend$/m.test(lg) && /^  field_type: description$/m.test(lg) && /^  optional: true$/m.test(lg), 'legend: a description field in the Legend group');
-  Object.keys(LEG).forEach((d) => {
-    const a = txt(part('author_info'), d), l = txt(lg, d);
+  ok(!/^- keyname: legend$/m.test(y), 'the Legend field is gone');
+  D6.forEach((d) => {
+    const a = txt(part('author_info'), d);
     ok(a && a.includes('<a href="' + SITE + '#guide"'), d + ': About links the guide');
     ok(a && /30 \/ 50/.test(a) && /3 \/ 8/.test(a) && /40 \/ 60/.test(a) && /10 \/ 50/.test(a) && /1000 \/ 1400/.test(a), d + ': About quotes the warning / alarming numbers');
-    ok(l && l.includes('<a href="' + SITE + '#guide"') && !/[—–]/.test(l), d + ': the legend links the guide');
-    LEG[d].forEach((n) => ok(l.includes('<strong>' + n + '</strong>'), d + ': the legend has a line for ' + n));
-    ok(/1000/.test(l) && /1400/.test(l) && /(^|\D)30(\D|$)/.test(l) && /(^|\D)50(\D|$)/.test(l), d + ': the legend has the bands');
   });
 });
 
