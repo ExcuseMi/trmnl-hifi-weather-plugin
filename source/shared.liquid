@@ -53,8 +53,7 @@
 {%- if view == 1 %}
  <div class="hidden lg:block h--[28cqh] lg:portrait:h--[22cqh]"><div class="flex flex--row flex--stretch-y gap--base h--full">
   {%- for k in (1..2) %}
-  {%- if k == 2 %}<div class="py--5 shrink-0" data-sw-between><div class="border--v-55 h--full"></div></div>{% endif %}{% comment %} owner: hairlines in the gaps {% endcomment %}
-  {{ p_open_g }}<div class="relative h--full w--full">
+  {{ p_open_g }}{% if k == 1 %}<div class="absolute right--0 top--5 bottom--5" data-sw-between><div class="border--v-55 h--full"></div></div>{% endif %}{% comment %} owner: a thin line where two sections meet, a framework border at the panel edge {% endcomment %}<div class="relative h--full w--full">
    <div class="absolute inset--0" data-sw-part="{% if k == 1 %}baro{% else %}tdial{% endif %}"></div>
    <span class="absolute bottom--3 left--4 title title--base lg:portrait:title--small text--bold" data-sw-cap>{% if k == 1 %}{{ ui.baro.name }}{% else %}{{ ui.tdial.name }}{% endif %}</span>{% comment %} owner step 13 {% endcomment %}
    {%- capture dv_row %}
@@ -69,7 +68,6 @@
   </div>{{ p_close }}
   {%- endfor %}
  </div></div>
- <div class="hidden lg:block w--full px--5" data-sw-between><div class="border--h-55"></div></div>
 {%- endif %}
 {% if calm_q %}{% assign mr_m = 6 %}{% assign mb_m = 4 %}{% endif %}
 {% capture c_meters %}
@@ -116,7 +114,7 @@
  low/high), the meters only when they fit readable. The page script (swSmall) sizes every part from the digit height and drops lower
  items whole. In the full view both consoles are in the markup and the script keeps one (data-sw-big / data-sw-alt). {%- endcomment -%}
 {%- if view != 2 %}
- <div data-sw-console data-sw-small{% if view == 1 %} data-sw-alt{% endif %} class="{{ con_h }}">{{ p_open_g }}<div class="relative flex flex--col flex--center h--full w--full p--2 lg:p--4" data-sw-sbox{% if view == 4 %} data-sw-nocue{% elsif view == 1 %} data-sw-keepcue{% endif %}>
+ <div data-sw-console data-sw-small{% if view == 1 %} data-sw-alt{% endif %} class="{{ con_h }}">{{ p_open_g }}{% if view == 1 %}<div class="hidden lg:block absolute top--0 left--5 right--5" data-sw-between><div class="border--h-55"></div></div>{% endif %}<div class="relative flex flex--col flex--center h--full w--full p--2 lg:p--4" data-sw-sbox{% if view == 4 %} data-sw-nocue{% elsif view == 1 %} data-sw-keepcue{% endif %}>
   <div class="{{ fcy }} flex--center-x gap--small w--full" data-sw-srow="cond">
    {%- if ui.icon %}<span class="block shrink-0 h--full aspect--1/1" data-sw-sicon><img class="{{ iia }} h--full w--full" src="{{ ui.icon }}" alt="" data-sw-ink="{{ ui.iconInk }}" data-sw-icon></span>{% endif %}
    <span class="{{ tsb }}" data-sw-cond data-sw-scond>{{ ui.cond }}</span>
@@ -143,7 +141,7 @@
  </div>{{ p_close }}</div>
 {%- endif %}
 {%- if view <= 2 %}
- <div data-sw-console{% if view == 1 %} data-sw-big{% endif %} class="{{ con_h }}">{{ p_open_g }}<div class="relative flex flex--row lg:portrait:flex--col-reverse{% if view == 2 %} lg:portrait:flex--between{% endif %} {% if view == 1 %}landscape:{% endif %}flex--stretch-y gap--medium lg:gap--large{% if view == 1 %} lg:portrait:gap--medium{% endif %} p--2 lg:p--4 h--full">{% comment %} X portrait (owner step 12) {% endcomment %}
+ <div data-sw-console{% if view == 1 %} data-sw-big{% endif %} class="{{ con_h }}">{{ p_open_g }}{% if view == 1 %}<div class="hidden lg:block absolute top--0 left--5 right--5" data-sw-between><div class="border--h-55"></div></div>{% endif %}<div class="relative flex flex--row lg:portrait:flex--col-reverse{% if view == 2 %} lg:portrait:flex--between{% endif %} {% if view == 1 %}landscape:{% endif %}flex--stretch-y gap--medium lg:gap--large{% if view == 1 %} lg:portrait:gap--medium{% endif %} p--2 lg:p--4 h--full">{% comment %} X portrait (owner step 12) {% endcomment %}
 {{ c_meters }}
   <div class="flex lg:portrait:hidden">{{ vr }}</div>
   <div class="flex flex--row flex--stretch-y gap--medium lg:gap--large grow">
@@ -154,8 +152,7 @@
  </div>{{ p_close }}</div>
 {%- endif %}
 {%- if days_h %}
- <div class="w--full px--5" data-sw-between data-sw-dstrip><div class="border--h-55" data-sw-rule></div></div>{% comment %} owner: no divider between filled {% endcomment %}
- <div class="{{ days_h }} grow" data-sw-dstrip>{{ p_open_g }}<div class="relative flex flex--col flex--center{% if view == 1 %} lg:portrait:flex--evenly{% endif %} h--full p--2 lg:p--4">
+<div class="{{ days_h }} grow" data-sw-dstrip>{{ p_open_g }}<div class="absolute top--0 left--5 right--5" data-sw-between><div class="border--h-55" data-sw-rule></div></div><div class="relative flex flex--col flex--center{% if view == 1 %} lg:portrait:flex--evenly{% endif %} h--full p--2 lg:p--4">
 {%- if ui.hours %}{% comment %} Hours strip (owner) {% endcomment %}
   {%- assign nh_md = 8 %}{% assign nh_lg = 12 %}{% if view == 3 %}{% assign nh_md = 6 %}{% assign nh_lg = 8 %}{% endif %}
   <div class="relative z--2 flex flex--row w--full h--full gap--xsmall" data-sw-hours="{{ nh_md }},{{ nh_lg }}">

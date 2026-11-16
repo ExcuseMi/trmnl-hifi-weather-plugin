@@ -247,14 +247,14 @@ return rows.map(function(q){return q.map(function(v){return v===null?'-':v.toFix
           want2 = pmode == 'dark' ? 85 : 170
           bad << "console divider #{rlum.round} is not the 2-bit palette grey #{want2}" if pbits == '2' && (rlum - want2).abs > 3
           if pbits == '1'
-            stretch = (-12..12).map { |a| (-3..3).map { |d| lum.call(png[(rx * kk + (rvt == 1 ? d : a)).to_i, (ry * kk + (rvt == 1 ? a : d)).to_i]) < 128 } }.transpose.map { |col| col.count(true) }.max   # dark pixels of the best column of a 25 px stretch
+            stretch = (-12..12).map { |a| (-3..3).map { |d| (lum.call(png[(rx * kk + (rvt == 1 ? d : a)).to_i, (ry * kk + (rvt == 1 ? a : d)).to_i]) < 128) == (pmode != 'dark') } }.transpose.map { |col| col.count(true) }.max   # dark pixels of the best column of a 25 px stretch
             bad << 'console divider is not dotted on a 1-bit screen' if stretch.nil? || stretch > 20 || stretch < 3
           end
         end
         want = pmode == 'dark' ? 85 : 170   # only used when the view has no console divider to copy
         # the darkest (light) or lightest (dark) pixel of a 10 px wide band, along a 60 px stretch: the line, if there is one
-        line = lambda do |cx, cy, horiz|
-          vals = (-30..30).step(2).flat_map { |a| (-5..5).map { |d| x = horiz ? cx + a : cx + d; y = horiz ? cy + d : cy + a; lum.call(png[[[x.to_i, 0].max, png.width - 1].min, [[y.to_i, 0].max, png.height - 1].min]) } }
+        line = lambda do |cx, cy, horiz, half = 5|
+          vals = (-30..30).step(2).flat_map { |a| (-half..half).map { |d| x = horiz ? cx + a : cx + d; y = horiz ? cy + d : cy + a; lum.call(png[[[x.to_i, 0].max, png.width - 1].min, [[y.to_i, 0].max, png.height - 1].min]) } }
           pmode == 'dark' ? vals.max : vals.min
         end
         faces.split(';').each do |f|
@@ -265,12 +265,13 @@ return rows.map(function(q){return q.map(function(v){return v===null?'-':v.toFix
           bad << "panel fill #{ins.round} is not the page #{page}" if (ins - page).abs > 3
           [[:bottom, gb, xm, (fbm + gb / 2) * kk, true], [:right, gr, (fr + gr / 2) * kk, ym, false], [:top, ga, xm, (ft - ga / 2) * kk, true], [:left, gl, (fl - gl / 2) * kk, ym, false]].each do |name, g, cx, cy, horiz|
             if g >= 0
-              v = line.call(cx, cy, horiz)
+              half = [(g * kk / 2).floor - 1, 5].max
+              v = line.call(cx, cy, horiz, half)
               ref = rlum || (c['device'] == 'v2' && !c['palette'] ? want : nil)   # no console divider in this view: only the X has a fixed grey to compare with
               next unless ref
               bad << "#{name} divider #{v.round}, the console's dividers are #{ref.round}" if (v - ref).abs > 8
               if rth && rth.positive?
-                th = (-30..30).step(2).map { |a| (-6..6).count { |d| x = horiz ? cx + a : cx + d; y = horiz ? cy + d : cy + a; (lum.call(png[[[x.to_i, 0].max, png.width - 1].min, [[y.to_i, 0].max, png.height - 1].min]) - ref).abs <= 5 } }.max
+                th = (-30..30).step(2).map { |a| (-half..half).count { |d| x = horiz ? cx + a : cx + d; y = horiz ? cy + d : cy + a; (lum.call(png[[[x.to_i, 0].max, png.width - 1].min, [[y.to_i, 0].max, png.height - 1].min]) - ref).abs <= 5 } }.max
                 bad << "#{name} divider #{th}px thick, the console's #{rth}px" if (th - rth).abs > 1.5
               end
             end
@@ -284,7 +285,7 @@ return rows.map(function(q){return q.map(function(v){return v===null?'-':v.toFix
         end
         # the ends: a line that ends inside its section stops short of the section's edge by at least the console's own divider inset (the drawn line's box, not pixels: glows and dots blur those)
         if rin && rin.positive?
-          ie = s.evaluate(%q{(function(RIN){var bad=[],U=function(e){var r=null;[].forEach.call(e?e.querySelectorAll('[data-sw-part="face"]'):[],function(f){var b=f.getBoundingClientRect();if(b.width<40)return;r=r?{left:Math.min(r.left,b.left),top:Math.min(r.top,b.top),right:Math.max(r.right,b.right),bottom:Math.max(r.bottom,b.bottom)}:{left:b.left,top:b.top,right:b.right,bottom:b.bottom}});return r};[].forEach.call(document.querySelectorAll('[data-sw-between]'),function(w){var l=w.firstElementChild,q=l&&l.getBoundingClientRect(),u=U(w.previousElementSibling);if(!q||!u||!(w.getBoundingClientRect().width>0||w.getBoundingClientRect().height>0))return;var h=w.getBoundingClientRect().width>w.getBoundingClientRect().height,wb=w.getBoundingClientRect(),s0=h?wb.left+RIN*0-u.left:wb.top-u.top;var a0=h?(l.getBoundingClientRect().left-u.left):(l.getBoundingClientRect().top-u.top),e0=h?(u.right-l.getBoundingClientRect().right):(u.bottom-l.getBoundingClientRect().bottom);if(a0<RIN-1)bad.push((h?'left':'top')+' end '+a0.toFixed(1)+' px in, the console divider is '+RIN.toFixed(1));if(e0<RIN-1)bad.push((h?'right':'bottom')+' end '+e0.toFixed(1)+' px in, the console divider is '+RIN.toFixed(1))});return bad.slice(0,2).join('; ')})(RINVAL)}.sub('RINVAL', rin.to_s))
+          ie = s.evaluate(%q{(function(RIN){var bad=[];[].forEach.call(document.querySelectorAll('[data-sw-between]'),function(w){var l=w.firstElementChild,q=l&&l.getBoundingClientRect(),pn=w.closest('[data-sw-panel]'),f=pn&&pn.querySelector('[data-sw-part="face"]'),u=f&&f.getBoundingClientRect();if(!q||!u||!(q.width>0||q.height>0)||u.width<40)return;var h=q.width>q.height,a0=h?q.left-u.left:q.top-u.top,e0=h?u.right-q.right:u.bottom-q.bottom;if(a0<RIN-1)bad.push((h?'left':'top')+' end '+a0.toFixed(1)+' px in, the console divider is '+RIN.toFixed(1));if(e0<RIN-1)bad.push((h?'right':'bottom')+' end '+e0.toFixed(1)+' px in, the console divider is '+RIN.toFixed(1))});return bad.slice(0,2).join('; ')})(RINVAL)}.sub('RINVAL', rin.to_s))
           bad << ie unless ie.empty?
         end
         puts "DIVIDER #{c['name']}: #{bad.first(3).join('; ')}" unless bad.empty?
@@ -657,7 +658,7 @@ if(!one('[data-sw-unit="sun"]')&&!document.querySelector('[data-sw-small]'))bad.
 var t=one('[data-sw-part="temp"] svg'),f=one('[data-sw-part="feels"] svg');if(t&&f&&(t.getBoundingClientRect().height<f.getBoundingClientRect().height*1.4||t.getBoundingClientRect().height<innerHeight*0.09))bad.push('temp not bigger '+t.getBoundingClientRect().height.toFixed(0)+'/'+f.getBoundingClientRect().height.toFixed(0));
 var ml=one('[data-sw-mlabel]'),dn=one('[data-sw-dname]');if(ml&&dn&&parseFloat(getComputedStyle(ml).fontSize)>parseFloat(getComputedStyle(dn).fontSize)+0.5)bad.push('meter label > day name');
 var td=one('[data-sw-today]');if(td&&!/label--inverted/.test(td.className))bad.push('today not lit');
-var sc=(document.querySelector('.screen')||document.body).classList;if(sc.contains('screen--1bit')||sc.contains('screen--2bit'))[].filter.call(document.querySelectorAll('[data-sw-rule]'),function(r){return r.getClientRects().length>0;}).forEach(function(r){if(!/-black/.test(r.className))bad.push('dither rule');});
+var sc=(document.querySelector('.screen')||document.body).classList;if(sc.contains('screen--1bit')||sc.contains('screen--2bit'))[].filter.call(document.querySelectorAll('[data-sw-rule]'),function(r){return r.getClientRects().length>0;}).forEach(function(r){if(!/border--[vh]-55/.test(r.className))bad.push('rule is not the shared divider grey');});
 return bad.join('; ');})()})
         puts "OGHV #{c['name']}: #{hv}" unless hv.empty?
         expect(hv).to eq('')
@@ -768,7 +769,7 @@ M.forEach(function(m,i){var a=m[1],g=0.4*a.height;M.slice(i+1).concat(L).forEach
       # same drawn size as its own text, not to the X's screen px; OG and X keep their numbers.
       # An lg screen shorter than the X's 780 framework px (Voyage 765) shares less height among the same rows: its floor shrinks with it.
       pxr = s.evaluate("(function(){var c=getComputedStyle(document.querySelector('.screen')),v=function(n){return parseFloat(c.getPropertyValue(n))||1};return v('--pixel-ratio')*v('--device-ui-scale')*(document.querySelector('.screen--lg')?Math.min(1,Math.min(v('--screen-w'),v('--screen-h'))/780):1)})()").to_f
-      expect(d[1]).to be >= (is_lg ? 53 / 1.8 : 28) * pxr * 0.85 if d[0].positive?   # B29 (owner 2026-11-16): every screen has the divider above the strip now, not only dark mode: the same 15 % allowance for all (it was dark mode's alone)   # the comment above says less 15 % for dark mode's divider; the code never took it (dark rows were 55 px by luck until the larger console)
+      expect(d[1]).to be >= (is_lg ? 53 / 1.8 : 28) * pxr * (c['dark'] ? 0.85 : 1) if d[0].positive?   # the comment above says less 15 % for dark mode's divider; the code never took it (dark rows were 55 px by luck until the larger console)
       expect([d[3], d[4]]).to eq(d[0].positive? ? [1, 1] : [0, 0])
       expect(d[5]).to eq(1)
       # Felt temperature (owner decision 2026-11-13): no felt readout anywhere (no felt digits, no felt word, no person
