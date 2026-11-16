@@ -63,4 +63,16 @@ module.exports = async ({ T, fx, SWModel, check, eq, ok }) => {
     const draw = require('fs').readFileSync(require('path').join(__dirname, '../../source/shared.liquid'), 'utf8');
     ok(!/mk\('HI'|mk\('LO'/.test(draw) && /SW\.hl/.test(draw), 'the captions are not literals in the page script');
   });
+  await check('lamps at their limits: UV 8 lit and 7.9 not, pollen 50 grains lit and 49.9 not, Fahrenheit wind 30 mph lit and 29 not, indoor humidity beyond 60 (Fable review: only wind and AQI had model tests)', async () => {
+    const view = (mut, unit) => { const f = fx('mixed'), m = SWModel.build(f, unit ? { unit } : {}); m.now.day = true; mut(m); return T.buildView(m, T.buildI18n('en'), f.daily, null, 0.3, { hourly: f.hourly }); };
+    const bad = (v, k) => (v.meters.filter((m) => m.key === k)[0] || {}).bad;
+    const uv = (x) => bad(view((m) => { m.today.uvMax = Math.max(x, 3); m.now.uv = x; }), 'uv');
+    eq([uv(8), uv(7.9), uv(11)], [true, false, true], 'UV: 8 lit, 7.9 not');
+    const pol = (g) => bad(view((m) => { m.now.pollen = T.pollenLevel({ current: { grass_pollen: g } }); }), 'pollen');
+    eq([pol(50), pol(49.9), pol(150)], [true, false, true], 'pollen: 50 grains lit, 49.9 not');
+    const wind = (x) => bad(view((m) => { m.now.wind = x; }, 'fahrenheit'), 'wind');
+    eq([wind(30), wind(29), wind(35)], [true, false, true], 'Fahrenheit wind: 30 mph lit, 29 not');
+    const hum = (x) => bad(view((m) => { m.inn.hum = x; m.inn.temp = 21; }), 'humidity');
+    eq(hum(65), undefined, 'the humidity row never carries the outdoor flag (the sensor\'s humidity lights in the page: below 30 and above 60, test in the render suite b30)');
+  });
 };

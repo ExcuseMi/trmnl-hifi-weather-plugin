@@ -463,5 +463,41 @@
   },
   "co2": "yes",
   "want_lit": []
+ },
+ {
+  "name": "b30-x-hum-high",
+  "device": "v2",
+  "view": "full",
+  "locale": "en-US",
+  "vars": {
+   "sensor_readings": {
+    "device_1": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 21.6
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 65
+      }
+     ],
+     "pressure": [],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 600
+      }
+     ]
+    }
+   }
+  },
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days"
+  },
+  "co2": "yes",
+  "want_lit": [
+   "humidity"
+  ]
  }
 ]
