@@ -75,4 +75,8 @@ module.exports = async ({ T, fx, SWModel, check, eq, ok }) => {
     const hum = (x) => bad(view((m) => { m.inn.hum = x; m.inn.temp = 21; }), 'humidity');
     eq(hum(65), undefined, 'the humidity row never carries the outdoor flag (the sensor\'s humidity lights in the page: below 30 and above 60, test in the render suite b30)');
   });
+  await check('the sensor name setting says how much of it shows: about 10 characters, in all six languages (review 4 P3)', async () => {
+    const y = require('fs').readFileSync(require('path').join(__dirname, '../../plugin/src/settings.yml'), 'utf8'), i = y.indexOf('- keyname: sensor_label'), part = y.slice(i, y.indexOf('\n- keyname:', i + 5));
+    ['description', 'description-de', 'description-fr', 'description-es-ES', 'description-nl', 'description-ja'].forEach((d) => ok(new RegExp('\\n  ' + d + ': .*10').test(part), d + ' names the 10 characters'));
+  });
 };

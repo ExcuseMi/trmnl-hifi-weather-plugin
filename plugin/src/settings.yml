@@ -1028,12 +1028,12 @@ custom_fields:
   name-es-ES: 'Nombre del sensor'
   name-nl: 'Sensornaam'
   name-ja: 'センサー名'
-  description: 'Optional. A short name for the sensor, for example Upstairs. It shows next to the sensor''s icon and on the temperature dial. Empty shows the icon alone.'
-  description-de: 'Optional. Ein kurzer Name für den Sensor, zum Beispiel Oben. Er steht neben dem Symbol des Sensors und am Thermometer. Leer zeigt nur das Symbol.'
-  description-fr: 'Facultatif. Un nom court pour le capteur, par exemple Étage. Il s''affiche à côté de l''icône du capteur et sur le thermomètre. Vide : l''icône seule.'
-  description-es-ES: 'Opcional. Un nombre corto para el sensor, por ejemplo Arriba. Se muestra junto al icono del sensor y en el termómetro. Vacío muestra solo el icono.'
-  description-nl: 'Optioneel. Een korte naam voor de sensor, bijvoorbeeld Boven. Hij staat naast het icoon van de sensor en bij de thermometer. Leeg toont alleen het icoon.'
-  description-ja: '任意。センサーの短い名前（例：2階）。センサーのアイコンの横と温度計に表示されます。空欄ならアイコンだけを表示します。'
+  description: 'Optional. A short name for the sensor, for example Upstairs. It shows next to the sensor''s icon and on the temperature dial. Empty shows the icon alone. About 10 characters show.'
+  description-de: 'Optional. Ein kurzer Name für den Sensor, zum Beispiel Oben. Er steht neben dem Symbol des Sensors und am Thermometer. Leer zeigt nur das Symbol. Etwa 10 Zeichen sind sichtbar.'
+  description-fr: 'Facultatif. Un nom court pour le capteur, par exemple Étage. Il s''affiche à côté de l''icône du capteur et sur le thermomètre. Vide : l''icône seule. Environ 10 caractères s''affichent.'
+  description-es-ES: 'Opcional. Un nombre corto para el sensor, por ejemplo Arriba. Se muestra junto al icono del sensor y en el termómetro. Vacío muestra solo el icono. Se ven unos 10 caracteres.'
+  description-nl: 'Optioneel. Een korte naam voor de sensor, bijvoorbeeld Boven. Hij staat naast het icoon van de sensor en bij de thermometer. Leeg toont alleen het icoon. Ongeveer 10 tekens zijn zichtbaar.'
+  description-ja: '任意。センサーの短い名前（例：2階）。センサーのアイコンの横と温度計に表示されます。空欄ならアイコンだけを表示します。表示は約10文字です。'
   placeholder: Upstairs
   optional: true
 - keyname: sensor_primary
