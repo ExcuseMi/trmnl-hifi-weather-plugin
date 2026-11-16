@@ -81,7 +81,7 @@
      <div class="flex flex--row flex--top gap--xsmall"><div class="flex flex--col flex--center gap--xsmall"><div class="{{ fcy }} gap--xsmall{% if tw == 2 and ph.lab %} w--full{% endif %}"><div class="shrink-0 h--[4cqh]" data-sw-part="loc" data-sw-sq data-sw-i="{{ tw | minus: 1 }}" data-sw-loc="{{ tw_k }}" data-sw-lz></div>{% if tw == 2 and ph.lab %}<div style="contain:inline-size;flex:1;min-width:0" data-sw-lw><span class="label text--bold" style="line-height:1.1" data-clamp="1" data-sw-slab>{{ ph.lab }}</span></div>{% endif %}{% if tw == 1 %}{{ cbadge | replace: 'data-sw-part="cue"', 'data-sw-part="cue" data-sw-cb' }}{% endif %}</div><div class="h--[{{ tw_dm | times: hm | times: tm | round | at_most: 100 }}cqh] lg:h--[{{ tw_dl | times: hl | times: tf | round | at_most: 100 }}cqh] lg:portrait:h--[6cqh]" data-sw-part="{% if tw == 1 %}temp{% else %}itemp{% endif %}"></div></div><div class="flex flex--col gap--xsmall"><div class="shrink-0 h--[4cqh]" data-sw-lsp></div><span class="value value--small" data-sw-unit="{% if tw == 2 %}in{% endif %}" data-sw-uu>{{ ui.unit }}</span></div></div>
      {%- if tw == 2 %}<span class="label label--small flex flex--row flex--center-y gap--xsmall">{{ inn_hum }}</span>{% else %}<span class="label label--small">&nbsp;</span>{% endif %}{% comment %} an empty line under BUITEN keeps {% endcomment %}
     </div>{% endfor %}{% else %}
-    <div class="flex flex--row flex--top gap--xsmall shrink-0 {{ tg_h }}"><div class="h--full" data-sw-part="temp"{% if view < 3 %} data-sw-tm{% endif %}></div><span class="value value--small" data-sw-unit data-sw-uu>{{ ui.unit }}</span></div>{% if ui.cue and ui.cue.size > 0 %}<div data-sw-div class="border--v-60 shrink-0 h--full"></div>{% endif %}{% comment %} owner: the thin divider between the {% endcomment %}
+    <div class="flex flex--row flex--top gap--xsmall shrink-0 {{ tg_h }}"><div class="h--full" data-sw-part="temp"{% if view < 3 %} data-sw-tm{% endif %}{% unless ui.cue.size > 0 %} data-sw-tr{% endunless %}></div><span class="value value--small" data-sw-unit data-sw-uu>{{ ui.unit }}</span></div>{% if ui.cue and ui.cue.size > 0 %}<div data-sw-div class="border--v-60 shrink-0 h--full"></div>{% endif %}{% comment %} owner: the thin divider between the {% endcomment %}
     {% if view < 3 %}{{ cbadge | replace: 'data-sw-part="cue"', 'data-sw-part="cue" data-sw-cs="0.52"' }}{% else %}{{ cbadge }}{% endif %}{% endif %}
    </div>
   </div>{% endcapture %}{% capture c_right %}{% comment %}Rain unit (owner){% endcomment %}{% assign rr = 2 %}{% if ui.rain.rows == 3 %}{% assign rr = 3 %}{% endif %}{% assign rr_m = rr %}{% if view == 2 %}{% assign rr_m = 2 %}{% endif %}{% assign k_m = 7 %}{% assign k_l = 4 %}{% if rr_m == 3 %}{% assign k_m = 6 %}{% endif %}{% comment %} X quadrant, 2-row calendar (it {% endcomment %}{% assign kw = 1 %}{% if rr == 3 %}{% assign k_l = 3.4 %}{% assign kw = 0.75 %}{% endif %}{% assign rc_m = k_m | times: hm | round %}{% assign rc_l = k_l | times: hl | round %}{% assign cal_m = rc_m | times: rr_m | at_most: 100 %}{% assign cal_l = k_l | times: hl | times: rr | round | at_most: 100 %}{% assign cal_p = 3 | times: rr %}{% if view == 1 %}{% assign cal_p = 5 | times: rr | divided_by: 2 %}{% endif %}{% if view == 2 %}{% assign cal_p = 5 | times: rr %}{% endif %}{% assign ib_l = cal_l %}{% assign ib_m = cal_m %}{% capture ib_cls %}aspect--1/1 h--[{{ ib_m }}cqh] lg:h--[{{ ib_l }}cqh] {% if view == 2 %}lg:portrait:h--[6cqh]{% elsif view == 1 %}lg:portrait:h--[{{ cal_p }}cqh]{% else %}lg:portrait:h--[7cqh]{% endif %} shrink-0{% endcapture %}{% comment %} X half vertical portrait (owner {% endcomment %}{% comment %} Calm quadrant {% endcomment %}
@@ -163,7 +163,7 @@
   {%- comment %} B31 (owner 2026-11-16): the week display. One column per day, time left to right: weather and clothing icon, the day's part (EQ sliders on one shared scale, or Digital), the name. The full view takes the Week display setting, every smaller view draws Digital. Columns by size class: md landscape, md portrait, lg landscape, lg portrait; never measured. {% endcomment %}
   {%- assign ws = 'dig' %}{% if view == 1 and cf.week_style != 'digital' %}{% assign ws = 'eq' %}{% endif %}
   {%- assign wk_cs = '7,4,7,7' | split: ',' %}{% assign wk_ic = 'h--full' %}{% assign wk_ih = 'h--[7cqh] portrait:h--[5cqh] lg:h--[5cqh] lg:portrait:h--[4cqh]' %}{% assign wk_nh = 'h--[6cqh] lg:h--[4cqh] lg:portrait:h--[3cqh]' %}{% assign wk_lw = 'w--[5cqw] lg:w--[4cqw]' %}
-  {%- if view == 3 %}{% assign wk_cs = '4,3,5,4' | split: ',' %}{% assign wk_ic = 'h--[7cqh] lg:h--[5cqh]' %}{% assign wk_ih = 'h--[14cqh] lg:h--[10cqh]' %}{% assign wk_nh = 'h--[6cqh] lg:h--[4cqh]' %}{% assign wk_lw = 'hidden lg:block lg:portrait:hidden w--[4cqw]' %}{% endif %}
+  {%- if view == 3 %}{% assign wk_cs = '4,3,3,3' | split: ',' %}{% assign wk_ic = 'h--[7cqh] lg:h--[6cqh]' %}{% assign wk_ih = 'h--[14cqh] lg:h--[12cqh]' %}{% assign wk_nh = 'h--[6cqh] lg:h--[4cqh]' %}{% assign wk_lw = 'hidden lg:block lg:portrait:hidden w--[4cqw]' %}{% endif %}
   {%- assign wk_ca = wk_cs[0] | plus: 0 %}{% assign wk_cb = wk_cs[1] | plus: 0 %}{% assign wk_cc = wk_cs[2] | plus: 0 %}{% assign wk_cd = wk_cs[3] | plus: 0 %}
   <div class="relative z--2 flex flex--row gap--none w--full h--full" data-sw-week>
    <div class="shrink-0 flex flex--col gap--none h--full {{ wk_lw }}"><div class="shrink-0 {{ wk_ih }}"></div><div class="grow basis--0 w--full" data-sw-part="wlab" data-sw-ws="{{ ws }}"></div><div class="shrink-0 {{ wk_nh }}"></div></div>
@@ -173,7 +173,7 @@
    <div class="grow basis--0 w--min-0 h--full {% if i < wk_ca %}block{% else %}hidden{% endif %} portrait:{% if i < wk_cb %}block{% else %}hidden{% endif %} lg:{% if i < wk_cc %}block{% else %}hidden{% endif %} lg:portrait:{% if i < wk_cd %}block{% else %}hidden{% endif %}" data-sw-wcol><div class="flex flex--col gap--none h--full w--full">
     <div class="shrink-0 w--full flex {% if view == 3 %}flex--col gap--none{% else %}flex--row gap--xsmall{% endif %} flex--center {{ wk_ih }}">{% if d.icon %}<img class="{{ iia }} {{ wk_ic }}" src="{{ d.icon }}" alt="">{% endif %}{% if d.cue.size > 0 %}<div class="shrink-0 {{ wk_ic }} aspect--1/1" data-sw-part="wcue" data-sw-i="{{ i }}"></div>{% endif %}</div>
     <div class="grow basis--0 w--full" data-sw-part="wday" data-sw-i="{{ i }}" data-sw-ws="{{ ws }}"></div>
-    <div class="shrink-0 w--full flex flex--center {{ wk_nh }}">{% if d.today %}<span class="label label--inverted label--large text--bold" data-sw-today>{{ d.name }}</span>{% else %}<span class="title title--base text--bold" data-sw-dname>{{ d.name }}</span>{% endif %}</div>
+    <div class="shrink-0 w--full flex flex--center-x flex--center-y {{ wk_nh }}">{% if d.today %}<span class="label label--inverted label--large text--bold" data-sw-today>{{ d.name }}</span>{% else %}<span class="title title--base text--bold" data-sw-dname>{{ d.name }}</span>{% endif %}</div>
    </div></div>
   {%- endif %}
   {%- endfor %}
@@ -361,7 +361,7 @@ var W = 56, HH = 100, T = 13, G = 14, x = 0, body = '', dec = '', post = false, 
 function put(t) { if (post) dec += t; else body += t; }
 // Owner 2026-11-14: fixed-width digit cells like an LCD: the 1 sits in a full cell and the integer part always reserves two cells (a minus takes the empty one), so 1.6 and 21.6 have the same width.
 var ip = (/^-?\d*/.exec(str) || [''])[0], idg = ip.replace('-', '').length, neg = ip.charAt(0) === '-';
-if (idg < 2 && !neg && !tr) { if (gh0) gh += Object.values(shapes(x, W, HH, T)).map((q) => poly(q)).join(''); x += W + G; }   /* tr: the outdoor readout beside its icons drops the empty cell */
+if (idg < 2 && !neg && !tr) x += W + G;   /* tr: the outdoor readout beside its icons drops the empty cell */
 for (var i = 0; i < str.length; i++) {
 var ch = str.charAt(i);
 // Owner 2026-11-15 ("-12" showed as "-  12"): the minus ends 0.3 gaps before the ink of the first digit (a 1 has its ink on the right of its cell), so no empty cell sits between them; the width stays the LCD cells'.
@@ -375,7 +375,7 @@ x += w + G;
 }
 if (dec) body += '<g data-sw-dec>' + g(b1() ? '' : (DKM() ? 'text--gray-30 dark:text--gray-30' : 'text--gray-30'), dec) + '</g>';
 var vw = Math.max(1, x - G);
-if (gh && !b1()) body = g(DKM() ? (B2() ? 'text--gray-30' : 'text--gray-20') : 'text--gray-70', gh) + body;   /* B31: the unlit segments as faint ghosts (the week's Digital); none on 1-bit, where no grey exists */
+if (gh && !b1() && !B2()) body = g(DKM() ? 'text--gray-15' : 'text--gray-75', gh) + body;   /* B31: the unlit segments of a used digit as very faint ghosts (the week's Digital), 4-bit only: on 2-bit and 1-bit a ghost would match the grey lows */
 return svg(H * vw / HH, H, glow(body, GPX * HH / H), '0 0 ' + vw + ' ' + HH);
 }
 function segtime(str, cap) {
@@ -472,7 +472,7 @@ for (var v = sc.a; v <= sc.b + 1e-9; v += sc.st * k) body += text(W - 2, wy(sc, 
 return svg(W, H, body);
 }
 function eqcol(SW, i, W, H) {
-var d = SW.days[i] || {}, sc = wsc(SW), m = wm(H), fs = m.fs, kh = m.kh, gp = fs * 0.3, lw = fs * 0.62 * 3.2, kw = Math.max(kh, Math.min(W * 0.4, kh * 3, W - lw - gp - 4)), cx = Math.max(kw / 2 + 1, (W - kw - gp - lw) / 2 + kw / 2), tw = Math.max(5, kh * 0.45), sw = Math.max(1.5, kh * 0.14), body = '', k = 1;
+var d = SW.days[i] || {}, sc = wsc(SW), m = wm(H), fs = m.fs, kh = m.kh, gp = fs * 0.3, lw = fs * 0.62 * 3.2, kw = Math.max(kh, Math.min(W * 0.4, kh * 3, W - 2 * (lw + gp) - 2)), cx = W / 2, tw = Math.max(5, kh * 0.45), sw = Math.max(1.5, kh * 0.14), body = '', k = 1;
 while ((sc.b - sc.a) / (sc.st * k) > 1 && (H - 2 * m.pad) / ((sc.b - sc.a) / (sc.st * k)) < fs * 1.5) k++;
 for (var v = sc.a; v <= sc.b + 1e-9; v += sc.st * k) body += '<line x1="0" x2="' + n1(W) + '" y1="' + n1(wy(sc, H, v)) + '" y2="' + n1(wy(sc, H, v)) + '" ' + SK + '1.5" stroke-dasharray="1.5 6"/>';
 body = g('text--gray-50', body) + rect(cx - tw / 2, m.pad - kh / 2, tw, H - 2 * m.pad + kh, tw / 2, FS + n1(sw) + '"');
@@ -485,11 +485,11 @@ body += text(cx + kw / 2 + gp, ly[0] + 0.36 * fs, d.hi, fs, 'start') + g(inc(), 
 return svg(W, H, body);
 }
 function wdl(SW, W, H) {   /* the Digital layout: the high digits' height from the widest of the shown highs, the low ones 0.6 of it; shared by the column and the captions */
-var mr = 0; (SW.days || []).slice(0, API.nCols || 7).forEach((q) => { mr = Math.max(mr, parseFloat(digits(String(q.hi), 100).match(/width="([\d.]+)"/)[1]) / 100); });
+var mr = 0; (SW.days || []).slice(0, API.nCols || 7).forEach((q) => { mr = Math.max(mr, parseFloat(digits(String(q.hi), 100, true).match(/width="([\d.]+)"/)[1]) / 100); });
 var h1 = Math.min(H * 0.5, W * 0.8 / (mr || 1.7)), h2 = h1 * 0.6, y1 = (H - h1 * 1.78) / 2;
 return { h1: h1, h2: h2, y1: y1, y2: y1 + h1 * 1.18 };
 }
-function wdig(s, h, x, y, c) { var v = digits(s, h, false, true), w = +v.match(/width="([\d.]+)"/)[1]; v = v.replace('<svg ', '<svg x="' + n1(x - w / 2) + '" y="' + n1(y) + '" '); return c ? g(c, v) : v; }
+function wdig(s, h, x, y, c) { var v = digits(s, h, true, true), w = +v.match(/width="([\d.]+)"/)[1]; v = v.replace('<svg ', '<svg x="' + n1(x - w / 2) + '" y="' + n1(y) + '" '); return c ? g(c, v) : v; }
 function digcol(SW, i, W, H) {
 var d = SW.days[i] || {}, L = wdl(SW, W, H), body = i ? g('text--gray-40', '<line x1="1" x2="1" y1="' + n1(Math.max(0, L.y1 - L.h1 * 0.2)) + '" y2="' + n1(Math.min(H, L.y2 + L.h2 * 1.2)) + '" ' + SK + '3" stroke-dasharray="3 7"/>') : '';
 if (d.hiV !== null && d.hiV !== undefined) body += wdig(d.hi, L.h1, W / 2, L.y1) + wdig(d.lo, L.h2, W / 2, L.y2, mid());
