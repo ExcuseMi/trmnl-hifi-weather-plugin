@@ -32,6 +32,7 @@ muts=[
  ('ROWBAND-fill','source/shared.liquid','<div class="relative grow basis--0 w--full h--min-0 {% if i < wr_md %}block','<div class="relative shrink-0 w--full h--[9cqh] {% if i < wr_md %}block',['b31-og1-port-full-dry']),
  ('ROWGAP-pad','source/shared.liquid',"Math.max(3 / k, 0.15 * b.offsetHeight)","Math.max(3 / k, 0.01 * b.offsetHeight)",['b31-og1-port-full-rain']),
  ('ROWONES','source/shared.liquid',"gp = 0.4 * h1, x0 = 0, y1 = (H - h1) / 2, hi, lo;","gp = 0.4 * h1, x0 = i * 3, y1 = (H - h1) / 2, hi, lo;",['b31-og1-port-full-dry']),
+ ('ROWSYM','source/shared.liquid',"inn.style.setProperty('padding-bottom', pd, 'important')","inn.style.setProperty('padding-bottom', '0px', 'important')",['b31-og1-port-full-rain','b31-x-port-full-dig']),
 ]
 which=sys.argv[1:]
 for name,f,old,new,cs in muts:

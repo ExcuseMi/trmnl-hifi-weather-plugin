@@ -176,7 +176,7 @@ module WeekChecks
   # at least a tenth of the row, minimum 3 device px, above and below. Pixel scan of each row box; the divider itself (+-2 px) is not ink.
   ROWS_JS = <<~'JS'
     (function(){var bx=[].filter.call(document.querySelectorAll('[data-sw-wrow-box]'),function(e){var b=e.getBoundingClientRect();return b.width>0&&b.height>0});
-    var tb=document.querySelector('.title_bar'),scr=document.querySelector('.screen'),tr=function(x){var b=x&&x.getBoundingClientRect();return b?[b.left,b.top,b.right,b.bottom].map(Math.round):null};var dv=[].map.call(document.querySelectorAll('[data-sw-part=wrdiv]'),function(e){var v=e.querySelector('svg'),a=e.getBoundingClientRect(),b=v&&v.getBoundingClientRect();return b&&a.width>0?[a.top,b.top,b.height]:null}).filter(Boolean);var on=[].map.call(document.querySelectorAll('[data-sw-part=wrow]'),function(e){if(!e.getBoundingClientRect().width)return null;var sv=e.querySelectorAll('svg svg');if(sv.length<2)return null;var rr=function(q){var g=q.querySelectorAll('g[data-sw-glyph]');return g.length?g[g.length-1].getBoundingClientRect().right:null};return [rr(sv[0]),rr(sv[1])]}).filter(Boolean);var bd=document.querySelector('[data-sw-wkrows] > div'),bb=bd&&bd.getBoundingClientRect();return JSON.stringify({ones:on,band:bb&&bb.width>0?[bb.left,bb.top,bb.right,bb.bottom]:null,cls:(document.querySelector('.screen')||document.body).className,n:SW.days.length,dv:dv,w:innerWidth,tb:tr(tb),scr:tr(scr),body:tr(document.body),dpr:devicePixelRatio,dbg:bx.map(function(e){var q=function(x){var b=x&&x.getBoundingClientRect();return b?[Math.round(b.top),Math.round(b.bottom)]:null};return [q(e),q(e.querySelector('[data-sw-part=wrdiv]')),q(e.lastElementChild),q(e.querySelector('[data-sw-part=wrow]')),e.lastElementChild.style.paddingTop,(function(){var g=e.querySelector('[data-sw-part=wrow] [data-sw-glyph]'),sv=e.querySelector('[data-sw-part=wrow] svg');return [q(g),q(sv),sv&&sv.getAttribute('height'),sv&&sv.getAttribute('viewBox'),innerHeight]})()]}),rows:bx.map(function(e){var b=e.getBoundingClientRect();return [b.left,b.top,b.right,b.bottom]})})})()
+    var tb=document.querySelector('.title_bar'),scr=document.querySelector('.screen'),tr=function(x){var b=x&&x.getBoundingClientRect();return b?[b.left,b.top,b.right,b.bottom].map(Math.round):null};var dv=[].map.call(document.querySelectorAll('[data-sw-part=wrdiv]'),function(e){var v=e.querySelector('svg'),a=e.getBoundingClientRect(),b=v&&v.getBoundingClientRect();return b&&a.width>0?[a.top,b.top,b.height]:null}).filter(Boolean);var on=[].map.call(document.querySelectorAll('[data-sw-part=wrow]'),function(e){if(!e.getBoundingClientRect().width)return null;var sv=e.querySelectorAll('svg svg');if(sv.length<2)return null;var rr=function(q){var g=q.querySelectorAll('g[data-sw-glyph]');return g.length?g[g.length-1].getBoundingClientRect().right:null};return [rr(sv[0]),rr(sv[1])]}).filter(Boolean);var nm=bx.map(function(e){var n=e.querySelector('[data-sw-dname],[data-sw-today]'),b=n&&n.getBoundingClientRect();return b&&b.width>0?[b.left,b.right]:null});var bd=document.querySelector('[data-sw-wkrows] > div'),bb=bd&&bd.getBoundingClientRect();return JSON.stringify({names:nm,ones:on,band:bb&&bb.width>0?[bb.left,bb.top,bb.right,bb.bottom]:null,cls:(document.querySelector('.screen')||document.body).className,n:SW.days.length,dv:dv,w:innerWidth,tb:tr(tb),scr:tr(scr),body:tr(document.body),dpr:devicePixelRatio,dbg:bx.map(function(e){var q=function(x){var b=x&&x.getBoundingClientRect();return b?[Math.round(b.top),Math.round(b.bottom)]:null};return [q(e),q(e.querySelector('[data-sw-part=wrdiv]')),q(e.lastElementChild),q(e.querySelector('[data-sw-part=wrow]')),e.lastElementChild.style.paddingTop,(function(){var g=e.querySelector('[data-sw-part=wrow] [data-sw-glyph]'),sv=e.querySelector('[data-sw-part=wrow] svg');return [q(g),q(sv),sv&&sv.getAttribute('height'),sv&&sv.getAttribute('viewBox'),innerHeight]})()]}),rows:bx.map(function(e){var b=e.getBoundingClientRect();return [b.left,b.top,b.right,b.bottom]})})})()
   JS
 
   def self.rowgap(s, png_path, c)
@@ -198,6 +198,7 @@ module WeekChecks
       mx = cnt.map(&:first).max
       mx < (x1 - x0) * 0.25 ? nil : (cnt.select { |n, _| n >= mx * 0.6 }.map(&:last).minmax.sum / 2.0)
     end
+    puts "ROWFOUND #{c['name']}: #{found.inspect} edges #{edges.map { |e| [e[2], e[3]] }.inspect}" if ENV['ROWDBG']
     off = found.each_with_index.map { |f, i| f && f - edges[i][2] }.compact.first || 0
     out = []; mins = []
     (r['dv'] || []).each_with_index { |(a, b, hh), i| out << "divider #{i + 1} drawn #{(b - a).round(1)} px below its row edge (the svg must start at the edge, 3 px high)" if (b - a).abs > 1.5 }
@@ -209,12 +210,26 @@ module WeekChecks
       y1 = [y1, png.height - 1].min
       h = y1 - y0
       need = [3.0, 0.1 * h].max - 0.6
-      ys = (y0 + 3..y1 - 3).select { |y| (x0..x1).any? { |x| ink.(x, y) } }
+      mk = [3, (0.03 * h).ceil + 1].max   # the divider's dots are 3 px (OG) to 5 px (X) thick: not ink
+      ys = (y0 + mk..y1 - mk).select { |y| (x0..x1).any? { |x| ink.(x, y) } }
       next if ys.empty?
       top = ys.first - y0; bot = y1 - ys.last
       mins << [top, bot].min
+      if (nm = (r['names'] || [])[i]) && !(c['view'] == 'half_vertical' && !r['cls'].include?('screen--lg'))   # (the two-line half vertical rows of the md screens carry the name on their first line)
+        # symmetry: the day name (capitals, no glyph with a short end) stands centred between the dividers, within 2 px
+        nx0 = (nm[0] * k).round - 2; nx1 = (nm[1] * k).round + 2
+        nys = (y0 + mk..y1 - mk).select { |y| (nx0..nx1).any? { |x| ink.(x, y) } }
+        unless nys.empty?
+          na = nys.first - y0; nb = y1 - nys.last
+          puts "ROWNAME #{c['name']} row #{i}: #{na} / #{nb}" if ENV['ROWDBG']
+          out << "row #{i}: the day name stands #{na} px below the divider above and #{nb} px above the one below (centre it within 3 px)" if (na - nb).abs > 3.0
+        end
+      end
+      (@rg ||= []) << [top, bot]
       out << "row #{i}: gap above #{top} px, below #{bot} px, need #{need.round(1)} of a #{h}px row" if top < need || bot < need
     end
+    puts "ROWPAIRS #{c['name']}: #{@rg.inspect}" if ENV['ROWDBG']
+    @rg = []
     puts "ROWOFF #{c['name']}: picture minus DOM #{off.round(1)} px" if ENV['ROWDBG']
     # ROWBAND: the rows share the band evenly (heights within 1.5 px) and fill it (first row at its top, last row at its bottom, 2 px), and there are as
     # many as the size class gives (full and half vertical: 4 md, 7 lg; never more than the days); no empty band.
