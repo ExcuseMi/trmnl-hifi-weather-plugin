@@ -171,7 +171,7 @@
   {%- assign i = forloop.index0 %}
   {%- if i < wk_ca or i < wk_cb or i < wk_cc or i < wk_cd %}
    <div class="relative grow basis--0 w--min-0 h--full {% if i < wk_ca %}block{% else %}hidden{% endif %} portrait:{% if i < wk_cb %}block{% else %}hidden{% endif %} lg:{% if i < wk_cc %}block{% else %}hidden{% endif %} lg:portrait:{% if i < wk_cd %}block{% else %}hidden{% endif %}" data-sw-wcol><div class="flex flex--col gap--none h--full w--full">
-    <div class="shrink-0 w--full flex {% if view == 3 %}flex--col gap--none{% else %}flex--row gap--xsmall{% endif %} flex--center {{ wk_ih }}">{% if d.icon %}<img class="{{ iia }} {{ wk_ic }}" src="{{ d.icon }}" alt="">{% endif %}{% if d.cue.size > 0 %}<div class="shrink-0 {{ wk_ic }} aspect--1/1" data-sw-part="wcue" data-sw-i="{{ i }}"></div>{% endif %}</div>
+    <div class="shrink-0 w--full flex {% if view == 3 %}flex--col gap--none{% else %}flex--row gap--xsmall{% endif %} flex--center {{ wk_ih }}">{% if d.icon %}<div class="shrink-0 {{ wk_ic }} aspect--1/1" data-sw-part="wicon" data-sw-i="{{ i }}"></div>{% endif %}{% if d.cue.size > 0 %}<div class="shrink-0 {{ wk_ic }} aspect--1/1" data-sw-part="wcue" data-sw-i="{{ i }}"></div>{% endif %}</div>
     <div class="grow basis--0 w--full" data-sw-part="wday" data-sw-i="{{ i }}" data-sw-ws="{{ ws }}"></div>
     <div class="shrink-0 w--full flex flex--center-x flex--center-y {{ wk_nh }}">{% if d.today %}<span class="label label--inverted label--large text--bold" data-sw-today>{{ d.name }}</span>{% else %}<span class="title title--base text--bold" data-sw-dname>{{ d.name }}</span>{% endif %}</div>
    </div></div>
@@ -479,21 +479,21 @@ y = n1(API.wzt + wy(sc, API.wzh, 0));
 return svg(W, H, g(b1() ? '' : 'text--gray-40', '<line x1="' + n1(API.wzx) + '" x2="' + n1(W) + '" y1="' + y + '" y2="' + y + '" ' + SK + '1.5"/>'));
 }
 function eqcol(SW, i, W, H) {
-var d = SW.days[i] || {}, sc = wsc(SW), m = wm(H), fs = m.fs, kh = m.kh, gp = fs * 0.3, lw = fs * 0.62 * 3.2, kw = Math.max(kh, Math.min(W * 0.4, kh * 3, W - 2 * (lw + gp) - 2)), cx = W / 2, tw = Math.max(5, kh * 0.4), sw = Math.max(1.5, kh * 0.14), gw = Math.max(1.5, kh * 0.09), tl = Math.max(3, fs * 0.4), tg = Math.max(2, sw * 1.2), tk = '', body = '';
+var d = SW.days[i] || {}, sc = wsc(SW), m = wm(H), fs = m.fs, kh = m.kh, fl = fs * 1.1, gp = fs * 0.3, lw = fl * 0.62 * 3.2, kw = Math.max(kh, Math.min(W * 0.4, kh * 3, W - 2 * (lw + gp) - 2)), cx = W / 2, tw = Math.max(5, kh * 0.4), sw = Math.max(1.5, kh * 0.14), gw = Math.max(1.5, kh * 0.09), tl = Math.max(3, fs * 0.4), tg = Math.max(2, sw * 1.2), tk = '', body = '';
 /* B31 mix (owner 2026-11-16): short tick marks on both sides of the track at every scale step; the 0 line is one element across the week (wzero), the labels move clear of it */
 for (var v = sc.a; v <= sc.b + 1e-9; v += sc.st) { var ty = n1(wy(sc, H, v)); tk += '<line x1="' + n1(cx - tw / 2 - tg - tl) + '" x2="' + n1(cx - tw / 2 - tg) + '" y1="' + ty + '" y2="' + ty + '"/><line x1="' + n1(cx + tw / 2 + tg) + '" x2="' + n1(cx + tw / 2 + tg + tl) + '" y1="' + ty + '" y2="' + ty + '"/>'; }
 body = '<g' + FS.replace(' fill="none"', '') + '1.5">' + tk + '</g>' + '<line data-sw-groove x1="' + n1(cx) + '" x2="' + n1(cx) + '" y1="' + n1(m.pad - kh / 2) + '" y2="' + n1(H - m.pad + kh / 2) + '" ' + SK + n1(gw) + '"/>';   /* the groove: one thin line; the range between the knobs is a wider bar */
-var ok = d.hiV !== null && d.hiV !== undefined && d.loV !== null && d.loV !== undefined, yh = ok ? wy(sc, H, Math.round(d.hiV)) : 0, yl = ok ? wy(sc, H, Math.round(d.loV)) : 0, sep = fs * 1.05, ly = [yh, yl], lx = cx + kw / 2 + gp, y0 = wy(sc, H, 0);
+var ok = d.hiV !== null && d.hiV !== undefined && d.loV !== null && d.loV !== undefined, yh = ok ? wy(sc, H, Math.round(d.hiV)) : 0, yl = ok ? wy(sc, H, Math.round(d.loV)) : 0, sep = fl * 1.05, ly = [yh, yl], lx = cx + kw / 2 + gp, y0 = wy(sc, H, 0);
 if (yl - yh < sep) { var c = (yl + yh) / 2; ly = [c - sep / 2, c + sep / 2]; }
 if (ok && sc.a <= 0 && sc.b >= 0) {
-var vs = [Math.round(d.hiV), Math.round(d.loV)]; ly.forEach((c, q) => { if (Math.abs(y0 - c) < fs * 0.5 + 2.5) ly[q] = y0 + (vs[q] >= 0 ? -1 : 1) * (fs * 0.5 + 3); });   /* a label whose box (half a font size each way, and 2.5 px margin) would touch the line goes whole clear of it: above for a value of 0 or more, below for less */
+var vs = [Math.round(d.hiV), Math.round(d.loV)]; ly.forEach((c, q) => { if (Math.abs(y0 - c) < fl * 0.5 + 2.5) ly[q] = y0 + (vs[q] >= 0 ? -1 : 1) * (fl * 0.5 + 3); });   /* a label whose box (half a font size each way, and 2.5 px margin) would touch the line goes whole clear of it: above for a value of 0 or more, below for less */
 if (ly[1] - ly[0] < sep) { if (vs[1] >= 0) ly[0] = ly[1] - sep; else ly[1] = ly[0] + sep; }
 }
 if (!ok) return svg(W, H, body);
 var pc = (API.paint && (API.paint('white') || {}).color) || '#fff', knob = (y, hi) => rect(cx - kw / 2, y - kh / 2, kw, kh, kh * 0.2, hi ? '' : ' fill="' + pc + '" stroke="currentColor" stroke-width="' + n1(sw) + '"') + '<line x1="' + n1(cx - kw * 0.32) + '" x2="' + n1(cx + kw * 0.32) + '" y1="' + n1(y) + '" y2="' + n1(y) + '" stroke="' + (hi ? pc : 'currentColor') + '" stroke-width="' + n1(Math.max(1.5, sw * 1.2)) + '"/>';
 body += g(d.today || B2() ? blk(true) : mid(), rect(cx - tw / 2, yh, tw, Math.max(0, yl - yh)));   /* 2-bit and 1-bit: every range black, today is the pill */
 body += knob(yl, 0) + knob(yh, 1);
-body += text(lx, ly[0] + 0.36 * fs, d.hi, fs, 'start') + g(inc(), text(lx, ly[1] + 0.36 * fs, d.lo, fs, 'start'));
+body += text(lx, ly[0] + 0.36 * fl, d.hi, fl, 'start') + g(blk(true), text(lx, ly[1] + 0.36 * fl, d.lo, fl, 'start'));   /* the low label as big as the high one and as dark as the range (darkest grey on 4-bit, black on 2-bit and 1-bit) */
 return svg(W, H, body);
 }
 function wal(SW) {   /* the cells of the shown values: the most digits, a minus taking one more */
@@ -562,7 +562,7 @@ sweater: "<path d='M10.2 5Q14 8.4 17.8 5L22.5 7 24 22h-3L19.5 12V24h-11V12L7 22H
 function cue(ks, W, H, wk) {
 ks = (ks || []).filter((k) => CLOTH[k]).slice(0, 2); if (!ks.length) return svg(W, H, '');
 if (!wk) W = Math.max(W, 1.6 * H);
-var s = wk ? 44 : Math.min(48, 30 * W / H), e = wk ? 20 : s * 0.55, sw = (z) => n1(Math.max(1.05, (b1() ? 1.25 : 0.9) * 28 / (z * H / 48)) * 100) / 100,
+var s = wk ? 44 : Math.min(48, 30 * W / H), e = wk ? 20 : s * 0.55, sw = (z) => n1(Math.max(1.05, (b1() ? 1.25 : 0.9) * 28 / (z * H / 48)) * (wk ? 150 : 100)) / 100,   /* the week's small icons: 1.5 times the stroke, to stay crisp on e-ink */
 it = (k, x, y, z) => '<g data-sw-item="' + (k === 'umbrella' ? k : 'top') + '" transform="translate(' + n1(x) + ' ' + n1(y) + ') scale(' + n1(z / 28 * 1000) / 1000 + ')" stroke-width="' + sw(z) + '">' + ((wk && H < 90 && CLOTH_S[k]) || CLOTH[k]) + '</g>', y0 = (48 - s) / 2;
 var body = it(ks[0], 0, y0, s) + (ks[1] ? (wk ? it(ks[1], s - 6, 0, e) : it(ks[1], s * 1.6 - e, y0, e)) : '');   /* B31: in the week the umbrella is a small mark at the garment's top right */
 return svg(W, H, '<svg ' + wh(W, H) + ' viewBox="0 0 ' + n1(48 * W / H) + ' 48" overflow="visible"><g data-sw-cloth data-sw-box="0,0,' + n1(H) + '"><g fill="none" stroke="currentColor"' + LR + ' stroke-width="' + sw(s) + '">' + body + '</g></g></svg>');
@@ -586,6 +586,10 @@ function swFilt(id) { return '<defs><filter id="' + id + '" x="0" y="0" width="1
 function icon(href, W, H) {
 var id = 'swink' + (K++);
 return svg(W, H, swFilt(id) + glow('<image href="' + href + '" x="0" y="0" ' + wh(W, H) + ' filter="url(#' + id + ')"/>', GPX));
+}
+function wicon(href, W, H) {   /* the week's small weather icon: the same file, its strokes made about 1.5 times as thick by laying it over itself shifted by d (0.6 px on small screens, about half a stroke on large ones: the dilate filter works in whole pixels and fuses the fine lines), the ink in the text colour */
+var id = 'swink' + (K++), d = H < 48 ? 0.6 : H * 0.022, o = (a, b, r) => '<feOffset in="SourceAlpha" dx="' + n1(a) + '" dy="' + n1(b) + '" result="' + r + '"/>';
+return svg(W, H, '<defs><filter id="' + id + '" x="0" y="0" width="1.15" height="1.15">' + o(d, 0, 'a') + o(0, d, 'b') + o(d, d, 'c') + '<feMerge result="m"><feMergeNode in="SourceAlpha"/><feMergeNode in="a"/><feMergeNode in="b"/><feMergeNode in="c"/></feMerge><feFlood flood-color="currentColor"/><feComposite in2="m" operator="in"/></filter></defs><image href="' + href + '" x="' + n1(-d / 2) + '" y="' + n1(-d / 2) + '" ' + wh(W, H) + ' filter="url(#' + id + ')"/>');
 }
 function cl(f) { return Math.max(-0.03, Math.min(1.03, f)); }
 function dm(H) { return [Math.max(2, H * 0.026), H * 0.045, H * 0.08, H * 0.1, Math.max(2.5, H * 0.008), Math.max(4, H * 0.03), 75 * Math.PI / 180]; }   /* the dial sizes every dial function shares: line, band, mark height, mark font, mark gap, gap, half sweep */
@@ -689,6 +693,7 @@ function part(SW, kind, i, W, H) {
 switch (kind) {
 case 'arrow': return arrow(((i ? SW.tdial : SW.baro) || {}).arrow, W, H);
 case 'cue': return cue(SW.cue, W, H);
+case 'wicon': return wicon((SW.days[i] || {}).icon, W, H);
 case 'wcue': return cue((SW.days[i] || {}).cue, W, H, 1);
 case 'wday': return (API.ws === 'dig' ? digcol : eqcol)(SW, i, W, H);
 case 'wzero': return wzero(SW, W, H);
