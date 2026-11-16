@@ -161,11 +161,11 @@
   </div>
 {%- else %}
   {%- comment %} B31 (owner 2026-11-16): the week display. One column per day, time left to right: weather and clothing icon, the day's part (EQ sliders on one shared scale, or Digital), the name. The full view takes the Week display setting, every smaller view draws Digital. Columns by size class: md landscape, md portrait, lg landscape, lg portrait; never measured. {% endcomment %}
-  {%- assign ws = 'dig' %}{% if view == 1 and cf.week_style != 'digital' %}{% assign ws = 'eq' %}{% endif %}
+  {%- assign ws = 'dig' %}{% if view == 1 %}{% if cf.week_style == 'eq' %}{% assign ws = 'eq' %}{% elsif cf.week_style != 'digital' %}{% assign ws = 'auto' %}{% endif %}{% endif %}{% comment %} Auto (the default, and an unsaved setting): the script takes sliders on a large 4-bit screen and digits on the rest, from the size class and bit depth, never measured {% endcomment %}
   {%- assign wk_cs = '7,4,7,7' | split: ',' %}{% assign wk_ic = 'h--full' %}{% assign wk_ih = 'h--[7cqh] portrait:h--[5cqh] lg:h--[5cqh] lg:portrait:h--[4cqh]' %}{% assign wk_nh = 'h--[6cqh] lg:h--[4cqh] lg:portrait:h--[3cqh]' %}{% assign wk_lw = 'w--[5cqw] lg:w--[4cqw]' %}
   {%- if view == 3 %}{% assign wk_cs = '4,3,4,3' | split: ',' %}{% assign wk_ic = 'h--[7cqh] lg:h--[6cqh]' %}{% assign wk_ih = 'h--[14cqh] lg:h--[12cqh]' %}{% assign wk_nh = 'h--[6cqh] lg:h--[4cqh]' %}{% assign wk_lw = 'hidden lg:block lg:portrait:hidden w--[4cqw]' %}{% endif %}
   {%- assign wk_ca = wk_cs[0] | plus: 0 %}{% assign wk_cb = wk_cs[1] | plus: 0 %}{% assign wk_cc = wk_cs[2] | plus: 0 %}{% assign wk_cd = wk_cs[3] | plus: 0 %}
-  <div class="relative z--2 flex flex--row gap--none w--full h--full" data-sw-week>{% if ws == 'eq' %}<div class="absolute inset--0" data-sw-part="wzero" data-sw-ws="eq"></div>{% endif %}
+  <div class="relative z--2 flex flex--row gap--none w--full h--full" data-sw-week>{% if ws != 'dig' %}<div class="absolute inset--0" data-sw-part="wzero" data-sw-ws="{{ ws }}"></div>{% endif %}
    <div class="relative shrink-0 flex flex--col gap--none h--full {{ wk_lw }}"><div class="shrink-0 {{ wk_ih }}"></div><div class="grow basis--0 w--full" data-sw-part="wlab" data-sw-ws="{{ ws }}"></div><div class="shrink-0 {{ wk_nh }}"></div></div>
   {%- for d in ui.days %}
   {%- assign i = forloop.index0 %}
@@ -474,7 +474,7 @@ return svg(W, H, body);
 }
 function wzero(SW, W, H) {   /* the 0 line: one element across the whole week strip, from the scale to the right edge, behind the tracks and knobs; only when 0 is on the scale */
 var sc = wsc(SW), y;
-if (!(sc.a <= 0 && sc.b >= 0 && API.wzh)) return svg(W, H, '');
+if (API.ws === 'dig' || !(sc.a <= 0 && sc.b >= 0 && API.wzh)) return svg(W, H, '');
 y = n1(API.wzt + wy(sc, API.wzh, 0));
 return svg(W, H, g(b1() ? '' : 'text--gray-40', '<line x1="' + n1(API.wzx) + '" x2="' + n1(W) + '" y1="' + y + '" y2="' + y + '" ' + SK + '1.5"/>'));
 }
@@ -1043,7 +1043,7 @@ if (!r.width && !r.height) return;
 SWDraw.tr = el.hasAttribute('data-sw-tr') || (el.hasAttribute('data-sw-tm') && !sc.contains('screen--lg') && !sc.contains('screen--portrait'));  SWDraw.gp = +(el.getAttribute('data-sw-gp') || 0); SWDraw.gx0 = +(el.getAttribute('data-sw-x0') || 0); SWDraw.mk = el.hasAttribute('data-sw-for'); SWDraw.big = el.hasAttribute('data-sw-lz') || el.hasAttribute('data-sw-sloc') || !!el.closest('[data-sw-dialin]');   /* B27: a big reading's icon is plain black (owner), only the dial corner's and the meter marks' follow the secondary grey */ SWDraw.n = +(el.getAttribute('data-sw-n') || 0) || null; SWDraw.j = +(el.getAttribute('data-sw-j') || 0);
 var ml = swVis('[data-sw-mlabel]')[0]; SWDraw.lp = ml ? parseFloat(getComputedStyle(ml).fontSize) * (ml.getBoundingClientRect().width / (ml.offsetWidth || 1)) : 0;
 var rw = (el.getAttribute('data-sw-rows') || '').split(','); SWDraw.rows = +(rw[SWS[4] ? 1 : 0]) || null;
-var wd = swVis('[data-sw-part="wday"]'); SWDraw.nCols = wd.length; SWDraw.wcw = wd.length ? Math.floor(wd[0].getBoundingClientRect().width) : 0; SWDraw.ws = el.getAttribute('data-sw-ws'); if (wd.length) { var wb = wd[0].getBoundingClientRect(); SWDraw.wzx = wb.left - r.left; SWDraw.wzt = wb.top - r.top; SWDraw.wzh = Math.floor(wb.height); }   /* the 0 line's start, and the top and height of a day's part inside the week box */   /* B31: the week's columns shown, one column's width */
+var wd = swVis('[data-sw-part="wday"]'); SWDraw.nCols = wd.length; SWDraw.wcw = wd.length ? Math.floor(wd[0].getBoundingClientRect().width) : 0; var wsv = el.getAttribute('data-sw-ws'); SWDraw.ws = wsv === 'auto' ? (sc.contains('screen--lg') && SWDraw.mode.bits >= 4 ? 'eq' : 'dig') : wsv; if (wd.length) { var wb = wd[0].getBoundingClientRect(); SWDraw.wzx = wb.left - r.left; SWDraw.wzt = wb.top - r.top; SWDraw.wzh = Math.floor(wb.height); }   /* the 0 line's start, and the top and height of a day's part inside the week box */   /* B31: the week's columns shown, one column's width */
 var hb = [].map.call(document.querySelectorAll('[data-sw-part="hbar"]'), function (q) { return q.getBoundingClientRect().height; }).filter(function (h) { return h > 0; }); SWDraw.hbarH = hb.length ? Math.floor(Math.min(...hb)) : null; SWDraw.hcols = hb.length || null;
 if (/^(baro|tdial)$/.test(el.getAttribute('data-sw-part'))) { SWDraw.caps = {}; document.querySelectorAll('[data-sw-part="baro"], [data-sw-part="tdial"]').forEach(function (d) { var b = d.getBoundingClientRect(); if (!b.width) return; SWDraw.caps[d.getAttribute('data-sw-part')] = [].map.call(d.parentElement.querySelectorAll('[data-sw-cap]'), function (c) { var rg = document.createRange(); rg.selectNodeContents(c); var q = rg.getBoundingClientRect(), l0 = q.left - b.left; return [l0, q.top - b.top, Math.max(q.right - b.left, l0 < b.width / 2 ? l0 + (d.getAttribute('data-sw-part') === 'baro' ? 0.264 : 0.311) * b.width : 0), q.bottom - b.top]; });   /* the left caption counts at least as wide as the English one, so the radius never depends on the language (DIALR, ja) */ }); }
 el.innerHTML = SWDraw.part(SW, el.getAttribute('data-sw-part'), +(el.getAttribute('data-sw-i') || 0), Math.floor(r.width), Math.floor(r.height));
