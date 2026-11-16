@@ -782,7 +782,8 @@ async function run(input) {
     renderedAt: ((input || {}).trmnl && input.trmnl.system && input.trmnl.system.timestamp_utc) || 0 };
   var model = SWModel.build(raw, { unit: fahrenheit ? 'fahrenheit' : 'celsius' }), moon = moonIcon(weather && weather.current && weather.current.time), phase = moonPhase(weather && weather.current && weather.current.time, w.utc_offset_seconds);
   var pc = stObj(st0.cue), pmt = stObj(st0.mt);
-  var vo = { wear: !/^(false|no|0)$/i.test(String(field(input, 'show_wear', true))), prevCue: pc && typeof pc.top === 'string' ? pc : null, prevMt: pmt, pressAgo: past.ago, prevHour: past.prev, hourly: w.hourly, hours: bottomHours(field(input, 'bottom', 'auto'), w.current && w.current.time, field(input, 'bottom_switch', '18')), limb: moonLimb(Date.parse(((w.current || {}).time || '') + 'Z') - (w.utc_offset_seconds || 0) * 1000, w.latitude, w.longitude) };
+  // the cue reads today's whole 07:00 to 19:00 from the uncut hourly list (past.today keeps the past hours), not the list cut at the current hour
+  var vo = { wear: !/^(false|no|0)$/i.test(String(field(input, 'show_wear', true))), prevCue: pc && typeof pc.top === 'string' ? pc : null, prevMt: pmt, pressAgo: past.ago, prevHour: past.prev, hourly: past.today || w.hourly, hours: bottomHours(field(input, 'bottom', 'auto'), w.current && w.current.time, field(input, 'bottom_switch', '18')), limb: moonLimb(Date.parse(((w.current || {}).time || '') + 'Z') - (w.utc_offset_seconds || 0) * 1000, w.latitude, w.longitude) };
   var ui = buildView(model, i18n, w.daily, moon, phase, vo);
   if (fb && fb.asOf) ui.stale = i18n.ours.asof + ' ' + clk(fb.asOf.slice(0, 2), fb.asOf.slice(3, 5));
   var st = { v: 1, cue: ui.keep.cue, mt: ui.keep.mt }, keep = snap || stObj(st0.snap); delete ui.keep;
