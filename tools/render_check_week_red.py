@@ -18,7 +18,14 @@ muts=[
  ('WEEKSCALE','source/shared.liquid',"for (var v = sc.a; v <= sc.b + 1e-9; v += sc.st) { var ty","for (var v = sc.a; v <= sc.b + 1e-9; v += sc.st * (i === 1 ? 2 : 1)) { var ty",['b31-x-auto-eq']),
  ('WEEKZERO','source/shared.liquid',"Math.abs(y0 - c) < fl * 0.5 + 2.5","Math.abs(y0 - c) < -1",['b31-x-frost','b31-og-forced-eq']),
  ('WEEKONES','source/shared.liquid',"n1(L.xr - ((n - 1) * 70 + 56) * h / 100)","n1(L.xr + (lo ? 8 : 0) - ((n - 1) * 70 + 56) * h / 100)",['b31-x-forced-dig']),
- ('WEEKZERO-gap','source/shared.liquid',"y + '\" y2=\"' + y + '\" ' + SK + '1.5\"/>'));","y + '\" y2=\"' + y + '\" ' + SK + '1.5\" stroke-dasharray=\"300 12\"/>'));",['b31-x-frost']),
+ ('WEEKZERO-gap','source/shared.liquid',"'<line x1=\"' + n1(API.wzx) + '\" x2=\"' + n1(W) + '\" y1=\"' + y","'<line stroke-dasharray=\"300 12\" x1=\"' + n1(API.wzx) + '\" x2=\"' + n1(W) + '\" y1=\"' + y",['b31-x-frost']),
+ # hours (owner 2026-11-16, H1): same harness, the HZERO check
+ ('HZERO-shadow','source/shared.liquid',"return svg(W, H, '<g data-sw-cells=\"' + n + '\" data-sw-area=\"' + n1(G.U * lh)","return svg(W, H, g(SHADOW + ' text--gray-65', cells) + '<g data-sw-cells=\"' + n + '\" data-sw-area=\"' + n1(G.U * lh)",['b31-x-hours-neg']),
+ ('HZERO-black','source/shared.liquid',"fill = blk(hi || B2());","fill = blk(hi);",['b31-og-hours-neg']),
+ ('HZERO-nohang','source/shared.liquid',"var v = Math.round(q.tV), up = v >= 0,","var v = Math.round(q.tV), up = true,",['b31-x-hours-neg']),
+ ('HZERO-noline','source/shared.liquid',"if (!G.below || !API.hbarW) return svg(W, H, '');","return svg(W, H, '');",['b31-x-hours-neg']),
+ ('HZERO-broken','source/shared.liquid',"<line data-sw-hzline x1=","<line data-sw-hzline stroke-dasharray=\"300 12\" x1=",['b31-x-hours-neg']),
+ ('HZERO-label','source/shared.liquid',": G.y0 - G.e - gp / 2;   /* a value below 0",": G.y0 + 3 + fs * 0.36 + 0 * gp;   /* a value below 0",['b31-x-hours-neg']),
 ]
 which=sys.argv[1:]
 for name,f,old,new,cs in muts:
@@ -33,7 +40,7 @@ for name,f,old,new,cs in muts:
     shutil.copy(B+'redbak.tmp',R+f)
     subprocess.run(['node','tools/build.js'],cwd=R,capture_output=True)
     out=r.stdout
-    keys=sorted(set(re.findall(r'^(WEEK[A-Z]+) ',out,re.M)))
+    keys=sorted(set(re.findall(r'^(WEEK[A-Z]+|HZERO|HCURVE|HOURS) ',out,re.M)))
     summ=re.findall(r'\d+ examples, \d+ failures?',out)
-    lines=[l[:200] for l in out.split('\n') if l.startswith('WEEK')][:3]
+    lines=[l[:200] for l in out.split('\n') if l.startswith(('WEEK','HZERO','HCURVE'))][:3]
     print(name,'->',keys,summ,lines,flush=True)

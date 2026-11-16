@@ -148,7 +148,7 @@
 <div class="{{ days_h }} grow" data-sw-dstrip>{{ p_open_g }}<div class="absolute top--0 left--5 right--5" data-sw-between><div class="border--h-55" data-sw-rule></div></div><div class="relative flex flex--col flex--center{% if view == 1 %} lg:portrait:flex--evenly{% endif %} h--full p--2 lg:p--4">
 {%- if ui.hours %}{% comment %} Hours strip (owner) {% endcomment %}
   {%- assign nh_md = 8 %}{% assign nh_lg = 12 %}{% if view == 3 %}{% assign nh_md = 6 %}{% assign nh_lg = 8 %}{% endif %}
-  <div class="relative z--2 flex flex--row w--full h--full gap--xsmall" data-sw-hours="{{ nh_md }},{{ nh_lg }}">
+  <div class="relative z--2 flex flex--row w--full h--full gap--xsmall" data-sw-hours="{{ nh_md }},{{ nh_lg }}"><div class="absolute inset--0" data-sw-part="hzero"></div>
   {%- for q in ui.hours %}{% assign i = forloop.index0 %}
   {%- if i < nh_md or i < nh_lg %}
    <div class="grow basis--0 h--full{% if i >= nh_md %} hidden lg:block{% elsif i >= nh_lg %} lg:hidden{% endif %}" data-sw-hcol="{{ i }}"><div class="flex flex--col flex--center-x h--full w--full gap--xsmall">{% comment %} the visibility on the outer box, {% endcomment %}
@@ -447,15 +447,41 @@ function hlevels(hs, C) {
 var steps = Math.max(1, hs.b - hs.a), cap = Math.max(1, Math.min(6, Math.floor(C / 6))), per = hper(hs, cap);
 return per > 1 ? Math.ceil(steps / per) : steps * Math.floor(cap / steps);
 }
+function hgeo(all, W, H) {   /* the hours strip's one geometry, for the bars and the 0 line: label size, the stack area C, and (an hour below 0) the cells above and below the line */
+var hs = hscale(all, API.hcols), HH = API.hbarH || H, lw = 2, o;
+(all || []).slice(0, API.hcols || (all || []).length).forEach((q) => { if (q && q.tV !== null && q.tV !== undefined) lw = Math.max(lw, String(q.t).length); });   /* the longest label of the shown hours: one size and one reserve for every column, so the 0 line is one height */
+var fs = Math.max(8, Math.min(W / (lw * 0.62), HH * 0.2, 30)), R = Math.round(fs * 1.45) + 3, C = Math.min(H, HH) - R;
+o = { hs: hs, fs: fs, C: C, below: !!hs && hs.a + 1 < 0 };
+if (!o.below) return o;
+var cap = Math.max(2, Math.min(6, Math.floor(C / 6))), per = 1, U, D, bD = -(hs.a + 1);   /* B31 hours (owner 2026-11-16): bars from the 0 line, up for 0 and more (a nub at 0), down below it, one block per degree while they fit */
+for (; per < 100; per++) { U = hs.b < 0 ? 0 : Math.floor(hs.b / per) + 1; D = Math.ceil(bD / per); if (U + D <= cap) break; }
+o.per = per; o.U = U; o.D = D; o.e = 1.5; o.lh = (C - 2 * o.e) / (U + D); o.y0 = H - C + U * o.lh + o.e;
+return o;
+}
 function hbar(q, hs0, W, H, hi, all) {
-var hs = hscale(all, API.hcols) || hs0;
+var G = hgeo(all, W, H), hs = G.hs || hs0;
 if (!q || q.tV === null || q.tV === undefined || !hs) return svg(W, H, '');
-var lw = String(q.t).length, fs = Math.max(8, Math.min(W / (Math.max(2, lw) * 0.62), (API.hbarH || H) * 0.2, 30)), R = Math.round(fs * 1.45) + 3;
-var C = Math.min(H, API.hbarH || H) - R, L = hlevels(hs, C), per = hper(hs, Math.max(1, Math.min(6, Math.floor(C / 6))));
-var n = Math.max(1, Math.min(L, per > 1 ? Math.ceil((Math.round(q.tV) - hs.a) / per) : Math.round((Math.round(q.tV) - hs.a) / (hs.b - hs.a) * L))), Hh = H - SO, lh = (C - SO) / L, gp = Math.max(2, lh * 0.2), bw = W - SO, cells = '', sh = '';
-for (var k = 0; k < n; k++) { var y = Hh - (k + 1) * lh + gp / 2; cells += rect(0, y, bw, lh - gp, 2); sh += rect(SO, y + SO, bw, lh - gp, 2); }
-var ty = Hh - n * lh + gp / 2 - 3 - fs * 0.36;
-return svg(W, H, g(SHADOW + ' text--gray-65', sh) + '<g data-sw-cells="' + n + '" data-sw-area="' + n1(C) + '">' + g(blk(hi), cells) + '</g>' + text(bw / 2, ty, q.t, fs, 'middle', 0, ' data-sw-htemp'));
+var fs = G.fs, C = G.C, cells = '', n, ty, fill = blk(hi || B2());   /* no offset shadows; black on 2-bit and 1-bit (the 4-bit panel keeps the lighter grey for the hours that are not now) */
+if (G.below) {
+var v = Math.round(q.tV), up = v >= 0, lh = G.lh, gp = Math.max(2, lh * 0.2), top;
+n = up ? Math.floor(v / G.per) + 1 : Math.ceil(-v / G.per);
+for (var k = 0; k < n; k++) cells += rect(0, up ? G.y0 - G.e - (k + 1) * lh + gp / 2 : G.y0 + G.e + k * lh + gp / 2, W, lh - gp, 2);
+top = up ? G.y0 - G.e - n * lh + gp / 2 : G.y0 - G.e - gp / 2;   /* a value below 0 has its label above the line, clear of it */
+ty = top - 3 - fs * 0.36;
+return svg(W, H, '<g data-sw-cells="' + n + '" data-sw-area="' + n1(G.U * lh) + '"' + (up ? '' : ' data-sw-below="1"') + '>' + g(fill, cells) + '</g>' + text(W / 2, ty, q.t, fs, 'middle', 0, ' data-sw-htemp'));
+}
+var L = hlevels(hs, C), per = hper(hs, Math.max(1, Math.min(6, Math.floor(C / 6))));
+n = Math.max(1, Math.min(L, per > 1 ? Math.ceil((Math.round(q.tV) - hs.a) / per) : Math.round((Math.round(q.tV) - hs.a) / (hs.b - hs.a) * L)));
+var lh2 = C / L, gp2 = Math.max(2, lh2 * 0.2);
+for (var k2 = 0; k2 < n; k2++) cells += rect(0, H - (k2 + 1) * lh2 + gp2 / 2, W, lh2 - gp2, 2);
+ty = H - n * lh2 + gp2 / 2 - 3 - fs * 0.36;
+return svg(W, H, '<g data-sw-cells="' + n + '" data-sw-area="' + n1(C) + '">' + g(fill, cells) + '</g>' + text(W / 2, ty, q.t, fs, 'middle', 0, ' data-sw-htemp'));
+}
+function hzero(SW, W, H) {   /* the hours' 0 line: one element across the strip, only when an hour is below 0 */
+var G = hgeo(SW.hours, API.hbarW || 0, API.hbarH || 0);
+if (!G.below || !API.hbarW) return svg(W, H, '');
+var y = n1(API.hzt + G.y0);
+return svg(W, H, g(b1() ? '' : 'text--gray-40', '<line data-sw-hzline x1="0" x2="' + n1(W) + '" y1="' + y + '" y2="' + y + '" ' + SK + '1.5"/>'));
 }
 /* B31 (owner 2026-11-16): the week display, one column per day. wday draws a day's column, wlab the scale labels (EQ sliders) or the HI / LO captions (Digital), wcue the clothing icon. Every metric is one function of the column, so the labels, scale and captions line up with the columns (same height). */
 function wsc(SW) {   /* the one temperature scale of the shown days */
@@ -697,6 +723,7 @@ case 'wicon': return wicon((SW.days[i] || {}).icon, W, H);
 case 'wcue': return cue((SW.days[i] || {}).cue, W, H, 1);
 case 'wday': return (API.ws === 'dig' ? digcol : eqcol)(SW, i, W, H);
 case 'wzero': return wzero(SW, W, H);
+case 'hzero': return hzero(SW, W, H);
 case 'wlab': return (API.ws === 'dig' ? diglab : eqlab)(SW, W, H);
 case 'temp': return digits(SW.temp, H, API.tr);
 case 'loc': return loc(['out', 'in'][i] || API.loc || 'out', W, H);
@@ -1046,6 +1073,7 @@ var ml = swVis('[data-sw-mlabel]')[0]; SWDraw.lp = ml ? parseFloat(getComputedSt
 var rw = (el.getAttribute('data-sw-rows') || '').split(','); SWDraw.rows = +(rw[SWS[4] ? 1 : 0]) || null;
 var wd = swVis('[data-sw-part="wday"]'); SWDraw.nCols = wd.length; SWDraw.wcw = wd.length ? Math.floor(wd[0].getBoundingClientRect().width) : 0; var wsv = el.getAttribute('data-sw-ws'); SWDraw.ws = wsv === 'auto' ? (sc.contains('screen--lg') && SWDraw.mode.bits >= 4 ? 'eq' : 'dig') : wsv; if (wd.length) { var wb = wd[0].getBoundingClientRect(); SWDraw.wzx = wb.left - r.left; SWDraw.wzt = wb.top - r.top; SWDraw.wzh = Math.floor(wb.height); }   /* the 0 line's start, and the top and height of a day's part inside the week box */   /* B31: the week's columns shown, one column's width */
 var hb = [].map.call(document.querySelectorAll('[data-sw-part="hbar"]'), function (q) { return q.getBoundingClientRect().height; }).filter(function (h) { return h > 0; }); SWDraw.hbarH = hb.length ? Math.floor(Math.min(...hb)) : null; SWDraw.hcols = hb.length || null;
+var hq = swVis('[data-sw-part="hbar"]')[0]; SWDraw.hbarW = hq ? Math.floor(hq.getBoundingClientRect().width) : 0; SWDraw.hzt = hq ? hq.getBoundingClientRect().top - r.top : 0;   /* the first hours bar's width and its top inside the painted box (the 0 line) */
 if (/^(baro|tdial)$/.test(el.getAttribute('data-sw-part'))) { SWDraw.caps = {}; document.querySelectorAll('[data-sw-part="baro"], [data-sw-part="tdial"]').forEach(function (d) { var b = d.getBoundingClientRect(); if (!b.width) return; SWDraw.caps[d.getAttribute('data-sw-part')] = [].map.call(d.parentElement.querySelectorAll('[data-sw-cap]'), function (c) { var rg = document.createRange(); rg.selectNodeContents(c); var q = rg.getBoundingClientRect(), l0 = q.left - b.left; return [l0, q.top - b.top, Math.max(q.right - b.left, l0 < b.width / 2 ? l0 + (d.getAttribute('data-sw-part') === 'baro' ? 0.264 : 0.311) * b.width : 0), q.bottom - b.top]; });   /* the left caption counts at least as wide as the English one, so the radius never depends on the language (DIALR, ja) */ }); }
 el.innerHTML = SWDraw.part(SW, el.getAttribute('data-sw-part'), +(el.getAttribute('data-sw-i') || 0), Math.floor(r.width), Math.floor(r.height));
 var lbs = el.hasAttribute('data-sw-lz') && el.nextElementSibling && el.nextElementSibling.querySelector('[data-sw-slab]'); if (lbs) { var lbk = (lbs.offsetHeight && lbs.getBoundingClientRect().height / lbs.offsetHeight) || 1, lbw = lbs.parentElement, lbb = lbw.parentElement.parentElement.nextElementSibling; if (lbb) lbw.style.marginRight = (-(lbb.getBoundingClientRect().width / lbk + (parseFloat(getComputedStyle(lbb.parentElement).columnGap) || 0))).toFixed(1) + 'px'; lbs.style.fontSize = px(0.555 * r.height / lbk, 2); }   /* B20: the label may use the unit column's room beside it (negative margin); its font is 0.55 of the icon height (caps 0.40, the icon is drawn full height), the Framework Clamp cuts what does not fit */
