@@ -348,18 +348,17 @@ test('days strip: 5-degree lines faint, other days thin mid-grey bars (at least 
   ok(hOf(day(true), 'text--gray-10') >= 20, 'today: dark block at least half the row');
 });
 test('panel face (owner 2026-11-16, replaces the 2026-11-12 plain fill): no fill, outline or box on any screen; a divider only toward a neighbour, none at an outer edge', () => {
-  const f = (m, W, H, nb) => { D.mode = m; Object.assign(D, { fdb: 0, fdr: 0, fdl: 0, dlc: '', dlw: 0, dls: '', dli: 0 }, nb || {}); const s = D.part({}, 'face', 0, W, H); D.mode = null; Object.assign(D, { fdb: 0, fdr: 0, fdl: 0, dlc: '', dlw: 0, dls: '', dli: 0 }); return s; };
-  const bad = /data-sw-outline|data-sw-fill|ellipse|<pattern|data-sw-backlight|<rect/;
+  const f = (m, W, H, nb) => { D.mode = m; Object.assign(D, { fdb: 0, fdr: 0, fdl: 0, dlc: '', dlw: 0, dls: false, dli: 0 }, nb || {}); const s = D.part({}, 'face', 0, W, H); D.mode = null; Object.assign(D, { fdb: 0, fdr: 0, fdl: 0, dlc: '', dlw: 0, dls: false, dli: 0 }); return s; };
+  const bad = /data-sw-outline|data-sw-fill|ellipse|<pattern|data-sw-backlight|<rect|<svg/;
   [{ dark: false, bits: 4 }, { dark: true, bits: 4 }, { dark: false, bits: 2 }, { dark: true, bits: 2 }, { dark: false, bits: 1 }].forEach((m) => {
     ok(f(m, 1200, 400) === '', 'no neighbour: nothing drawn ' + JSON.stringify(m));
     const s = f(m, 1200, 400, { fdb: 20, fdr: 20 });
-    ok(/data-sw-divider/.test(s) && !bad.test(s), 'neighbours: dividers only ' + JSON.stringify(m));
+    ok((s.match(/data-sw-divider/g) || []).length === 2 && !bad.test(s), 'neighbours: two dividers only ' + JSON.stringify(m));
   });
-  ok(/stroke="#aaa"/.test(f({ dark: false, bits: 4 }, 1200, 400, { fdb: 20 })) && /stroke="#555"/.test(f({ dark: true, bits: 4 }, 1200, 400, { fdb: 20 })), 'fallback without a console rule: gray 170 light, gray 85 dark');
-  ok(/stroke="rgb\(1, 2, 3\)" stroke-width="3"/.test(f({ dark: false, bits: 4 }, 1200, 400, { fdb: 20, dlc: 'rgb(1, 2, 3)', dlw: 3 })), 'colour and weight are the console rule\'s');
-  
-  ok(/x1="30" y1="410" x2="1170"/.test(f({ dark: false, bits: 4 }, 1200, 400, { fdb: 20, dli: 30 })) && /y1="30"[^>]*y2="370"/.test(f({ dark: false, bits: 4 }, 1200, 400, { fdr: 20, dli: 30 })), 'both ends stop short by the console rule\'s inset');
-  ok(/y1="410"/.test(f({ dark: false, bits: 4 }, 1200, 400, { fdb: 20 })) && (f({ dark: false, bits: 4 }, 1200, 400, { fdr: 20 }).match(/x1="1210"/g) || []).length === 1, 'centred in the gap: 400 + 10, 1200 + 10');
+  ok(/background:#aaa/.test(f({ dark: false, bits: 4 }, 1200, 400, { fdb: 20 })) && /background:#555/.test(f({ dark: true, bits: 4 }, 1200, 400, { fdb: 20 })), 'fallback without a console rule: gray 170 light, gray 85 dark');
+  ok(/background:rgb\(1, 2, 3\)/.test(f({ dark: false, bits: 4 }, 1200, 400, { fdb: 20, dlc: 'rgb(1, 2, 3)', dlw: 3 })) && /height:3px/.test(f({ dark: false, bits: 4 }, 1200, 400, { fdb: 20, dlw: 3 })), 'colour and weight are the console rule\'s');
+  ok(/repeating-linear-gradient\(90deg,#aaa 0 3px,#0000 3px 9px\)/.test(f({ dark: false, bits: 1 }, 1200, 400, { fdb: 20, dls: true, dlw: 3 })) && !/repeating/.test(f({ dark: false, bits: 2 }, 1200, 400, { fdb: 20, dlw: 3 })), 'dotted only when the console rule is dotted');
+  ok(/left:30px;top:408.5px;width:1140px/.test(f({ dark: false, bits: 4 }, 1200, 400, { fdb: 20, dli: 30, dlw: 3 })) && /top:30px;width:3px;height:340px/.test(f({ dark: false, bits: 4 }, 1200, 400, { fdr: 20, dli: 30, dlw: 3 })), 'centred in the gap, both ends stop short by the console rule\'s inset');
 });
 test('dial light: backlight in light mode (2-bit up), glow in dark (blur 4-bit, halo 2-bit, none 1-bit)', () => {
   const t = (m) => { D.mode = m; const s = D.dial({ now: 5, lo: 1, hi: 9, a: 0, b: 15, step: 5 }, 900, 380, false); D.mode = null; return s; };

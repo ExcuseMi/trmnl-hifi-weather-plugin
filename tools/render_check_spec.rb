@@ -225,7 +225,7 @@ return rows.map(function(q){return q.map(function(v){return v===null?'-':v.toFix
       end
       # B27 (owner 2026-11-16): no panel fill, outline or rounded box on any screen; a divider line centred in the gap between each two adjacent sections, none at the outer edge
       # (the X: gray 170 light / 85 dark +/- 8, the other screens: clearly darker than the page, in 1-bit dotted black). Seen red on 7836632 (outlined panels, no dividers).
-      pf = s.evaluate(%q{(function(){var F=[].filter.call(document.querySelectorAll('[data-sw-part="face"]'),function(e){var b=e.getBoundingClientRect();return b.width>40&&b.height>40}).map(function(e){return e.getBoundingClientRect()});return F.map(function(r){var o={l:r.left,t:r.top,r:r.right,b:r.bottom,gb:-1,gr:-1,ga:-1,gl:-1};F.forEach(function(q){if(q===r)return;var ox=Math.min(r.right,q.right)-Math.max(r.left,q.left),oy=Math.min(r.bottom,q.bottom)-Math.max(r.top,q.top);if(ox>10&&q.top-r.bottom>-1)o.gb=o.gb<0?q.top-r.bottom:Math.min(o.gb,q.top-r.bottom);if(oy>10&&q.left-r.right>-1)o.gr=o.gr<0?q.left-r.right:Math.min(o.gr,q.left-r.right);if(ox>10&&r.top-q.bottom>-1)o.ga=o.ga<0?r.top-q.bottom:Math.min(o.ga,r.top-q.bottom);if(oy>10&&r.left-q.right>-1)o.gl=o.gl<0?r.left-q.right:Math.min(o.gl,r.left-q.right)});return [o.l,o.t,o.r,o.b,o.gb,o.gr,o.ga,o.gl].join(',')}).join(';')+'|'+innerWidth+'|'+(document.querySelector('.screen--dark-mode')||document.documentElement.classList.contains('dark')?'dark':'light')+'|'+(document.querySelector('.screen--1bit')?1:(document.querySelector('.screen--2bit')?2:4))+'|'+(function(){var rl=[].filter.call(document.querySelectorAll('[data-sw-rule]'),function(e){var b=e.getBoundingClientRect();return b.height>b.width})[0];if(!rl)return '';var b=rl.getBoundingClientRect(),vt=true,ra=getComputedStyle(rl,'::after'),f=(rl.closest('[data-sw-console]')||rl.parentElement).querySelector('[data-sw-part="face"]');if(!f)return '';var fb=f.getBoundingClientRect();return [b.left+(vt?0.5:b.width/2),b.top+(vt?b.height/2:0.5),vt?1:0,parseFloat(vt?ra.width:ra.height),vt?b.top-fb.top:b.left-fb.left].join(',')})()})()})
+      pf = s.evaluate(%q{(function(){var F=[].filter.call(document.querySelectorAll('[data-sw-part="face"]'),function(e){var b=e.getBoundingClientRect();return b.width>40&&b.height>40}).map(function(e){return e.getBoundingClientRect()});return F.map(function(r){var o={l:r.left,t:r.top,r:r.right,b:r.bottom,gb:-1,gr:-1,ga:-1,gl:-1};F.forEach(function(q){if(q===r)return;var ox=Math.min(r.right,q.right)-Math.max(r.left,q.left),oy=Math.min(r.bottom,q.bottom)-Math.max(r.top,q.top);if(ox>10&&q.top-r.bottom>-1)o.gb=o.gb<0?q.top-r.bottom:Math.min(o.gb,q.top-r.bottom);if(oy>10&&q.left-r.right>-1)o.gr=o.gr<0?q.left-r.right:Math.min(o.gr,q.left-r.right);if(ox>10&&r.top-q.bottom>-1)o.ga=o.ga<0?r.top-q.bottom:Math.min(o.ga,r.top-q.bottom);if(oy>10&&r.left-q.right>-1)o.gl=o.gl<0?r.left-q.right:Math.min(o.gl,r.left-q.right)});return [o.l,o.t,o.r,o.b,o.gb,o.gr,o.ga,o.gl].join(',')}).join(';')+'|'+innerWidth+'|'+(document.querySelector('.screen--dark-mode')||document.documentElement.classList.contains('dark')?'dark':'light')+'|'+(document.querySelector('.screen--1bit')?1:(document.querySelector('.screen--2bit')?2:4))+'|'+(function(){var rl=[].filter.call(document.querySelectorAll('[data-sw-rule]'),function(e){var b=e.getBoundingClientRect();return b.height>b.width})[0];if(!rl)return '';var b=rl.getBoundingClientRect(),vt=true,ra=getComputedStyle(rl,'::after'),f=(rl.closest('[data-sw-console]')||rl.parentElement).querySelector('[data-sw-part="face"]');if(!f)return '';var fb=f.getBoundingClientRect();return [b.left+(vt?0.5:b.width/2),b.top+(vt?b.height/2:0.5),vt?1:0,parseFloat(vt?ra.width:ra.height),vt?b.top-fb.top:b.left-fb.left,/repeating/.test(ra.backgroundImage)?1:0].join(',')})()})()})
       faces, iw2, pmode, pbits, refs = pf.split('|', 5)
       refs = refs.to_s
       unless faces.to_s.empty?
@@ -234,15 +234,21 @@ return rows.map(function(q){return q.map(function(v){return v===null?'-':v.toFix
         kk = png.width / iw2.to_f
         lum = ->(v) { 0.3 * ChunkyPNG::Color.r(v) + 0.59 * ChunkyPNG::Color.g(v) + 0.11 * ChunkyPNG::Color.b(v) }
         page = pmode == 'dark' ? 0 : 255
-        rx, ry, rvt, rw, rin = refs.split(',').map(&:to_f)   # the console's own divider: where it is, its weight, its end inset (none in a view without one)
+        rx, ry, rvt, rw, rin, rdot = refs.split(',').map(&:to_f)   # the console's own divider: where it is, its weight, its end inset (none in a view without one)
         rlum = nil
         if rx   # its colour as drawn: the extreme pixel over a 6 px stretch across it
           ex = pmode == 'dark' ? :max : :min
-          rlum = (-6..6).map { |d| lum.call(png[(rx * kk + (rvt == 1 ? d : 0)).to_i, (ry * kk + (rvt == 1 ? 0 : d)).to_i]) }.send(ex)
+          rlum = (-6..6).flat_map { |d| (-12..12).map { |a| lum.call(png[(rx * kk + (rvt == 1 ? d : a)).to_i, (ry * kk + (rvt == 1 ? a : d)).to_i]) } }.send(ex)   # across it and 12 px along it (a dotted line has gaps)
           rth = (-6..6).count { |d| (lum.call(png[(rx * kk + (rvt == 1 ? d : 0)).to_i, (ry * kk + (rvt == 1 ? 0 : d)).to_i]) - rlum).abs <= 5 }   # its drawn thickness
         end
-        want = pmode == 'dark' ? 85 : 170   # only used when the view has no console divider to copy
         bad = []
+        # B29 (owner 2026-11-16): the OG's console dividers are a palette grey on 2-bit (170 light, 85 dark, no dither) and dotted black on 1-bit; the section dividers copy them
+        if rx && rlum
+          want2 = pmode == 'dark' ? 85 : 170
+          bad << "console divider #{rlum.round} is not the 2-bit palette grey #{want2}" if pbits == '2' && (rlum - want2).abs > 3
+          bad << 'console divider is not dotted on a 1-bit screen' if pbits == '1' && rdot != 1
+        end
+        want = pmode == 'dark' ? 85 : 170   # only used when the view has no console divider to copy
         # the darkest (light) or lightest (dark) pixel of a 10 px wide band, along a 60 px stretch: the line, if there is one
         line = lambda do |cx, cy, horiz|
           vals = (-30..30).step(2).flat_map { |a| (-5..5).map { |d| x = horiz ? cx + a : cx + d; y = horiz ? cy + d : cy + a; lum.call(png[[[x.to_i, 0].max, png.width - 1].min, [[y.to_i, 0].max, png.height - 1].min]) } }
@@ -275,7 +281,7 @@ return rows.map(function(q){return q.map(function(v){return v===null?'-':v.toFix
         end
         # the ends: a line that ends inside its section stops short of the section's edge by at least the console's own divider inset (the drawn line's box, not pixels: glows and dots blur those)
         if rin && rin.positive?
-          ie = s.evaluate(%q{(function(RIN){var bad=[];[].forEach.call(document.querySelectorAll('[data-sw-divider]'),function(l){var f=l.ownerSVGElement.parentElement.getBoundingClientRect(),q=l.getBoundingClientRect(),h=q.width>q.height,s0=h?q.left-f.left:q.top-f.top,e0=h?f.right-q.right:f.bottom-q.bottom;if(s0>=0&&s0<RIN-1)bad.push((h?'left':'top')+' end '+s0.toFixed(1)+' px in, the console divider is '+RIN.toFixed(1));if(e0>=0&&e0<RIN-1)bad.push((h?'right':'bottom')+' end '+e0.toFixed(1)+' px in, the console divider is '+RIN.toFixed(1))});return bad.slice(0,2).join('; ')})(RINVAL)}.sub('RINVAL', rin.to_s))
+          ie = s.evaluate(%q{(function(RIN){var bad=[];[].forEach.call(document.querySelectorAll('[data-sw-divider]'),function(l){var f=l.parentElement.getBoundingClientRect(),q=l.getBoundingClientRect(),h=q.width>q.height,s0=h?q.left-f.left:q.top-f.top,e0=h?f.right-q.right:f.bottom-q.bottom;if(s0>=0&&s0<RIN-1)bad.push((h?'left':'top')+' end '+s0.toFixed(1)+' px in, the console divider is '+RIN.toFixed(1));if(e0>=0&&e0<RIN-1)bad.push((h?'right':'bottom')+' end '+e0.toFixed(1)+' px in, the console divider is '+RIN.toFixed(1))});return bad.slice(0,2).join('; ')})(RINVAL)}.sub('RINVAL', rin.to_s))
           bad << ie unless ie.empty?
         end
         puts "DIVIDER #{c['name']}: #{bad.first(3).join('; ')}" unless bad.empty?
