@@ -910,6 +910,13 @@ var rows=[].filter.call(document.querySelectorAll('[data-sw-row="day"]'),vis),n=
 if(n&&n!==rows.length)bad.push('rows '+n+'/'+rows.length);if(NOWEAR&&n)bad.push('What to wear is off but '+n+' day rows carry a clothing icon');if(ws.length&&Math.max.apply(null,ws)-Math.min.apply(null,ws)>1)bad.push('widths '+ws.map(Math.round).join(','));return cn+','+n+'|'+bad.join('; ');})()}.sub('NOWEAR', (c['want_nowear'] ? 'true' : 'false')))
       puts "CLOTH #{c['name']}: console,dayrows|bad #{co}"
       expect(co.split('|', 2)[1]).to eq('')
+      # B32 (owner 2026-11-16): the Blocks week's day bars are 1.3 times their former height, a little taller than the numbers beside them: a bar is at least
+      # 0.5 of its part's height (today 0.52 as the now mark takes room; it was 0.4 and 0.5, today 0.45), on every device and view (the portrait rows keep their own width-limited ratio).
+      unless c['orientation'] == 'portrait'
+        db = s.evaluate(%q{(function(){var bad=[];[].filter.call(document.querySelectorAll('[data-sw-part="day"]'),function(e){return e.getBoundingClientRect().width>0}).forEach(function(e,i){var sv=e.querySelector('svg'),r=e.querySelector('[data-sw-cells] rect');if(!sv||!r)return;var f=r.getBoundingClientRect().height/sv.getBoundingClientRect().height,t=!!e.querySelector('[data-sw-hl]');if(f<(t?0.52:0.49))bad.push('day '+i+' bar is '+(f*100).toFixed(0)+' % of its row part, at least '+(t?52:49)+' expected')});return bad.slice(0,3).join('; ')})()})
+        puts "DAYBAR #{c['name']}: #{db}" unless db.empty?
+        expect(db).to eq('')
+      end
       expect(co.split(',')[1].to_i).to be_positive if (c['view'] || 'full') == 'full' && (c['fields'] || {})['bottom'] != 'hours' && !c['hcols'] && !c['want_nowear'] && (c['fields'] || {})['week_style'] != 'digital'   # B25: Hours, then days shows hours (hcols) before its switch hour; B31: What to wear off draws no cue
       # Portrait day rows and console (owner, step 19 on x-port-hv; OG half vertical portrait the model): the console badge
       # beside the temperature (full and half views; quadrants are tiny views without a badge, owner B3 2026-11-14), every day row keeps its low and high, the header its two markers, and the scale labels
