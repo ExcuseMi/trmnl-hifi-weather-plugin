@@ -883,5 +883,71 @@
   "want_lit": [
    "humidity"
   ]
+ },
+ {
+  "name": "b30-live-og-8920",
+  "device": "og_plus",
+  "view": "full",
+  "locale": "nl",
+  "current": {
+   "time": "2026-11-08T21:00",
+   "temperature_2m": 2.2,
+   "relative_humidity_2m": 89,
+   "wind_speed_10m": 5.8,
+   "wind_gusts_10m": 7.6,
+   "pressure_msl": 1004.7,
+   "weather_code": 3,
+   "apparent_temperature": -0.5
+  },
+  "past_press": 1008.0,
+  "aq": {
+   "current": {
+    "time": "2026-11-08T21:00",
+    "european_aqi": 44
+   }
+  },
+  "fields": {
+   "lat_lon": "50.8394007,3.3627927",
+   "unit": "celsius",
+   "time_format": "24",
+   "bottom": "auto",
+   "bottom_switch": "18",
+   "week_style": "blocks",
+   "show_wear": true,
+   "sensor_source": "own",
+   "sensor_icon": "house",
+   "sensor_primary": "outside",
+   "sensor_label": "Boven",
+   "hide_title_bar": "false"
+  },
+  "vars": {
+   "trmnl": {
+    "user": {
+     "locale": "nl"
+    },
+    "device": {
+     "id": 8920
+    }
+   },
+   "sensor_readings": {
+    "device_8920": {
+     "temperature": [
+      {
+       "2026-11-08 20:55:00 UTC": 12.8
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 20:55:00 UTC": 68
+      }
+     ],
+     "carbon_dioxide": [],
+     "pressure": []
+    }
+   }
+  },
+  "want_lit": [
+   "humidity"
+  ]
  }
 ]
