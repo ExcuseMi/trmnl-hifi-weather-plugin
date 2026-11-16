@@ -468,21 +468,29 @@ function wm(H) { var fs = Math.max(12, Math.min(H * 0.14, (API.wcw || 100) * 0.2
 function wy(sc, H, v) { var m = wm(H); return m.pad + (sc.b - v) / (sc.b - sc.a) * (H - 2 * m.pad); }
 function eqlab(SW, W, H) {
 var sc = wsc(SW), m = wm(H), k = 1, body = '';
-while ((sc.b - sc.a) / (sc.st * k) > 1 && (H - 2 * m.pad) / ((sc.b - sc.a) / (sc.st * k)) < m.fs * 1.5) k++;
+while ((sc.b - sc.a) / (sc.st * k) > 1 && (H - 2 * m.pad) / ((sc.b - sc.a) / (sc.st * k)) < m.fs * 1.2) k++;
 for (var v = sc.a; v <= sc.b + 1e-9; v += sc.st * k) body += text(W - 2, wy(sc, H, v) + 0.36 * m.fs, v + ((SW.scale || {}).deg || '°'), m.fs, 'end');
 return svg(W, H, body);
 }
 function eqcol(SW, i, W, H) {
-var d = SW.days[i] || {}, sc = wsc(SW), m = wm(H), fs = m.fs, kh = m.kh, gp = fs * 0.3, lw = fs * 0.62 * 3.2, kw = Math.max(kh, Math.min(W * 0.4, kh * 3, W - 2 * (lw + gp) - 2)), cx = W / 2, tw = Math.max(5, kh * 0.45), sw = Math.max(1.5, kh * 0.14), body = '', k = 1;
-while ((sc.b - sc.a) / (sc.st * k) > 1 && (H - 2 * m.pad) / ((sc.b - sc.a) / (sc.st * k)) < fs * 1.5) k++;
-for (var v = sc.a; v <= sc.b + 1e-9; v += sc.st * k) body += '<line x1="0" x2="' + n1(W) + '" y1="' + n1(wy(sc, H, v)) + '" y2="' + n1(wy(sc, H, v)) + '" ' + SK + '1.5" stroke-dasharray="1.5 6"/>';
-body = g('text--gray-50', body) + rect(cx - tw / 2, m.pad - kh / 2, tw, H - 2 * m.pad + kh, tw / 2, FS + n1(sw) + '"');
-if (d.hiV === null || d.hiV === undefined || d.loV === null || d.loV === undefined) return svg(W, H, body);
-var yh = wy(sc, H, Math.round(d.hiV)), yl = wy(sc, H, Math.round(d.loV)), pc = (API.paint && (API.paint('white') || {}).color) || '#fff', knob = (y, hi) => rect(cx - kw / 2, y - kh / 2, kw, kh, kh * 0.2, hi ? '' : ' fill="' + pc + '" stroke="currentColor" stroke-width="' + n1(sw) + '"') + '<line x1="' + n1(cx - kw * 0.32) + '" x2="' + n1(cx + kw * 0.32) + '" y1="' + n1(y) + '" y2="' + n1(y) + '" stroke="' + (hi ? pc : 'currentColor') + '" stroke-width="' + n1(Math.max(1.5, sw * 1.2)) + '"/>';
-body += g(d.today ? blk(true) : mid(), rect(cx - tw / 2 + sw / 2, yh, tw - sw, Math.max(0, yl - yh)));
+var d = SW.days[i] || {}, sc = wsc(SW), m = wm(H), fs = m.fs, kh = m.kh, gp = fs * 0.3, lw = fs * 0.62 * 3.2, kw = Math.max(kh, Math.min(W * 0.4, kh * 3, W - 2 * (lw + gp) - 2)), cx = W / 2, tw = Math.max(5, kh * 0.45), sw = Math.max(1.5, kh * 0.14), tl = Math.max(3, fs * 0.4), tg = Math.max(2, sw * 1.2), tk = '', body = '';
+/* B31 mix (owner 2026-11-16): short tick marks on both sides of the track at every scale step; a thin solid 0 line across the week when 0 is on the scale, broken at a value label it would touch */
+for (var v = sc.a; v <= sc.b + 1e-9; v += sc.st) { var ty = n1(wy(sc, H, v)); tk += '<line x1="' + n1(cx - tw / 2 - tg - tl) + '" x2="' + n1(cx - tw / 2 - tg) + '" y1="' + ty + '" y2="' + ty + '"/><line x1="' + n1(cx + tw / 2 + tg) + '" x2="' + n1(cx + tw / 2 + tg + tl) + '" y1="' + ty + '" y2="' + ty + '"/>'; }
+body = '<g' + FS.replace(' fill="none"', '') + '1.5">' + tk + '</g>' + rect(cx - tw / 2, m.pad - kh / 2, tw, H - 2 * m.pad + kh, tw / 2, FS + n1(sw) + '"');
+var ok = d.hiV !== null && d.hiV !== undefined && d.loV !== null && d.loV !== undefined, yh = ok ? wy(sc, H, Math.round(d.hiV)) : 0, yl = ok ? wy(sc, H, Math.round(d.loV)) : 0, sep = fs * 1.05, ly = [yh, yl], lx = cx + kw / 2 + gp;
+if (yl - yh < sep) { var c = (yl + yh) / 2; ly = [c - sep / 2, c + sep / 2]; }
+if (sc.a <= 0 && sc.b >= 0) {
+var y0 = wy(sc, H, 0), cuts = [];
+if (ok) [d.hi, d.lo].forEach((t, q) => { if (Math.abs(y0 - ly[q]) < fs * 0.6) cuts.push([lx - gp * 0.8, lx + String(t).length * fs * 0.6 + gp * 0.8]); });
+var x = 0, zl = '', seg = (a, b) => { if (b - a > 1) zl += '<line x1="' + n1(a) + '" x2="' + n1(b) + '" y1="' + n1(y0) + '" y2="' + n1(y0) + '"/>'; };
+cuts.forEach((q) => { seg(x, q[0]); x = q[1]; }); seg(x, W);
+body = g(b1() ? '' : 'text--gray-40', '<g' + FS.replace(' fill="none"', '') + '1.5">' + zl + '</g>') + body;
+}
+if (!ok) return svg(W, H, body);
+var pc = (API.paint && (API.paint('white') || {}).color) || '#fff', knob = (y, hi) => g(SHADOW + ' text--gray-65', rect(cx - kw / 2 + SO, y - kh / 2 + SO, kw, kh, kh * 0.2)) + rect(cx - kw / 2, y - kh / 2, kw, kh, kh * 0.2, hi ? '' : ' fill="' + pc + '" stroke="currentColor" stroke-width="' + n1(sw) + '"') + '<line x1="' + n1(cx - kw * 0.32) + '" x2="' + n1(cx + kw * 0.32) + '" y1="' + n1(y) + '" y2="' + n1(y) + '" stroke="' + (hi ? pc : 'currentColor') + '" stroke-width="' + n1(Math.max(1.5, sw * 1.2)) + '"/>';
+body += g(d.today || B2() ? blk(true) : mid(), rect(cx - tw / 2 + sw / 2, yh, tw - sw, Math.max(0, yl - yh)));   /* 2-bit and 1-bit: every range black, today is the pill */
 body += knob(yl, 0) + knob(yh, 1);
-var sep = fs * 1.05, ly = [yh, yl]; if (yl - yh < sep) { var c = (yl + yh) / 2; ly = [c - sep / 2, c + sep / 2]; }
-body += text(cx + kw / 2 + gp, ly[0] + 0.36 * fs, d.hi, fs, 'start') + g(inc(), text(cx + kw / 2 + gp, ly[1] + 0.36 * fs, d.lo, fs, 'start'));
+body += text(lx, ly[0] + 0.36 * fs, d.hi, fs, 'start') + g(inc(), text(lx, ly[1] + 0.36 * fs, d.lo, fs, 'start'));
 return svg(W, H, body);
 }
 function wal(SW) {   /* the cells of the shown values: the most digits, a minus taking one more */
