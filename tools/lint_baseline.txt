@@ -1,0 +1,3 @@
+[custom_field_links_embedded] Custom field 'sensor_custom_url' description-ja has a plain 
+[custom_field_links_embedded] Custom field 'sensor_hass_url' description-ja has a plain li
+[form_fields_valid] settings.yml custom_fields — unknown field_type: description

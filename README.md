@@ -94,7 +94,7 @@ ruby ../tools/sync_trmnl_i18n.rb   # re-sync TRMNL's translations
 
 Edit `source/shared.liquid` (all comments live there), then run `node tools/build.js`: it writes `plugin/src/shared.liquid` (Liquid comments stripped, long Liquid variable names shortened, page script minified), which is what trmnlp pushes. Never edit the built file; the model tests fail when it is out of date or over 84 KB.
 
-Before a live push, save the full output of each render suite (base and `tools/render_check_b22.json`) to a file, never piped through `tail`, and run `tools/suite_green.sh <file>...`: push only on GREEN.
+Before a live push, save the full output of each render suite (base and `tools/render_check_b22.json`) to a file, never piped through `tail`, and run `tools/suite_green.sh <file>...`: push only on GREEN. Also run `tools/lint_gate.sh` (`trmnlp lint` against `tools/lint_baseline.txt`, fails on any new finding such as a `<style>` block or a `style=` attribute): push only on GREEN.
 
 Two render-check tiers, same spec (`tools/render_check_spec.rb`), run base first, then devices, then ship:
 
