@@ -305,7 +305,7 @@ var SWDraw = (() => {
 var API = { paint: null };
 function ko(k, fs, b) { return '<g data-sw-' + k + ' stroke="' + ((API.paint && (API.paint('white') || {}).color) || '#fff') + '" stroke-width="' + n1(fs * 0.22) + '" paint-order="stroke" stroke-linejoin="round">' + b + '</g>'; }   /* the panel-coloured knock-out round text (the day strip's axis, the dial's scale numbers) */
 var GLYPH = { '0': 'abcdef', '1': 'bc', '2': 'abdeg', '3': 'abcdg', '4': 'bcfg', '5': 'acdfg', '6': 'acdefg', '7': 'abc', '8': 'abcdefg', '9': 'abcdfg', '-': 'g', ' ': '' };
-var SHADOW = 'dark:hidden 1bit:hidden', SO = 3, K = 0;
+var SHADOW = 'dark:hidden 1bit:hidden 2bit:hidden', SO = 3, K = 0;
 var SK = 'stroke="currentColor" stroke-width="', FS = ' fill="none" ' + SK, LR = ' stroke-linecap="round" stroke-linejoin="round"';   // size: the stroke attributes most shapes share
 function wh(w, h) { return 'width="' + n1(w) + '" height="' + n1(h) + '"'; }   /* size: width and height attributes, eight callers */
 function n1(v) { return String(Math.round(v * 10) / 10); }
