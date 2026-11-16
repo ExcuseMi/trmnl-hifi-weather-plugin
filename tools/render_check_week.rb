@@ -171,4 +171,51 @@ module WeekChecks
     end
     out
   end
+
+  # ROWGAP (portrait rows, owner 2026-11-16): between the dotted dividers (the row edges) and any ink of the row (digits, degree sign, icons, name)
+  # at least a tenth of the row, minimum 3 device px, above and below. Pixel scan of each row box; the divider itself (+-2 px) is not ink.
+  ROWS_JS = <<~'JS'
+    (function(){var bx=[].filter.call(document.querySelectorAll('[data-sw-wrow-box]'),function(e){var b=e.getBoundingClientRect();return b.width>0&&b.height>0});
+    var tb=document.querySelector('.title_bar'),scr=document.querySelector('.screen'),tr=function(x){var b=x&&x.getBoundingClientRect();return b?[b.left,b.top,b.right,b.bottom].map(Math.round):null};var dv=[].map.call(document.querySelectorAll('[data-sw-part=wrdiv]'),function(e){var v=e.querySelector('svg'),a=e.getBoundingClientRect(),b=v&&v.getBoundingClientRect();return b&&a.width>0?[a.top,b.top,b.height]:null}).filter(Boolean);return JSON.stringify({dv:dv,w:innerWidth,tb:tr(tb),scr:tr(scr),body:tr(document.body),dpr:devicePixelRatio,dbg:bx.map(function(e){var q=function(x){var b=x&&x.getBoundingClientRect();return b?[Math.round(b.top),Math.round(b.bottom)]:null};return [q(e),q(e.querySelector('[data-sw-part=wrdiv]')),q(e.lastElementChild),q(e.querySelector('[data-sw-part=wrow]')),e.lastElementChild.style.paddingTop,(function(){var g=e.querySelector('[data-sw-part=wrow] [data-sw-glyph]'),sv=e.querySelector('[data-sw-part=wrow] svg');return [q(g),q(sv),sv&&sv.getAttribute('height'),sv&&sv.getAttribute('viewBox'),innerHeight]})()]}),rows:bx.map(function(e){var b=e.getBoundingClientRect();return [b.left,b.top,b.right,b.bottom]})})})()
+  JS
+
+  def self.rowgap(s, png_path, c)
+    r = JSON.parse(s.evaluate(ROWS_JS))
+    return [{}, nil] if r['rows'].empty?
+    puts "RAWROWS #{c['name']} #{r.reject { |kk, _| kk == 'dbg' }.inspect}" if ENV['ROWDBG']
+    png = ChunkyPNG::Image.from_file(png_path)
+    k = png.width.to_f / r['w']
+    bg = ChunkyPNG::Color.r(png[2, (r['rows'][0][1] * k).round])
+    lum = ->(x, y) { cc = png[x, y]; (ChunkyPNG::Color.r(cc) * 0.3 + ChunkyPNG::Color.g(cc) * 0.59 + ChunkyPNG::Color.b(cc) * 0.11) }
+    ink = ->(x, y) { (lum.(x, y) - bg).abs > 70 }
+    # The dividers are found in the picture itself (the layout can still move between the screenshot and the DOM reading): the row of the
+    # picture, within 30 px of the DOM edge, with the most ink across the row is the dotted line (its centre).
+    rows = r['rows']
+    edges = rows.map { |(l, t, rr, b)| [(l * k).round + 2, (rr * k).round - 3, (t * k).round, (b * k).round] }
+    found = edges.each_with_index.map do |(x0, x1, y0, _y1), i|
+      next nil if i.zero?
+      cnt = (y0 - 10..y0 + 10).map { |y| next [0, y] if y < 0 || y >= png.height; [(x0..x1).count { |x| ink.(x, y) }, y] }
+      mx = cnt.map(&:first).max
+      mx < (x1 - x0) * 0.25 ? nil : (cnt.select { |n, _| n >= mx * 0.6 }.map(&:last).minmax.sum / 2.0)
+    end
+    off = found.each_with_index.map { |f, i| f && f - edges[i][2] }.compact.first || 0
+    out = []; mins = []
+    (r['dv'] || []).each_with_index { |(a, b, hh), i| out << "divider #{i + 1} drawn #{(b - a).round(1)} px below its row edge (the svg must start at the edge, 3 px high)" if (b - a).abs > 1.5 }
+    rows.each_with_index do |(l, t, rr, b), i|
+      x0, x1, y0, y1 = edges[i]
+      y0 = found[i].round if found[i]
+      y0 = (y0 + off).round if i.zero?
+      y1 = found[i + 1] ? found[i + 1].round : (y1 + off).round
+      y1 = [y1, png.height - 1].min
+      h = y1 - y0
+      need = [3.0, 0.1 * h].max - 0.6
+      ys = (y0 + 3..y1 - 3).select { |y| (x0..x1).any? { |x| ink.(x, y) } }
+      next if ys.empty?
+      top = ys.first - y0; bot = y1 - ys.last
+      mins << [top, bot].min
+      out << "row #{i}: gap above #{top} px, below #{bot} px, need #{need.round(1)} of a #{h}px row" if top < need || bot < need
+    end
+    puts "ROWOFF #{c['name']}: picture minus DOM #{off.round(1)} px" if ENV['ROWDBG']
+    [{ 'ROWGAP' => out }.reject { |_, v| v.empty? }, mins.min]
+  end
 end

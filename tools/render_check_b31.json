@@ -976,5 +976,30 @@
    ]
   },
   "hcols": 8
+ },
+ {
+  "name": "b31-x-port-full-dig",
+  "device": "v2",
+  "view": "full",
+  "locale": "en-US",
+  "orientation": "portrait",
+  "portrait_console": true,
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days",
+   "week_style": "digital"
+  }
+ },
+ {
+  "name": "b31-x-port-hv-dig",
+  "device": "v2",
+  "view": "half_vertical",
+  "locale": "en-US",
+  "orientation": "portrait",
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days",
+   "week_style": "digital"
+  }
  }
 ]
