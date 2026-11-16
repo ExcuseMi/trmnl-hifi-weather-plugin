@@ -505,11 +505,18 @@ test('moon drawn from the phase: lit fraction within 10 % for crescent, quarter,
     if (ic === 'wi-moon-alt-full') ok(Math.abs(p - 0.5) < 0.03, t + ' full at ' + p); if (ic === 'wi-moon-alt-new') ok(p < 0.03 || p > 0.97, t + ' new at ' + p); }
   eq(T.moonPhase(null), null);
 });
+test('parka needs the coldest felt under 3 C AND the warmest felt under 8 C (owner 2026-11-16); otherwise the top by the warmest', () => {
+  const C = (o, F) => T.cueFor(Object.assign({ rain: false, wind: null, gust: null, lo: null, hi: null, uv: null, day: true }, o), F).join('+');
+  eq([C({ lo: 1, hi: 7.9 }), C({ lo: 1, hi: 8 }), C({ lo: 2.9, hi: 5 }), C({ lo: 3, hi: 5 }), C({ lo: -5, hi: 15 }), C({ lo: -5, hi: 11.9 })], ['parka', 'jacket', 'parka', 'jacket', 'sweater', 'jacket'], 'both limits; a cold morning with a mild afternoon is no parka');
+  eq([C({ lo: 37.4, hi: 46 }, true), C({ lo: 37.2, hi: 46 }, true), C({ lo: 37.2, hi: 46.4 }, true)], ['jacket', 'parka', 'jacket'], 'Fahrenheit: 3 C = 37.4 F, 8 C = 46.4 F');
+  const day = T.dayCueInput({ time: ['2026-11-08T07:00', '2026-11-08T12:00', '2026-11-08T16:00'], apparent_temperature: [1, 9, 16] }, { time: ['2026-11-08'] }, 0);
+  eq([day.lo, day.hi, T.cueFor(day, false)[0]], [1, 16, 'sweater'], 'felt 1 at 07:00 and 16 in the afternoon: not a parka (the top follows the warmest, 16 is under 18)');
+});
 test('barometer trend over 3 h with +/-1 hPa thresholds; clothing cues for every rule and limit', () => {
   eq([T.pressTrend(1011, 1010), T.pressTrend(1010.9, 1010), T.pressTrend(1009, 1010), T.pressTrend(1009.1, 1010), T.pressTrend(1010, null), T.pressTrend(null, 1010)], ['rising', 'steady', 'falling', 'steady', null, null]);
   const C = (o, F) => T.cueFor(Object.assign({ rain: false, wind: null, gust: null, lo: null, hi: null, uv: null, day: true }, o), F).join('+');
   eq([C({ rain: true, lo: 15 }), C({ rain: true, lo: 15, wind: 80, gust: 120 }), C({ rain: true, lo: 1 })], ['sweater+umbrella', 'sweater+umbrella', 'parka+umbrella'], 'rain: always the umbrella extra, the top by felt temperature; no raincoat (owner)');
-  eq([C({ lo: -2.1, hi: 25 }), C({ lo: 2.9, hi: 25 }), C({ lo: 3, hi: 25 }), C({ lo: 4.9, hi: 25 }), C({ lo: 5, hi: 25 })], ['parka', 'parka', 'tshirt', 'tshirt', 'tshirt'], 'parka under 3 from the coldest, no beanie (owner)');
+  eq([C({ lo: -2.1, hi: 25 }), C({ lo: 2.9, hi: 25 }), C({ lo: 3, hi: 25 }), C({ lo: -2.1, hi: 5 }), C({ lo: 2.9, hi: 5 }), C({ lo: 3, hi: 5 })], ['tshirt', 'tshirt', 'tshirt', 'parka', 'parka', 'jacket'], 'parka under 3 from the coldest AND under 8 from the warmest (owner 2026-11-16: a cold morning with a warm afternoon is no parka), no beanie');
   eq([C({ lo: 40.8 }, true), C({ lo: 41 }, true), C({ lo: 37.3 }, true), C({ lo: 37.4 }, true)], ['jacket', 'jacket', 'parka', 'jacket'], 'Fahrenheit: 5 C = 41 F, 3 C = 37.4 F');
   eq([C({ lo: 5, hi: 15, uv: 6 }), C({ lo: 5, hi: 15, uv: 5.9 }), C({ lo: 5, hi: 15, uv: 8, day: false }), C({ lo: 1, uv: 9 })], ['sweater', 'sweater', 'sweater', 'parka'], 'no sunglasses at any UV (owner)');
   eq([C({ hi: 11.9 }), C({ hi: 12 }), C({ hi: 17.9 }), C({ hi: 18 }), C({ hi: 53.5 }, true), C({ hi: 53.6 }, true), C({ hi: 64.3 }, true), C({ hi: 64.4 }, true)], ['jacket', 'sweater', 'sweater', 'tshirt', 'jacket', 'sweater', 'sweater', 'tshirt'], 'tops from the warmest: jacket under 12, sweater under 18, t-shirt; F 53.6 and 64.4');
@@ -559,7 +566,8 @@ test('console cue window (owner 2026-11-13): garment now to +3 h, umbrella to 19
   const C = (hourly, hours, now, uv) => T.cueFor(T.nowCueInput(hourly, hours, Object.assign({ temp: 15, feels: 15, day: true }, now || {}), uv === undefined ? 2 : uv), false).join('+');
   const H = (h0, n, wetAt) => Array.from({ length: n }, (_, k) => ({ h: (h0 + k) % 24, p: (h0 + k) % 24 === wetAt ? 80 : 0, wet: false }));
   eq(C({ apparent_temperature: [15, 15, 15, 15, -10] }, H(7, 25)), 'sweater', 'a cold hour at +4 h does not count');
-  eq(C({ apparent_temperature: [15, 15, 15, 1, 15] }, H(7, 25)), 'parka', 'the coldest felt hour up to +3 h picks the parka');
+  eq(C({ apparent_temperature: [15, 15, 15, 1, 15] }, H(7, 25)), 'sweater', 'one cold felt hour up to +3 h is no parka when the warmest is 15 (owner 2026-11-16)');
+  eq(C({ apparent_temperature: [5, 6, 4, 1, 15] }, H(7, 25)), 'parka', 'all hours up to +3 h under 8 and the coldest under 3: the parka');
     eq(C({ apparent_temperature: [20, 20, 20, 20] }, H(7, 25, 15)), 'tshirt+umbrella', 'rain at 15:00 shows the umbrella at 07:30');
   eq(C({ apparent_temperature: [20, 20, 20, 20] }, H(7, 25, 20)), 'tshirt', 'rain at 20:00 is after 19:00: no umbrella in the morning');
   eq([C({ apparent_temperature: [20, 20, 20, 20] }, H(21, 25, 0)), C({ apparent_temperature: [20, 20, 20, 20] }, H(21, 25, 1))], ['tshirt+umbrella', 'tshirt'], 'evening (21:00): the umbrella looks to +3 h (00:00), not +4 h');
@@ -598,7 +606,7 @@ test('per-day clothing cue: daytime hours 07:00 to 19:00 from the hourly data, d
   eq([b.lo, b.hi, b.rain, b.uv], [6, 14, false, 7], 'no hours for the day: daily fields');
   eq(T.cueFor(b, false), ['sweater']);
   const c = T.dayCueInput(null, { time: ['2026-11-08'], temperature_2m_min: [1], temperature_2m_max: [9], precipitation_probability_max: [60] }, 0);
-  eq([c.lo, c.hi, c.rain, T.cueFor(c, false)], [1, 9, true, ['parka', 'umbrella']], 'no felt fields: air temperature; rain from the daily value');
+  eq([c.lo, c.hi, c.rain, T.cueFor(c, false)], [1, 9, true, ['jacket', 'umbrella']], 'no felt fields: air temperature; rain from the daily value (the warmest 9 is no parka)');
   const f = fx('mixed'), M = SWModel.build(f, {}), i = T.buildI18n('nl');
   const v = T.buildView(M, i, f.daily, null, 0.3, { hourly: f.hourly });
   ok(v.days.every((q) => Array.isArray(q.cue) && q.cue.length >= 1 && q.cue.length <= 2), 'top layer and at most the umbrella on every day');
@@ -773,8 +781,8 @@ test('clothing hysteresis (owner 2026-11-13): the top layer stays until 1 C (2 F
   eq(c(5, 13, { top: 'jacket' })[0], 'sweater', 'warmer by 1: flips');
   eq(c(5, 11.2, { top: 'sweater' })[0], 'sweater', 'colder by 0.8: stays');
   eq(c(5, 10.9, { top: 'sweater' })[0], 'jacket', 'colder by 1.1: flips');
-  eq(c(2.5, 10, { top: 'jacket' })[0], 'jacket', 'parka needs under 2 C');
-  eq(c(1.9, 10, { top: 'jacket' })[0], 'parka');
+  eq(c(2.5, 6, { top: 'jacket' })[0], 'jacket', 'parka needs under 2 C');
+  eq(c(1.9, 6, { top: 'jacket' })[0], 'parka');
   eq(c(-5, 0, { top: 'tshirt' })[0], 'parka', 'a big change skips levels');
   eq(c(55, 54.6, { top: 'jacket' }, true)[0], 'jacket', 'F: 53.6 threshold + 1 F stays');
   eq(c(55, 55.7, { top: 'jacket' }, true)[0], 'sweater', 'F: past by 2 F flips');

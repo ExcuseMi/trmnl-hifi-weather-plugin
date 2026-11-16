@@ -420,7 +420,7 @@ var TOPS = ['parka', 'jacket', 'sweater', 'tshirt'];
 function cueFor(o, F_, prev) {
 var T = (c) => F_ ? c * 1.8 + 32 : c, has = (v) => v !== null && v !== undefined, m = F_ ? 2 : 1;
 var lo = has(o.lo) ? o.lo : o.hi, hi = has(o.hi) ? o.hi : o.lo;
-var cls = (l, h) => l < T(3) ? 'parka' : (h < T(12) ? 'jacket' : (h < T(18) ? 'sweater' : 'tshirt'));
+var cls = (l, h) => l < T(3) && h < T(8) ? 'parka' : (h < T(12) ? 'jacket' : (h < T(18) ? 'sweater' : 'tshirt'));   // owner 2026-11-16: a parka needs the coldest felt under 3 C and the warmest under 8 C, else the top follows the warmest
 var top = !has(lo) ? null : cls(lo, hi), pt = prev ? TOPS.indexOf(prev.top) : -1;
 if (top && pt >= 0 && top !== prev.top) top = TOPS.indexOf(top) > pt ? TOPS[Math.max(pt, TOPS.indexOf(cls(lo - m, hi - m)))] : TOPS[Math.min(pt, TOPS.indexOf(cls(lo + m, hi + m)))];
 return [top, o.rain ? 'umbrella' : null].filter((k) => k);
