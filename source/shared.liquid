@@ -386,7 +386,7 @@ var m = /^gray-(\d+)$/.exec(tok || ''); if (!m) return tok;
 var v = +m[1]; return v <= 20 ? 'black' : (v <= 47 ? 'gray-30' : (v <= 72 ? 'gray-55' : 'white'));
 }
 function mid() { return b1() ? '' : (B2() ? 'text--gray-40 dark:text--gray-60' : 'text--gray-45 dark:text--gray-50'); }
-function act() { return 'text--gray-' + (B2() ? 40 : 20); }
+function act() { return 'text--gray-' + (B2() ? 40 : 30); }   /* B33 (owner 2026-11-16): the 4-bit lit cells are the OG's grey 85 (token 30 on the X palette); lamps and the current markers stay black */
 function blk(hi) { return b1() ? '' : (hi ? 'text--gray-10 dark:text--gray-75' : (act() + ' dark:text--gray-60')); }
 function g(cls, body) {
 var keep = [], tok = null;

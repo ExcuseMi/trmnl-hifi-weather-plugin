@@ -338,6 +338,10 @@ var edge=lit.indexOf(0)>=0||lit.indexOf(4)>=0,lab=document.querySelector('[data-
 if(g.querySelector('[data-sw-twrow="in"] > g[class*="hidden"]'))bad.push('shadow on the balance row')});return bad.join('; ')})()})
       puts "BALANCE #{c['name']}: #{bl}" unless bl.empty?
       expect(bl).to eq('')
+      # B33 (owner 2026-11-16): on a 4-bit grey screen the lit meter cells are the OG's grey 85 (they were 51), lamps and current markers black.
+      cg = s.evaluate(%q{(function(){var sc=document.querySelector('.screen')||document.body,c=sc.className;if(/screen--(1bit|2bit|dark-mode|color)/.test(c))return '';var bad=[];[].filter.call(document.querySelectorAll('[data-sw-part^="meter"] [data-sw-on] rect[data-sw-c]'),function(r){return r.getBoundingClientRect().width>0}).slice(0,6).forEach(function(r){var m=/(\d+)\D+(\d+)\D+(\d+)/.exec(getComputedStyle(r).fill||'');if(!m)return;var l=0.3*m[1]+0.59*m[2]+0.11*m[3];if(Math.abs(l-85)>10)bad.push('lit cell grey '+l.toFixed(0)+', want 85')});return bad.slice(0,2).join('; ')})()})
+      puts "CELLGREY #{c['name']}: #{cg}" unless cg.empty?
+      expect(cg).to eq('')
       puts "LITLABEL #{c['name']}: #{lt_bad}" unless lt_bad.empty?
       expect(lt_bad).to eq('')
       if c['want_lit']
