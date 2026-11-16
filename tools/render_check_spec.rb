@@ -323,11 +323,21 @@ return bad.slice(0,4).join('; ')})()})
       puts "UNIT #{c['name']}: #{ug}" unless ug.empty?
       expect(ug).to eq('')
       # B30 (owner 2026-11-16): a meter label is lit (data-sw-lit: Framework bg--black text--white, mirrored in dark mode, rectangular: no rounded corners) exactly when its value is in its bad (top) zone: WIND, UV, AQI, POLLEN and CO2 from their
-      # red zone, the sensor's HUM below 30 or above 60 %; outdoor humidity never. Cases name the lit set in want_lit.
+      # red zone, the sensor's HUM below 30 or above 65 %; outdoor humidity never. Cases name the lit set in want_lit.
       lt = s.evaluate(%q{(function(){var bad=[],lit=[];[].filter.call(document.querySelectorAll('[data-sw-lk]'),function(e){var b=e.getBoundingClientRect();return b.width>0&&b.height>0}).forEach(function(e){var k=e.getAttribute('data-sw-lk'),m=SW.meters.filter(function(q){return q.key===k})[0]||{},iv=SW.iv||[],ex;
-if(k==='humidity')ex=e.hasAttribute('data-sw-lin')&&iv[1]!=null&&(iv[1]<30||iv[1]>60);else if(k==='co2')ex=iv[2]!=null&&iv[2]>=1400;else ex=!!(m.zones&&m.frac>=m.zones[1]);
+if(k==='humidity')ex=e.hasAttribute('data-sw-lin')&&iv[1]!=null&&(iv[1]<30||iv[1]>65);else if(k==='co2')ex=iv[2]!=null&&iv[2]>=1400;else ex=!!(m.zones&&m.frac>=m.zones[1]);
 var on=e.hasAttribute('data-sw-lit');if(on)lit.push(k==='humidity'?'humidity':k);if(on&&parseFloat(getComputedStyle(e).borderTopLeftRadius)>0)bad.push(k+' lit label is rounded (owner 2026-11-16: rectangular)');if(on!==!!ex)bad.push(k+(e.hasAttribute('data-sw-lin')?' (sensor)':'')+(on?' lit':' not lit')+' but its value is '+(ex?'in':'not in')+' the bad range')});return bad.join('; ')+'|'+lit.sort().join(',')})()})
       lt_bad, lt_lit = lt.split('|', 2)
+      # B32 (owner 2026-11-16): the indoor humidity row is a balance meter: one centre tick, the cells filling outward from it by the bands (over 65 two cells
+      # right, over 55 one, under 30 two left, under 40 one, 40 to 55 none), and the label lamp on exactly when an edge cell is lit.
+      bl = s.evaluate(%q{(function(){var bad=[],iv=SW.iv||[];[].filter.call(document.querySelectorAll('[data-sw-twrow="in"]'),function(g){return g.getBoundingClientRect().width>0}).forEach(function(g){var h=iv[1];if(h===null||h===undefined)return;
+var tk={};[].forEach.call(g.querySelectorAll('[data-sw-bt]'),function(r){tk[Math.round(r.getBoundingClientRect().left)]=1});if(Object.keys(tk).length!==1)bad.push('the indoor humidity row has '+Object.keys(tk).length+' centre ticks');
+var lit=[].map.call(g.querySelectorAll('[data-sw-on] [data-sw-c]'),function(r){return +r.getAttribute('data-sw-c')}).sort().filter(function(v,i,a){return a.indexOf(v)===i}),want=h>65?[3,4]:(h>55?[3]:(h<30?[0,1]:(h<40?[1]:[])));
+if(lit.join()!==want.join())bad.push('humidity '+h+' lights cells '+lit.join('+')+', want '+want.join('+'));
+var edge=lit.indexOf(0)>=0||lit.indexOf(4)>=0,lab=document.querySelector('[data-sw-lk="humidity"][data-sw-lin]');if(lab&&lab.hasAttribute('data-sw-lit')!==edge)bad.push('lamp '+(edge?'off':'on')+' but the edge cell is '+(edge?'lit':'not lit'));
+if(g.querySelector('[data-sw-twrow="in"] > g[class*="hidden"]'))bad.push('shadow on the balance row')});return bad.join('; ')})()})
+      puts "BALANCE #{c['name']}: #{bl}" unless bl.empty?
+      expect(bl).to eq('')
       puts "LITLABEL #{c['name']}: #{lt_bad}" unless lt_bad.empty?
       expect(lt_bad).to eq('')
       if c['want_lit']
@@ -486,7 +496,13 @@ var st=[].filter.call(document.querySelectorAll('[data-sw-suntime] span.title'),
 [].filter.call(document.querySelectorAll('[data-sw-unit="sun"] img'),vis).forEach(function(e,i){var t=e.parentElement.querySelector('[data-sw-suntime] span.title');add('sun',e,cap(t||st[0]))});
 [].filter.call(document.querySelectorAll('[data-sw-part="moon"]'),vis).forEach(function(e){if(st[0])add('moon',e.querySelector('svg')||e,cap(st[0]))});
 var ca=[].filter.call(document.querySelectorAll('[data-sw-part="rain"] svg text'),vis)[0];[].filter.call(document.querySelectorAll('[data-sw-unit="rain"] img'),vis).forEach(function(e){if(ca)add('rain',e,scap(ca))});
-var tr='';   // B31: the days scale track and the day-row icons are gone (the WEEK* checks)
+[].filter.call(document.querySelectorAll('[data-sw-row="day"]'),vis).forEach(function(r,i){var t=[].filter.call(r.querySelectorAll('span.title'),function(s){return vis(s)&&/\d/.test(s.textContent)})[0];if(!t)return;var c=cap(t);var nm=r.querySelector('[data-sw-dname],[data-sw-today]'),nf=nm?parseFloat(getComputedStyle(nm).fontSize):0,tf=parseFloat(getComputedStyle(t).fontSize);if(nf&&tf<0.85*nf)ic.push(['day'+i+' low/high '+tf+'px under 0.85 x the day name '+nf+'px',0,0,0,0,1]);[].filter.call(r.querySelectorAll('img'),vis).forEach(function(e){add('day'+i+' icon',e,c)});var d=r.querySelector('[data-sw-part="dcue"]');if(vis(d))add('day'+i+' clothing',d,c);});
+var tr='',sc=[].filter.call(document.querySelectorAll('[data-sw-part="scale"]'),vis)[0],row=[].filter.call(document.querySelectorAll('[data-sw-row="day"]'),vis)[0];
+if(sc&&row){var sv=sc.querySelector('svg'),sb=sv.getBoundingClientRect(),k=sb.width/(+sv.getAttribute('width')||sb.width),g=sv.querySelector('[data-sw-track]'),cw=0;
+[].forEach.call(document.querySelectorAll('[data-sw-cells] rect'),function(q){var w=q.getBoundingClientRect().width;if(vis(q))cw=Math.max(cw,w+2)});
+var x0,x1;if(g){var v=g.getAttribute('data-sw-track').split(',').map(Number);x0=sb.left+v[0]*k;x1=sb.left+v[1]*k}else{var L=1e9,Rr=-1e9;[].forEach.call(document.querySelectorAll('[data-sw-cells] rect'),function(q){var b=vis(q);if(b){L=Math.min(L,b.left);Rr=Math.max(Rr,b.right)}});x0=L;x1=Rr}
+var lb=[].map.call(sv.querySelectorAll('text[data-sw-tick]'),function(t){var b=t.getBoundingClientRect();return (b.left+b.right)/2});
+tr=[(x1-x0)/row.getBoundingClientRect().width,lb.length?lb[0]-x0:1e9,lb.length?lb[lb.length-1]-x1:1e9,cw].map(function(v){return v.toFixed(3)}).join(',')}
 var pn=[];[].filter.call(document.querySelectorAll('[data-sw-panel]'),vis).forEach(function(p){var q=p.getBoundingClientRect(),t=1e9,b=-1e9;p.querySelectorAll('img, svg, span').forEach(function(e){if(e.closest('[data-sw-part="face"]'))return;var r=vis(e);if(!r||(e.tagName==='SPAN'&&!e.textContent.trim()))return;t=Math.min(t,r.top);b=Math.max(b,r.bottom)});if(b>t)pn.push([p.closest('[data-sw-console]')?'console':'days',q.left+10,t,q.right-10,b,q.height]);
 var rt=p.querySelector('[data-sw-right]'),rb=vis(rt);if(rb&&rb.left>q.left+q.width*0.25){var tp=rt.parentElement.getBoundingClientRect();pn.push(['right column',rb.left,tp.top,rb.right,tp.bottom,q.height,1])}});
 var tq=vis(document.querySelector('[data-sw-part="temp"] svg')),pq=vis(document.querySelector('[data-sw-console] [data-sw-panel]'));if(QUAD&&tq&&pq&&tq.height<0.13*pq.height)ic.push(['temperature '+tq.height.toFixed(0)+' under 13 % of the console '+pq.height.toFixed(0),0,0,0,0,1]);
@@ -540,6 +556,15 @@ var rg=document.createRange();rg.selectNodeContents(sp);var lr=[].filter.call(rg
 var ik=((ic.querySelector('[data-sw-ink]')||ic).getAttribute('data-sw-ink')||'0,1').split(',').map(Number),it=ib.top+ik[0]*ib.height,ih=ik[1]*ib.height,h=n>1?t1-t0+cap:cap,mid=sf?(sb.top+sb.bottom)/2:(n>1?(t0+t1)/2:t0+cap/2),q=ih/h;if(n>2)bad.push('label on '+n+' lines');if(n>1&&(q=ih/cap,0))0;if(n>1?(q<(ic.hasAttribute('data-sw-clamped')?1.6:2.1)||q>2.5):(q<(ic.hasAttribute('data-sw-clamped')?1.6:2.1)||q>2.5))bad.push('icon ink '+ih.toFixed(1)+' / cap '+(n>1?cap:h).toFixed(1)+' = '+q.toFixed(2)+' ('+n+' lines)');if(Math.abs(it+ih/2-mid)>1.5)bad.push('icon ink centre off '+(it+ih/2-mid).toFixed(1));});return bad.join('; ');})()})
       puts "CONDICON #{c['name']}: #{ci}" unless ci.empty?
       expect(ci).to eq('')
+      # Days strip (owner 2026-11-12, later): the strip always starts with today, the one highlighted row.
+      hl = s.evaluate(%q{(function(){var r=[].filter.call(document.querySelectorAll('[data-sw-part="day"]'),function(e){return e.getBoundingClientRect().width>0});if(!r.length)return '';var h=r.map(function(e,i){return e.querySelector('[data-sw-hl]')?i:-1}).filter(function(i){return i>=0});var t0=SW.days[+r[0].getAttribute('data-sw-i')];if(!t0||!t0.today)return 'first row not today: '+(t0&&t0.name);var tl=[].filter.call(document.querySelectorAll('[data-sw-today]'),function(e){return e.getBoundingClientRect().width>0})[0];if(!tl||!/label--inverted/.test(tl.className))return 'today name not an inverted label';return h.length===1&&h[0]===0?'':'highlighted rows '+JSON.stringify(h);})()})
+      puts "HL #{c['name']}: #{hl}" unless hl.empty?
+      expect(hl).to eq('')
+      # Days strip axis labels (owner 2026-11-12): at least the meter label size.
+      ax = s.evaluate(%q{(function(){var vis=function(e){var b=e.getBoundingClientRect();return b.width>0&&b.height>0};var lab=[].filter.call(document.querySelectorAll('[data-sw-mlabel]'),vis)[0],sc=[].filter.call(document.querySelectorAll('[data-sw-part="scale"] svg'),vis)[0];if(!lab||!sc)return '';
+var lp=parseFloat(getComputedStyle(lab).fontSize)*(lab.getBoundingClientRect().width/(lab.offsetWidth||1)),k=sc.getBoundingClientRect().height/+sc.getAttribute('height'),t=sc.querySelector('text[data-sw-tick]');if(!t)return 'no axis label';var fs=+t.getAttribute('font-size')*k;return fs<lp-0.5?'axis '+fs.toFixed(1)+' < label '+lp.toFixed(1):'';})()})
+      puts "AXIS #{c['name']}: #{ax}" unless ax.empty?
+      expect(ax).to eq('')
       # Colour (owner 2026-11-12, as live): red and yellow only on colour palettes and only on the warning parts
       # (lit lamps, meter warning zones, the days now line and pointer, lit rain cells); none on gray palettes.
       hu = s.evaluate(%q{(function(){var bad=[],n=0,ch=function(v){var m=/(\d+)\D+(\d+)\D+(\d+)/.exec(v||'');if(!m)return false;var a=[+m[1],+m[2],+m[3]];return Math.max.apply(0,a)-Math.min.apply(0,a)>60};
@@ -608,6 +633,22 @@ return bad.join('; ');})()})
         expect(rdk.zero? ? rlum <= 80 : rlum >= 170).to be(true), "lit rain cell too mid-grey (#{rlum.round}) for its numbers"
       end
       expect(sn.split(',')[1].to_i).to eq(want.positive? ? dials : 0)
+      # Days strip (owner 2026-11-12): a paper channel beside the now line in every row with cells; cells a solid bar or
+      # separated by at least 2 px; the now line over the axis labels (continuous) and its pointer clear of every label.
+      ds = s.evaluate(%q{(function(){var bad=[],vis=function(e){var b=e&&e.getBoundingClientRect();return b&&b.width>0&&b.height>0?b:null};
+document.querySelectorAll('[data-sw-part="day"]').forEach(function(el){if(!vis(el))return;var nl=el.querySelector('[data-sw-now]'),cs=el.querySelectorAll('[data-sw-cells] rect');if(!cs.length)return;
+var gk=el.querySelector('[data-sw-k]');if(gk&&+gk.getAttribute('data-sw-r')>=2*+gk.getAttribute('data-sw-k')&&cs.length<2)bad.push('one slab row '+el.getAttribute('data-sw-i'));
+[].forEach.call(cs,function(q){var w=q.getBoundingClientRect().width;if(w<4)bad.push('cell under 4 px row '+el.getAttribute('data-sw-i')+' '+w.toFixed(1));});   // step 18: OG half vertical portrait drew 1 px slats
+var R=[].map.call(cs,function(q){return[+q.getAttribute('x'),+q.getAttribute('x')+ +q.getAttribute('width')]}),wd=R.map(function(q){return q[1]-q[0]}).sort(function(a,b){return a-b}),md=wd[wd.length>>1];if(R.length>1&&wd[0]<md/2-0.5)bad.push('sliver row '+el.getAttribute('data-sw-i')+' '+wd[0].toFixed(1));
+if(nl){var x0=+nl.getAttribute('x'),x1=x0+ +nl.getAttribute('width');R.forEach(function(q){if((Math.abs(q[0]-x1)<0.9||Math.abs(q[1]-x0)<0.9||(q[0]>x0-0.9&&q[0]<x1+0.9)||(q[1]>x0-0.9&&q[1]<x1+0.9)))bad.push('edge at the now line row '+el.getAttribute('data-sw-i'));});}
+var r=[].map.call(cs,function(q){return[+q.getAttribute('x'),+q.getAttribute('x')+ +q.getAttribute('width')]}).sort(function(a,b){return a[0]-b[0]});for(var i=1;i<r.length;i++)if(r[i][0]-r[i-1][1]<1.9){bad.push('cells merge row '+el.getAttribute('data-sw-i')+' gap '+(r[i][0]-r[i-1][1]).toFixed(1));break;}});
+document.querySelectorAll('[data-sw-part="scale"]').forEach(function(el){if(!vis(el))return;var nl=el.querySelector('[data-sw-now]'),ax=el.querySelector('[data-sw-axis]');if(!nl)return;
+if(ax&&(ax.compareDocumentPosition(nl)&Node.DOCUMENT_POSITION_FOLLOWING)===0)bad.push('now line under the labels');var pt=el.querySelector('polygon');var pb=vis(pt);
+if(pb)el.querySelectorAll('text').forEach(function(t){var b=t.getBoundingClientRect(),k=el.getBoundingClientRect().height/(+el.querySelector('svg').getAttribute('height')||1),cy=(b.top+b.bottom)/2,hc=+t.getAttribute('font-size')*k*0.36;if(b.width&&pb.left<b.right-1&&pb.right>b.left+1&&pb.bottom>cy-hc+0.5)bad.push('pointer over '+t.textContent);});});
+return bad.join('; ');})()})
+      puts "DAYS #{c['name']}: #{ds}" unless ds.empty?
+      puts "DAYSTRIP #{c['name']}: #{ds}" unless ds.empty?
+      expect(ds).to eq('')
       # X condition label (owner 2026-11-12): a clearly larger title than the day names, so it fills the middle block.
       if is_lg && %w[full half_horizontal].include?(c['view'] || 'full') && !is_port
         cr = s.evaluate(%q{(function(){var v=function(q){return [].filter.call(document.querySelectorAll(q),function(e){return e.getBoundingClientRect().width>0})[0]},a=v('[data-sw-cond]'),b=v('[data-sw-dname]')||v('[data-sw-mlabel]');return a&&b?parseFloat(getComputedStyle(a).fontSize)/parseFloat(getComputedStyle(b).fontSize):9;})()})
@@ -698,26 +739,74 @@ p.querySelectorAll('span').forEach(function(sp){if(!vis(sp)||sp.querySelector('s
 var rg=document.createRange();rg.selectNodeContents(sp);[].forEach.call(rg.getClientRects(),function(r){if(!r.width)return;var bl=r.top+(r.height-(fa+fd)*k)/2+fa*k;add(r.left,r.right,bl-m.actualBoundingBoxAscent*k,bl+Math.max(0,m.actualBoundingBoxDescent)*k);});});
 if(L<1e9)out.push([L-q.left,q.right-R,T-q.top,q.bottom-B].map(function(v){return v.toFixed(0)}).join(','));});return out.join(' ');})()})
       puts "PAD #{c['name']}: L,R,T,B #{pad}"
+      # Small views (owner, Calm round 3): no days strip in a quadrant; Calm day rows at least the floor height (the Calm
+      # full view's light row, 34 px on the OG and 63 px on the X, less 15 % for dark mode's divider); Calm: one now pointer, on today's row.
+      dr = s.evaluate(%q{(function(){var r=[].filter.call(document.querySelectorAll('[data-sw-row="day"]'),function(e){return e.getBoundingClientRect().height>0}).map(function(e){return e.getBoundingClientRect().height});
+var nm=[].filter.call(document.querySelectorAll('[data-sw-nowmark]'),function(e){return e.getBoundingClientRect().width>0}),tod=nm.filter(function(e){var d=e.closest('[data-sw-part="day"]');return d&&SW.days[+d.getAttribute('data-sw-i')].today}).length;
+var ax=[].filter.call(document.querySelectorAll('[data-sw-part="scale"] text[data-sw-tick]'),function(e){return e.getBoundingClientRect().width>0})[0],big=1;
+nm.forEach(function(e){var b=e.getBoundingClientRect(),k=ax?ax.ownerSVGElement.getBoundingClientRect().height/+ax.ownerSVGElement.getAttribute('height'):1,fs=ax?+ax.getAttribute('font-size')*k:0;if(b.height<fs*0.42*0.9)big=0;
+[].forEach.call(e.ownerSVGElement.querySelectorAll('[data-sw-cells] rect'),function(r){var q=r.getBoundingClientRect();if(q.top<b.bottom-0.5&&q.left<b.right&&q.right>b.left)big=0;});});
+return [r.length,r.length?Math.min.apply(null,r).toFixed(1):0,innerHeight,nm.length,tod,big].join(',');})()})
+      puts "DAYROW #{c['name']}: rows,minH,screenH,ptr,ptrToday,ptrBigAndClear #{dr}"
+      # Day rows (owner step 17): one name column width, so the icons line up in every row, the name never reaches its icon
+      # (the inverted today label included; its text measured too, and never clipped by its box: step 19, x-port-hv) and all rows are the same height.
+      al = s.evaluate(%q{(function(){var bad=[],L=[],H=[];[].forEach.call(document.querySelectorAll('[data-sw-row="day"]'),function(e){var q=e.getBoundingClientRect();if(!q.height)return;H.push(q.height);var lo=[].filter.call(e.querySelectorAll('span.title:not([data-sw-dname])'),function(x){return x.getBoundingClientRect().width>0})[0],im=[].filter.call(e.querySelectorAll('img'),function(x){return x.getBoundingClientRect().width>0})[0],nm=e.querySelector('[data-sw-today],[data-sw-dname]');if(nm&&lo&&nm.getBoundingClientRect().right>lo.getBoundingClientRect().left-6)bad.push('name '+nm.textContent.trim()+' reaches its low');if(nm){var r0=document.createRange();r0.selectNodeContents(nm);var tb=r0.getBoundingClientRect(),nb=nm.getBoundingClientRect();if(tb.width&&(tb.right>nb.right+0.5||tb.left<nb.left-0.5))bad.push('name '+nm.textContent.trim()+' runs past its label');}if(!im||!nm)return;var a=im.getBoundingClientRect(),b=nm.getBoundingClientRect(),rg=document.createRange();rg.selectNodeContents(nm);var rr=rg.getBoundingClientRect();if(rr.width&&rr.right>b.right)b=rr;L.push(a.left);if(b.right>a.left-3)bad.push('name '+nm.textContent.trim()+' reaches its icon');});
+if(L.length&&Math.max.apply(null,L)-Math.min.apply(null,L)>1)bad.push('icon lefts '+L.map(Math.round));if(H.length&&Math.max.apply(null,H)-Math.min.apply(null,H)>1)bad.push('row heights '+H.map(Math.round));return bad.join('; ')})()})
       # Rain calendar cells are rectangles with the meter cells' corner radius (owner step 17), in rendered pixels.
       rx = s.evaluate(%q{(function(){var cal=[].filter.call(document.querySelectorAll('[data-sw-part="rain"] svg rect[rx]'),function(r){return r.getBoundingClientRect().width>0})[0],mc=[].filter.call(document.querySelectorAll('[data-sw-part="meter"] svg rect[rx]'),function(r){return r.getBoundingClientRect().width>0})[0];if(!cal||!mc)return '';
 var px=function(r){var sv=r.ownerSVGElement;return +r.getAttribute('rx')*sv.getBoundingClientRect().height/+sv.getAttribute('height')};var a=px(cal),b=px(mc);return Math.abs(a-b)>0.6?'calendar rx '+a.toFixed(1)+' meter rx '+b.toFixed(1):''})()})
       puts "RAINRX #{c['name']}: #{rx}" unless rx.empty?
       expect(rx).to eq('')
+      # Day names on one left edge, and a bar under its name sits closer to that name than to the next day (owner
+      # 2026-11-13, OG half vertical portrait: names shifted, bars floating between rows).
+      dn = s.evaluate(%q{(function(){var tb=function(n){var g=document.createRange();g.selectNodeContents(n);return n.hasAttribute('data-sw-today')?n.getBoundingClientRect():g.getBoundingClientRect()};var L=[],bad=[],R=[].filter.call(document.querySelectorAll('[data-sw-row="day"]'),function(r){return r.getBoundingClientRect().height>0});R.forEach(function(r){var n=r.querySelector('[data-sw-today],[data-sw-dname]');if(n)L.push(tb(n).left)});if(L.length&&Math.max.apply(null,L)-Math.min.apply(null,L)>2)bad.push('name lefts '+L.map(Math.round));R.forEach(function(r,i){var n=r.querySelector('[data-sw-today],[data-sw-dname]'),b=r.querySelector('[data-sw-part="day"]'),nx=R[i+1]&&R[i+1].querySelector('[data-sw-today],[data-sw-dname]');if(!n||!b||!nx)return;var nb=tb(n),bb=b.getBoundingClientRect(),xb=tb(nx);if(bb.top>=nb.bottom-1&&bb.top-nb.bottom>xb.top-bb.bottom-3)bad.push('bar '+i+' nearer the next day ('+Math.round(bb.top-nb.bottom)+' vs '+Math.round(xb.top-bb.bottom)+')')});return bad.join('; ')})()})
+      puts "DAYNAME #{c['name']}: #{dn}" unless dn.empty?
+      expect(dn).to eq('')
       # Rain calendar (owner 2026-11-13): a third row only when it holds a wet hour.
       r3 = s.evaluate(%q{(function(){var sv=[].filter.call(document.querySelectorAll('[data-sw-part="rain"] svg'),function(v){return v.getBoundingClientRect().width>0})[0];if(!sv)return '';var ys={};[].forEach.call(sv.querySelectorAll('text'),function(t){var y=t.getAttribute('y');ys[y]=ys[y]||[];ys[y].push(!!t.closest('.text--white'))});var k=Object.keys(ys).sort(function(a,b){return a-b});if(k.length<3)return '';return ys[k[k.length-1]].some(Boolean)?'':k.length+' rows, last dry'})()})
       puts "RAIN3 #{c['name']}: #{r3}" unless r3.empty?
       expect(r3).to eq('')
+      # Day row parts apart (owner 2026-11-14, OG portrait "lots of clipping"): in each day row the day name, the icon (its box as
+      # drawn, shifts included), the low and the high text and the bar cells neither overlap nor touch (at least 1 px apart); the
+      # numbers no longer spill out of their columns into the icon or the bar track.
+      dp = s.evaluate(%q{(function(){var bad=[],T=function(e){var g=document.createRange();g.selectNodeContents(e);return g.getBoundingClientRect()},v=function(b){return b&&b.width>0&&b.height>0};[].forEach.call(document.querySelectorAll('[data-sw-row="day"]'),function(r,i){if(!r.getBoundingClientRect().height)return;var P=[],nm=r.querySelector('[data-sw-today],[data-sw-dname]'),im=[].filter.call(r.querySelectorAll('img,[data-sw-part="icon"]'),function(e){return v(e.getBoundingClientRect())&&!e.closest('[data-sw-part="dcue"]')})[0],nu=[].filter.call(r.querySelectorAll('span.title:not([data-sw-dname])'),function(e){return v(e.getBoundingClientRect())}),cl=[].filter.call(r.querySelectorAll('[data-sw-cells] rect'),function(e){return v(e.getBoundingClientRect())});if(nm)P.push(['name',nm.hasAttribute('data-sw-today')?nm.getBoundingClientRect():T(nm)]);if(im)P.push(['icon',im.getBoundingClientRect()]);nu.forEach(function(e,j){P.push([j?'high':'low',T(e)])});if(cl.length){var L=1e9,R=-1e9,U=1e9,D=-1e9;cl.forEach(function(e){var b=e.getBoundingClientRect();L=Math.min(L,b.left);R=Math.max(R,b.right);U=Math.min(U,b.top);D=Math.max(D,b.bottom)});P.push(['bar',{left:L,right:R,top:U,bottom:D,width:R-L,height:D-U}])}
+for(var a=0;a<P.length;a++)for(var b=a+1;b<P.length;b++){var x=P[a][1],y=P[b][1];if(v(x)&&v(y)&&x.left<y.right+1&&y.left<x.right+1&&x.top<y.bottom-1&&y.top<x.bottom-1)bad.push('row '+i+' '+P[a][0]+' meets '+P[b][0]+' (gap '+Math.round(Math.max(x.left,y.left)-Math.min(x.right,y.right))+' px)')}});return bad.join('; ')})()})
+      puts "DAYPARTS #{c['name']}: #{dp}" unless dp.empty?
+      # Days scale labels apart (owner 2026-11-14, OG portrait: "-25°-15°" ran together on a wide range): the visible tick labels (number and degree mark) do not overlap.
+      tk = s.evaluate(%q{(function(){var bad=[],L=[].map.call(document.querySelectorAll('text[data-sw-tick]'),function(t){var b=t.getBoundingClientRect(),d=t.nextElementSibling,q=d&&!d.hasAttribute('data-sw-tick')?d.getBoundingClientRect():b;return [t.textContent,{left:Math.min(b.left,q.left),right:Math.max(b.right,q.right),top:Math.min(b.top,q.top),bottom:Math.max(b.bottom,q.bottom),width:b.width}]}).filter(function(q){return q[1].width>0}).sort(function(a,b){return a[1].left-b[1].left});for(var i=1;i<L.length;i++){var g=L[i][1].left-L[i-1][1].right;if(g<0&&L[i][1].top<L[i-1][1].bottom&&L[i-1][1].top<L[i][1].bottom)bad.push(L[i-1][0]+' '+L[i][0]+' gap '+g.toFixed(1))}return bad.join('; ')})()})
+      puts "TICKS #{c['name']}: #{tk}" unless tk.empty?
+      expect(tk).to eq('')
+      expect(dp).to eq('')
+      # Owner 2026-11-14 (OG photo, "temps aligned on the digit before the comma"): in each low and in each high column of the days strip
+      # the last digit of every row ends at the same x (1 px): the numbers right-aligned on their ones digit, the minus and tens reach left.
+      # Owner 2026-11-14 ("make sure the triangle is aligned with it"): the header's low and high marks centred on that ones digit (1 px).
+      dgc = s.evaluate(%q{(function(){var C=[[],[]];[].forEach.call(document.querySelectorAll('[data-sw-row="day"]'),function(r){if(!r.getBoundingClientRect().height)return;[].filter.call(r.querySelectorAll('span.title:not([data-sw-dname])'),function(q){return q.getBoundingClientRect().width>0}).slice(0,2).forEach(function(q,j){var t=q.firstChild,m=t&&t.nodeType===3?t.textContent.search(/\d(?!.*\d)/):-1;if(m<0)return;var g=document.createRange();g.setStart(t,m);g.setEnd(t,m+1);var gr=g.getBoundingClientRect();C[j].push([q.textContent.trim(),gr.right,(gr.left+gr.right)/2])})});var bad=[];C.forEach(function(v,j){var tr=[].filter.call(document.querySelectorAll('[data-sw-part="tri"][data-sw-i="'+j+'"]'),function(e){return e.getBoundingClientRect().width>0})[0];if(tr&&v.length){var tb=tr.getBoundingClientRect(),tc=(tb.left+tb.right)/2;if(Math.abs(tc-v[0][2])>1)bad.push((j?'high':'low')+' mark centre '+tc.toFixed(1)+' vs ones digit '+v[0][2].toFixed(1))}if(v.length<2)return;var x=v.map(function(e){return e[1]}),lo=Math.min.apply(null,x),hi=Math.max.apply(null,x);if(hi-lo>1)bad.push((j?'high':'low')+' digits end '+v.map(function(e){return e[0]+'@'+e[1].toFixed(1)}).join(' '))});return bad.join('; ')})()})
+      puts "DIGITCOL #{c['name']}: #{dgc}" unless dgc.empty?
+      expect(dgc).to eq('')
+      # Owner 2026-11-14 (round 2 review, Kindle 7 portrait read "▲0°"): the low and high marks keep at least 0.4 of their own height
+      # from each other and from every days scale label beside them (ink boxes overlapping in height); seen red on 5696558.
+      mg = s.evaluate(%q{(function(){var vis=function(e){var b=e.getBoundingClientRect();return b.width>0&&b.height>0},M=[].filter.call(document.querySelectorAll('[data-sw-part="tri"] svg polygon'),vis).map(function(e){return ['mark',e.getBoundingClientRect()]}),L=[].filter.call(document.querySelectorAll('[data-sw-part="scale"] svg text'),vis).map(function(e){return ['label '+e.textContent.trim(),e.getBoundingClientRect()]}),bad=[];
+M.forEach(function(m,i){var a=m[1],g=0.4*a.height;M.slice(i+1).concat(L).forEach(function(o){var b=o[1];if(b.top>a.bottom||b.bottom<a.top)return;var d=Math.max(b.left-a.right,a.left-b.right);if(d<g)bad.push('mark '+i+' to '+o[0]+' '+d.toFixed(1)+'<'+g.toFixed(1))})});return bad.join('; ')})()})
+      puts "MARKGAP #{c['name']}: #{mg}" unless mg.empty?
+      expect(mg).to eq('')
       # Round 2 review (v2 portrait with a sensor: HUM/HUM/WIND rows over the indoor and outdoor digits): no temperature digits' ink
       # overlaps a meter row (its label or blocks) of the same panel.
       mo = s.evaluate(%q{(function(){var vis=function(e){var b=e.getBoundingClientRect();return b.width>0&&b.height>0},bad=[];[].filter.call(document.querySelectorAll('[data-sw-part="temp"] svg,[data-sw-part="itemp"] svg'),vis).forEach(function(v){var r=v.getBoundingClientRect(),vb=v.viewBox.baseVal,bb=v.getBBox(),kx=r.width/(vb.width||r.width),ky=r.height/(vb.height||r.height),I={l:r.left+(bb.x-vb.x)*kx,r:r.left+(bb.x-vb.x+bb.width)*kx,t:r.top+(bb.y-vb.y)*ky,b:r.top+(bb.y-vb.y+bb.height)*ky},p=v.closest('[data-sw-panel]');if(!p)return;
 [].filter.call(p.querySelectorAll('[data-sw-part^="meter"],[data-sw-mlabel]'),vis).forEach(function(m){var q=m.getBoundingClientRect();if(q.left<I.r-1&&q.right>I.l+1&&q.top<I.b-1&&q.bottom>I.t+1)bad.push(v.parentElement.getAttribute('data-sw-part')+' digits over '+(m.getAttribute('data-sw-key')||m.textContent.trim()))})});return bad.filter(function(x,i,a){return a.indexOf(x)===i}).join('; ')})()})
       puts "DIGITROW #{c['name']}: #{mo}" unless mo.empty?
       expect(mo).to eq('')
-      # (the portrait rows' gap checks run after the digits-over check: a layout that overlaps fails on the overlap first, not on a row gap)
-      rg, rgmin = WeekChecks.rowgap(s, s.png_path, c)   # portrait rows: the clear gap to the row dividers
-      puts "ROWGAP #{c['name']}: min gap #{rgmin.inspect} px"
-      rg.each { |kk, vv| puts "#{kk} #{c['name']}: #{vv.join('; ')}" }
-      expect(rg).to eq({})
+      puts "DAYALIGN #{c['name']}: #{al}" unless al.empty?
+      expect(al).to eq('')
+      d = dr.split(',').map(&:to_f)
+      expect(d[0]).to eq(0) if c['view'] == 'quadrant'
+      # B12 (device tier): the floor is a size in the framework's px (X 53 screen px at its pixel ratio 1.8, OG 28 at 1) at the framework's
+      # text scale, so a screen with another ratio (Voyage 1.4, Scribe 2.5) or a smaller text scale (Palma, Kindle 2024: 0.8) is held to the
+      # same drawn size as its own text, not to the X's screen px; OG and X keep their numbers.
+      # An lg screen shorter than the X's 780 framework px (Voyage 765) shares less height among the same rows: its floor shrinks with it.
+      pxr = s.evaluate("(function(){var c=getComputedStyle(document.querySelector('.screen')),v=function(n){return parseFloat(c.getPropertyValue(n))||1};return v('--pixel-ratio')*v('--device-ui-scale')*(document.querySelector('.screen--lg')?Math.min(1,Math.min(v('--screen-w'),v('--screen-h'))/780):1)})()").to_f
+      expect(d[1]).to be >= (is_lg ? 53 / 1.8 : 28) * pxr * (c['dark'] ? 0.85 : 1) if d[0].positive?   # the comment above says less 15 % for dark mode's divider; the code never took it (dark rows were 55 px by luck until the larger console)
+      expect([d[3], d[4]]).to eq(d[0].positive? ? [1, 1] : [0, 0])
+      expect(d[5]).to eq(1)
       # Felt temperature (owner decision 2026-11-13): no felt readout anywhere (no felt digits, no felt word, no person
       # icon); the felt temperature only drives the clothing badge.
       fi = s.evaluate(%q{(function(){var bad=[],vis=function(e){var b=e&&e.getBoundingClientRect();return b&&b.width>0&&b.height>0?b:null};if(document.querySelector('[data-sw-part="person"]'))bad.push('person icon');
@@ -774,8 +863,8 @@ return bad.slice(0,4).join('; ');})()})
       # B31 hours (owner 2026-11-16): no offset shadow on the bars, black bars on 2-bit and 1-bit, and an hour below 0 draws one unbroken 0 line
       # across the strip with the bars below 0 hanging down from it (others up), labels clear of the line.
       hz = s.evaluate(%q{(function(){var bad=[],cs=[].filter.call(document.querySelectorAll('[data-sw-part="hbar"]'),function(e){return e.getBoundingClientRect().width>0});if(!cs.length)return '';
-var sc=document.querySelector('.screen')||document.body,dk=sc.classList.contains('screen--1bit')||sc.classList.contains('screen--2bit'),Lf=function(e){var c=getComputedStyle(e).fill,q=c&&c.match(/[\d.]+/g);return q&&q.length>2?0.3*q[0]+0.59*q[1]+0.11*q[2]:null};
-cs.forEach(function(e){var i=+e.getAttribute('data-sw-i'),gs=e.querySelectorAll('svg g');if(gs.length>2||e.querySelector('[class*="hidden"]'))bad.push('shadow in bar '+i);if(dk)e.querySelectorAll('[data-sw-cells] rect').forEach(function(r){var l=Lf(r);if(l!==null&&(SWDraw.mode&&SWDraw.mode.dark?l<215:l>40))bad.push('bar '+i+' not full ink ('+l.toFixed(0)+')')});});
+var sc=document.querySelector('.screen')||document.body,Lf=function(e){var c=getComputedStyle(e).fill,q=c&&c.match(/[\d.]+/g);return q&&q.length>2?0.3*q[0]+0.59*q[1]+0.11*q[2]:null};
+cs.forEach(function(e){var i=+e.getAttribute('data-sw-i'),gs=e.querySelectorAll('svg g');if(gs.length>2||e.querySelector('[class*="hidden"]'))bad.push('shadow in bar '+i);e.querySelectorAll('[data-sw-cells] rect').forEach(function(r){var l=Lf(r);if(l===null)return;var dm=SWDraw.mode&&SWDraw.mode.dark,ink=dm?l>=215:l<=40,now=!!(SW.hours[i]||{}).now;if(sc.classList.contains('screen--1bit')&&!ink)bad.push('bar '+i+' not full ink ('+l.toFixed(0)+')');if(sc.classList.contains('screen--2bit')){if(now&&!ink)bad.push('the current hour bar is not black on 2-bit');if(!now&&ink)bad.push('bar '+i+' is black on 2-bit (the meters dark grey, black only for the current hour)')}});});   /* owner 2026-11-16: 2-bit hours bars like the meters; the B31 rule black on 2-bit is withdrawn */
 var below=cs.some(function(e){var q=SW.hours[+e.getAttribute('data-sw-i')];return q&&q.tV!==null&&q.tV!==undefined&&Math.round(q.tV)<0}),ls=[].filter.call(document.querySelectorAll('[data-sw-hzline]'),function(e){return e.getBoundingClientRect().width>0});
 if(!below){if(ls.length)bad.push('0 line without an hour below 0');return bad.slice(0,4).join('; ')}
 if(ls.length!==1){bad.push(ls.length+' 0 lines');return bad.join('; ')}
@@ -789,7 +878,7 @@ return bad.slice(0,4).join('; ')})()})
       expect(hs).to eq("#{c['hcols'] || 0}|")   # (after HZERO has printed too, so a break shows both)
       expect(hz).to eq('')
       # 1-bit (owner 2026-11-13): block parts (hours and days strip blocks, meter cells) solid ink, no grey (dithered) fill.
-      sb = s.evaluate(%q{(function(){if(!(document.querySelector('.screen')||document.body).classList.contains('screen--1bit'))return '';var bad=[];document.querySelectorAll('[data-sw-part="hbar"] g, [data-sw-part="meter"] g').forEach(function(e){if(!/text--gray-/.test(e.getAttribute('class')||'')||!e.querySelector('rect,path')||e.closest('[data-sw-st="p"]'))return;   // cells reached earlier today: the Framework's lighter grey (owner 2026-11-13)
+      sb = s.evaluate(%q{(function(){if(!(document.querySelector('.screen')||document.body).classList.contains('screen--1bit'))return '';var bad=[];document.querySelectorAll('[data-sw-part="hbar"] g, [data-sw-part="day"] [data-sw-cells] g, [data-sw-part="meter"] g').forEach(function(e){if(!/text--gray-/.test(e.getAttribute('class')||'')||!e.querySelector('rect,path')||e.closest('[data-sw-st="p"]'))return;   // cells reached earlier today: the Framework's lighter grey (owner 2026-11-13)
 var b=e.getBoundingClientRect();if(b.width>0&&getComputedStyle(e).display!=='none')bad.push(e.closest('[data-sw-part]').getAttribute('data-sw-part')+' '+e.getAttribute('class'));});return bad.slice(0,3).join('; ');})()})
       puts "SOLID1 #{c['name']}: #{sb}" unless sb.empty?
       # Meter states (owner 2026-11-13): every cell drawn in exactly the state the model gives (a now, p reached earlier
@@ -815,18 +904,22 @@ var on=e.querySelector('[data-sw-on]');var dg=on&&on.querySelector(':scope > [da
       co = s.evaluate(%q{(function(){var vis=function(e){var b=e&&e.getBoundingClientRect();return b&&b.width>0&&b.height>0},bad=[],ws=[];
 var IT={parka:['top'],jacket:['top'],sweater:['top'],tshirt:['top'],umbrella:['umbrella']};
 function chk(e,want,tag){var cl=e.querySelector('g[data-sw-cloth]'),exp=[].concat.apply([],want.map(function(k){return IT[k]||[]})).sort().join('+'),its=[].slice.call(e.querySelectorAll('g[data-sw-item]')),got=its.map(function(g){return g.getAttribute('data-sw-item')}).sort().join('+');if(got!==exp)bad.push(tag+' parts '+got+'/'+exp);
-ws.push(e.getBoundingClientRect().width);var E=e.getBoundingClientRect(),sv=cl&&cl.closest('svg'),T=sv&&sv.getBoundingClientRect();its.forEach(function(g){var b=g.getBoundingClientRect();if(!b.width)return;if(tag.indexOf('week')===0&&g.getAttribute('data-sw-item')==='umbrella'){if(b.right>T.right+0.3*(T.right-T.left)||b.top<T.top-1||b.bottom>T.bottom+1)bad.push(tag+' umbrella mark outside its corner');return}if((tag==='console'&&(b.left<E.left-1||b.right>E.right+1||b.top<E.top-1||b.bottom>E.bottom+1))||b.left<T.left-1||b.right>T.right+1||b.top<T.top-1||b.bottom>T.bottom+1)bad.push(tag+' '+g.getAttribute('data-sw-item')+' overflows its box')});}
+ws.push(e.getBoundingClientRect().width);var E=e.getBoundingClientRect(),sv=cl&&cl.closest('svg'),T=sv&&sv.getBoundingClientRect();its.forEach(function(g){var b=g.getBoundingClientRect();if(!b.width)return;if((tag==='console'&&(b.left<E.left-1||b.right>E.right+1||b.top<E.top-1||b.bottom>E.bottom+1))||b.left<T.left-1||b.right>T.right+1||b.top<T.top-1||b.bottom>T.bottom+1)bad.push(tag+' '+g.getAttribute('data-sw-item')+' overflows its box')});}
 var cn=0;[].filter.call(document.querySelectorAll('[data-sw-part="cue"]'),vis).forEach(function(e){cn++;chk(e,SW.cue||[],'console');});ws=[];   // the console badge has its own box (owner); the day rows share one width
-var wc=[].filter.call(document.querySelectorAll('[data-sw-part="wcue"]'),vis),n=0;wc.forEach(function(e){n++;var i=+e.getAttribute('data-sw-i');chk(e,SW.days[i].cue||[],'week '+i);});   // B31: the week's clothing icons (the old day-row badges are gone)
-if(ws.length&&Math.max.apply(null,ws)-Math.min.apply(null,ws)>1)bad.push('widths '+ws.map(Math.round).join(','));return cn+','+n+'|'+bad.join('; ');})()})
-      puts "CLOTH #{c['name']}: console,weekcues|bad #{co}"
+var rows=[].filter.call(document.querySelectorAll('[data-sw-row="day"]'),vis),n=0;rows.forEach(function(r){var ds=[].filter.call(r.querySelectorAll('[data-sw-part="dcue"]'),vis);if(!ds.length)return;n++;if(ds.length>1)bad.push('badges '+ds.length);var i=+ds[0].getAttribute('data-sw-i');chk(ds[0],SW.days[i].cue||[],'day '+i);});
+if(n&&n!==rows.length)bad.push('rows '+n+'/'+rows.length);if(NOWEAR&&n)bad.push('What to wear is off but '+n+' day rows carry a clothing icon');if(ws.length&&Math.max.apply(null,ws)-Math.min.apply(null,ws)>1)bad.push('widths '+ws.map(Math.round).join(','));return cn+','+n+'|'+bad.join('; ');})()}.sub('NOWEAR', (c['want_nowear'] ? 'true' : 'false')))
+      puts "CLOTH #{c['name']}: console,dayrows|bad #{co}"
       expect(co.split('|', 2)[1]).to eq('')
-      expect(co.split(',')[1].to_i).to be_positive if (c['view'] || 'full') == 'full' && (c['fields'] || {})['bottom'] != 'hours' && !c['hcols'] && !c['want_nowear']   # B25: Hours, then days shows hours (hcols) before its switch hour; B31: What to wear off draws no cue
-      # Portrait console (owner, step 19 on x-port-hv; OG half vertical portrait the model): the console badge
-      # beside the temperature (full and half views; quadrants are tiny views without a badge, owner B3 2026-11-14). B31: the day-row, marker and scale parts of this check are replaced by the WEEK* checks.
+      expect(co.split(',')[1].to_i).to be_positive if (c['view'] || 'full') == 'full' && (c['fields'] || {})['bottom'] != 'hours' && !c['hcols'] && !c['want_nowear'] && (c['fields'] || {})['week_style'] != 'digital'   # B25: Hours, then days shows hours (hcols) before its switch hour; B31: What to wear off draws no cue
+      # Portrait day rows and console (owner, step 19 on x-port-hv; OG half vertical portrait the model): the console badge
+      # beside the temperature (full and half views; quadrants are tiny views without a badge, owner B3 2026-11-14), every day row keeps its low and high, the header its two markers, and the scale labels
+      # no larger than 1.3 x the low/high digits.
       if is_port
         pr = s.evaluate(%q{(function(){var vis=function(e){var b=e&&e.getBoundingClientRect();return b&&b.width>0&&b.height>0},bad=[],fs=function(e){return parseFloat(getComputedStyle(e).fontSize)*(e.getBoundingClientRect().width/(e.offsetWidth||1))};
 if(QUAD0&&SW.cue&&SW.cue.length&&![].some.call(document.querySelectorAll('[data-sw-part="cue"]'),vis))bad.push('no console badge');
+var rows=[].filter.call(document.querySelectorAll('[data-sw-row="day"]'),vis),lf=0;rows.forEach(function(r){var n=[].filter.call(r.querySelectorAll('span.title:not([data-sw-dname])'),vis);if(n.length<2)bad.push('row '+r.textContent.trim().split(/\s+/)[0]+' without low/high');else lf=fs(n[0]);});
+if(rows.length){var tr=[].filter.call(document.querySelectorAll('[data-sw-part="tri"]'),vis).length;if(tr!==2)bad.push('markers '+tr);
+var sv=[].filter.call(document.querySelectorAll('[data-sw-part="scale"] svg'),vis)[0];if(sv&&lf){var k=sv.getBoundingClientRect().height/(+sv.getAttribute('height')||1);[].forEach.call(sv.querySelectorAll('text'),function(t){var f=+t.getAttribute('font-size')*k;if(f>lf*1.3)bad.push('scale label '+f.toFixed(0)+' px over low/high '+lf.toFixed(0));});}}
 return bad.filter(function(x,i,a){return a.indexOf(x)===i}).join('; ');})()}.sub('QUAD0', (c['view'] != 'quadrant').to_s))
         puts "PORT #{c['name']}: #{pr}" unless pr.empty?
         expect(pr).to eq('')
@@ -843,22 +936,22 @@ if(e.getAttribute&&e.tagName!=='IMG'){var cs=getComputedStyle(e);if((cs.fill==='
 if(b.bottom<=R.top||b.top>=R.bottom)return;var d=b.left>x?b.left-x:(b.right<x?x-b.right:-1);
 if(d<g){var p=e.t||((e.closest('[data-sw-part]')||{getAttribute:function(){return e.tagName}}).getAttribute('data-sw-part')+'/'+e.tagName);bad.push(p+' '+d.toFixed(1)+'<'+g.toFixed(1)+' @'+x.toFixed(0));}});});
 var u=[];bad.forEach(function(s){if(u.indexOf(s)<0)u.push(s)});return u.slice(0,8).join('; ');})()})
-      # Outfit proportions (owner 2026-11-13, squashed garments): the garment drawn in every cue box (console badge, week cues)
+      # Outfit proportions (owner 2026-11-13, squashed garments): the garment drawn in every cue box (console badge, day rows)
       # keeps the height/width ratio of tools/outfit_ratios.js for its type (within 5 %); stroke taken out, so a non-uniform scale shows.
       pr = s.evaluate(%q{(function(){var out=[],vis=function(e){var b=e&&e.getBoundingClientRect();return b&&b.width>0&&b.height>0};
 function m(e,keys,tag){var t=keys[0],g=e.querySelector('g[data-sw-cloth]'),it=g&&g.querySelector('[data-sw-item="top"]');if(!it||!vis(it))return;var sw=getComputedStyle(it.querySelector('path')).stroke==='none'?0:+it.getAttribute('stroke-width'),b=it.getBBox(),r=it.getBoundingClientRect();out.push(t+','+(b.height*(r.height/(b.height+sw))/(b.width*(r.width/(b.width+sw)))).toFixed(4)+','+tag+','+it.getScreenCTM().a.toFixed(3))}
 [].filter.call(document.querySelectorAll('[data-sw-part="cue"]'),vis).forEach(function(e){m(e,SW.cue||[],'console')});
-[].filter.call(document.querySelectorAll('[data-sw-part="wcue"]'),vis).forEach(function(d){m(d,SW.days[+d.getAttribute('data-sw-i')].cue||[],'week')});return out.join(' ')})()})
+[].filter.call(document.querySelectorAll('[data-sw-row="day"]'),vis).forEach(function(r){var d=r.querySelector('[data-sw-part="dcue"]');if(d)m(d,SW.days[+d.getAttribute('data-sw-i')].cue||[],'day')});return out.join(' ')})()})
       unless pr.empty?
         @ref ||= JSON.parse(`node #{File.join(__dir__, 'outfit_ratios.js')}`)
         bad = pr.split.map { |q| t, v, tag = q.split(','); [t, v.to_f, tag] }.select { |t, v, _| (v / @ref[t] - 1).abs > 0.05 }
-        # One scale per box size (owner 2026-11-13): the garment is drawn at the same scale in every week cue, and in every console badge, within 3 %.
-        %w[week console].each { |g| ks = pr.split.map { |q| q.split(',') }.select { |q| q[2] == g }.map { |q| q[3].to_f }; bad << [g, 'scale', ks] if ks.size > 1 && ks.max / ks.min > 1.03 }
+        # One scale per box size (owner 2026-11-13): the garment is drawn at the same scale in every day-row cue, and in every console badge, within 3 %.
+        %w[day console].each { |g| ks = pr.split.map { |q| q.split(',') }.select { |q| q[2] == g }.map { |q| q[3].to_f }; bad << [g, 'scale', ks] if ks.size > 1 && ks.max / ks.min > 1.03 }
         puts "PROP #{c['name']}: #{bad.inspect}" unless bad.empty?
         expect(bad).to eq([])
       end
       # Garment size (owner 2026-11-13, "too small"): the garment (top part, stroke included) is at least 66 % of its cue box's height in every console badge and day row (boxes at least 1.4 wide per high; the OG portrait day row is held at 12 cqw by the 45 % track rule and is width-limited).
-      gm = s.evaluate(%q{(function(){var o=[];document.querySelectorAll('[data-sw-part="cue"],[data-sw-part="wcue"]').forEach(function(e){var r=e.getBoundingClientRect(),t=e.querySelector('[data-sw-item="top"]');if(!r.height||!t)return;var q=t.getBoundingClientRect();if(r.width>=1.4*r.height&&q.height<0.66*r.height)o.push(e.getAttribute('data-sw-part')+' '+Math.round(100*q.height/r.height)+'%')});return o.join(', ')})()})
+      gm = s.evaluate(%q{(function(){var o=[];document.querySelectorAll('[data-sw-part="cue"],[data-sw-part="dcue"]').forEach(function(e){var r=e.getBoundingClientRect(),t=e.querySelector('[data-sw-item="top"]');if(!r.height||!t)return;var q=t.getBoundingClientRect();if(r.width>=1.4*r.height&&q.height<0.66*r.height)o.push(e.getAttribute('data-sw-part')+' '+Math.round(100*q.height/r.height)+'%')});return o.join(', ')})()})
       puts "GARM #{c['name']}: #{gm}" unless gm.empty?
       expect(gm).to eq('')
       # Console hairline (owner 2026-11-12, step 12): the same gap above (to the lowest ink of the top part) and below
@@ -884,7 +977,7 @@ if(cb&&tw&&gb.bottom>tt+3)bad.push('outdoor badge '+gb.bottom.toFixed(0)+' not a
 if(!sm&&!cb&&(gb.height<0.5*th-0.5||Math.abs((gb.top+gb.bottom)/2-tt-th/2)>3))bad.push('badge '+gb.top.toFixed(1)+'-'+gb.bottom.toFixed(1)+' under half the digits or off their middle '+tt.toFixed(1)+'-'+(tt+th).toFixed(1));   // owner 2026-11-15 "C it is" (big OG digits): the cue may be smaller than the digits, at least 50 % of their height, centred on them
 var dv=e.previousElementSibling;if(!sm&&!e.closest('[data-sw-twin]')&&!(dv&&dv.hasAttribute('data-sw-div')&&dv.getBoundingClientRect().height>0))bad.push('no divider before the badge');});
 if(tm){var ti2=dgh(tm),fz=function(e){return (+e.getAttribute('data-sw-fs')||parseFloat(getComputedStyle(e).fontSize))*(e.getBoundingClientRect().width/(e.offsetWidth||1))},mx=0;[].forEach.call(document.querySelectorAll('[data-sw-suntime],[data-sw-cond]'),function(e){if(vis(e))mx=Math.max(mx,fz(e))});if(mx&&ti2<1.2*mx)bad.push('temperature digits '+ti2.toFixed(0)+' not the largest readout (text '+mx.toFixed(0)+')');}   // owner 2026-11-13 (live X hv dark, 4.4 smaller than the sun times)
-document.querySelectorAll('[data-sw-panel]').forEach(function(p){var q=vis(p);if(!q)return;var r=[].map.call(p.querySelectorAll('[data-sw-wcol]'),vis).filter(Boolean);if(r.length&&r[r.length-1].bottom>q.bottom+0.5)bad.push('week column past the panel '+(r[r.length-1].bottom-q.bottom).toFixed(0))});
+document.querySelectorAll('[data-sw-panel]').forEach(function(p){var q=vis(p);if(!q)return;var r=[].map.call(p.querySelectorAll('[data-sw-row="day"]'),vis).filter(Boolean);if(r.length&&r[r.length-1].bottom>q.bottom+0.5)bad.push('day row '+r.length+' past the panel '+(r[r.length-1].bottom-q.bottom).toFixed(0))});
 return bad.join('; ');})()})
       puts "READOUT #{c['name']}: #{cr2}" unless cr2.empty?
       expect(cr2).to eq('')

@@ -8,20 +8,14 @@ R=os.path.join(os.path.dirname(os.path.abspath(__file__)),'..')+'/'
 B=tempfile.mkdtemp(prefix='weekred-')+'/'
 cases={x['name']:x for x in json.load(open(R+'tools/render_check_b31.json'))}
 muts=[
- ('WEEKCOLS','source/shared.liquid',"'7,4,7,7' | split","'6,4,6,6' | split",['b31-x-auto-eq']),
- ('WEEKEQ','source/shared.liquid',"flex flex--center-x flex--center-y {{ wk_nh }}","flex flex--center-y {{ wk_nh }}",['b31-x-auto-eq']),
- ('WEEKTODAY','source/shared.liquid','<span class="label label--inverted label--large text--bold" data-sw-today>','<span class="label label--large text--bold" data-sw-today>',['b31-x-auto-eq']),
- ('WEEKSTYLE','source/shared.liquid',"'eq' : 'dig') : wsv","'dig' : 'dig') : wsv",['b31-x-auto-eq']),
- ('WEEKSTYLE-small','source/shared.liquid',"{%- assign ws = 'dig' %}{% if view == 1 %}","{%- assign ws = 'eq' %}{% if view == 1 %}",['b31-x-hv-forced-eq']),
- ('WEEKCUE','plugin/src/transform.js',"out.days[0].cue = out.cue.slice(0, 3);","out.days[0].cue = ['tshirt'];",['b31-x-auto-eq']),
+ ('WEEKCOLS','source/shared.liquid',"'5,4,7,7' | split","'4,4,6,6' | split",['b31-x-forced-dig']),
+ ('WEEKTODAY','source/shared.liquid','<span class="label label--inverted label--large text--bold" data-sw-today>','<span class="label label--large text--bold" data-sw-today>',['b31-x-forced-dig']),
+ ('WEEKCUE','plugin/src/transform.js',"out.days[0].cue = out.cue.slice(0, 3);","out.days[0].cue = ['tshirt'];",['b31-x-forced-dig']),
  ('WEEKCUE-nowear','plugin/src/transform.js',"if (opt && opt.wear === false) {","if (false) {",['b31-x-nowear']),
- ('WEEKSCALE','source/shared.liquid',"for (var v = sc.a; v <= sc.b + 1e-9; v += sc.st) { var ty","for (var v = sc.a; v <= sc.b + 1e-9; v += sc.st * (i === 1 ? 2 : 1)) { var ty",['b31-x-auto-eq']),
- ('WEEKZERO','source/shared.liquid',"Math.abs(y0 - c) < fl * 0.5 + 2.5","Math.abs(y0 - c) < -1",['b31-x-frost','b31-og-forced-eq']),
  ('WEEKONES','source/shared.liquid',"n1(L.xr - ((n - 1) * 70 + 56) * h / 100)","n1(L.xr + (lo ? 8 : 0) - ((n - 1) * 70 + 56) * h / 100)",['b31-x-forced-dig']),
- ('WEEKZERO-gap','source/shared.liquid',"'<line x1=\"' + n1(API.wzx) + '\" x2=\"' + n1(W) + '\" y1=\"' + y","'<line stroke-dasharray=\"300 12\" x1=\"' + n1(API.wzx) + '\" x2=\"' + n1(W) + '\" y1=\"' + y",['b31-x-frost']),
  # hours (owner 2026-11-16, H1): same harness, the HZERO check
  ('HZERO-shadow','source/shared.liquid',"return svg(W, H, '<g data-sw-cells=\"' + n + '\" data-sw-area=\"' + n1(G.U * lh)","return svg(W, H, g(SHADOW + ' text--gray-65', cells) + '<g data-sw-cells=\"' + n + '\" data-sw-area=\"' + n1(G.U * lh)",['b31-x-hours-neg']),
- ('HZERO-black','source/shared.liquid',"fill = blk(hi || B2());","fill = blk(hi);",['b31-og-hours-neg']),
+ ('HZERO-black','source/shared.liquid',"fill = blk(hi);","fill = blk(true);",['b31-og-hours-neg']),
  ('HZERO-nohang','source/shared.liquid',"var v = Math.round(q.tV), up = v >= 0,","var v = Math.round(q.tV), up = true,",['b31-x-hours-neg']),
  ('HZERO-noline','source/shared.liquid',"if (!G.below || !API.hbarW) return svg(W, H, '');","return svg(W, H, '');",['b31-x-hours-neg']),
  ('HZERO-broken','source/shared.liquid',"<line data-sw-hzline x1=","<line data-sw-hzline stroke-dasharray=\"300 12\" x1=",['b31-x-hours-neg']),

@@ -202,7 +202,7 @@
   </div></div>
   <div class="flex flex--col flex--center{% if view == 1 %} lg:portrait:flex--evenly{% endif %} w--full h--full {% if ws == 'blocks' %}flex{% else %}hidden{% endif %}" data-sw-wkblocks>
   <div class="relative z--2 flex flex--row flex--center-y w--full {{ dgap | default: 'gap--small' }} h--[{{ hh_m | times: hm | round | at_most: 100 }}cqh] lg:h--[{{ 4 | times: hl | round }}cqh]">
-   {%- assign dcue_on = false %}{% if view != 2 and view != 4 %}{% assign dcue_on = true %}{% endif %}{% capture dcue_w %}{{ badge_w }}{% if view == 3 %} hidden lg:block lg:portrait:hidden{% endif %}{% endcapture %}{% comment %} Calm (owner) {% endcomment %}
+   {%- assign dcue_on = false %}{% if view != 2 and view != 4 %}{% assign dcue_on = true %}{% endif %}{% if ui.days[0].cue.size == 0 and ui.days[1].cue.size == 0 and ui.days[2].cue.size == 0 and ui.cue.size == 0 %}{% assign dcue_on = false %}{% endif %}{% comment %} What to wear off: no clothing column in the day rows {% endcomment %}{% capture dcue_w %}{{ badge_w }}{% if view == 3 %} hidden lg:block lg:portrait:hidden{% endif %}{% endcapture %}{% comment %} Calm (owner) {% endcomment %}
    <div class="shrink-0 {{ name_w }}"></div><div class="shrink-0 {{ icon_w }}"></div>
    {%- for ti in (0..1) %}<div class="shrink-0 {{ num_w }} flex flex--center h--full{{ num_cls }}"><div class="h--[{{ 4 | times: hm | round }}cqh] lg:h--[{{ 3 | times: hl | round }}cqh] w--[{{ 2 | times: wm | round }}cqw]" data-sw-part="tri" data-sw-i="{{ ti }}"></div></div>{% endfor %}
    <div class="grow basis--0 h--full" data-sw-part="scale"></div>{% if dcue_on %}<div class="shrink-0 {{ dcue_w }}"></div>{% endif %}
@@ -258,11 +258,11 @@ var cap = function (x, ch) { var cs = getComputedStyle(x), r = document.createRa
 var dy = cap(nm, '0') - cap(e, '°'); e.style.transform = 'translateY(' + dy.toFixed(2) + 'px)';
 });
 }
-/* B30 (owner 2026-11-16): a meter whose value is in its bad (top) zone lights its label, inverted like today's day label: WIND, UV, AQI, POLLEN and CO2 from their red zone, the sensor's HUM below 30 % or above 60 %. The weather meters' flag comes with the margin from the transform (m.bad); the sensor's readings are merged here, so their flags use the plain thresholds (render check LITLABEL) */
+/* B30 (owner 2026-11-16): a meter whose value is in its bad (top) zone lights its label, inverted like today's day label: WIND, UV, AQI, POLLEN and CO2 from their red zone, the sensor's HUM below 30 % or above 65 % (owner 2026-11-16, was 60). The weather meters' flag comes with the margin from the transform (m.bad); the sensor's readings are merged here, so their flags use the plain thresholds (render check LITLABEL) */
 function swLit() {
 document.querySelectorAll('[data-sw-lk]').forEach(function (e) {
 var k = e.getAttribute('data-sw-lk'), m = SW.meters.filter(function (q) { return q.key === k; })[0] || {}, v = SW.iv || [], on = false;
-if (k === 'humidity') on = e.hasAttribute('data-sw-lin') && v[1] !== null && (v[1] < 30 || v[1] > 60);
+if (k === 'humidity') on = e.hasAttribute('data-sw-lin') && v[1] !== null && (v[1] < 30 || v[1] > 65);
 else if (k === 'co2') on = v[2] !== null && v[2] >= 1400;
 else on = m.bad === undefined ? !!(m.zones && m.frac >= m.zones[1]) : m.bad;
 ['bg--black', 'text--white'].forEach(function (c) { e.classList.toggle(c, on); }); e.classList.toggle('px--1', on && !e.closest('[data-sw-srow]'));   /* the small console's label box has a fixed width: no padding there */ if (on) e.setAttribute('data-sw-lit', ''); else e.removeAttribute('data-sw-lit');
@@ -455,7 +455,18 @@ return { st: st, peak: k - 1 };
 function meter(m, W, H, n, ind) {
 /* owner 2026-11-15: every meter row looks the same, main or secondary, only the icon differs (the dial keeps its grey secondary needle) */
 if (!ind) return svg(W, H, m.tw ? '<g data-sw-twrow="out">' + mrow(m, W, H, n, '') + '</g>' : mrow(m, W, H, n, ''));
-return svg(W, H, '<g data-sw-twrow="in">' + mrow(m.tw.m, W, H, n, '') + '</g>');
+return svg(W, H, '<g data-sw-twrow="in">' + balrow(m.tw.m, W, H) + '</g>');
+}
+/* B32 (owner 2026-11-16): the indoor humidity as a balance meter, the middle of five slots a fixed tick, two cells left (dry) and two right (damp) that fill outward from it: 40 to 55 % nothing, over 55 up to 65 one cell right, over 65 two (the lamp), 30 up to under 40 one left, under 30 two (the lamp); the edge cells light the label exactly as for every other meter. No shadow */
+function balrow(m, W, H) {
+var v = m.frac === null || m.frac === undefined ? null : Math.round(m.frac * 1000) / 10, r = v === null ? 0 : (v > 65 ? 2 : (v > 55 ? 1 : 0)), l = v === null ? 0 : (v < 30 ? 2 : (v < 40 ? 1 : 0)), cw = (W - SO) / 5, gp = cw * 0.12, ch = H - SO, on = '', off = '', DK = DKM() && API.mode.bits >= 2, nl = 0;
+for (var i = 0; i < 5; i++) {
+var x = i * cw + gp / 2, w = cw - gp;
+if (i === 2) { var tw = Math.max(3, Math.min(w * 0.14, 6)); on += rect(x + (w - tw) / 2, ch * 0.1, tw, ch * 0.8, 1, ' data-sw-bt'); continue; }
+if (i < 2 ? 2 - i <= l : i - 2 <= r) { on += rect(x, 0, w, ch, 2, ' data-sw-c="' + i + '"'); nl++; }
+else off += DK ? rect(x, 0, w, ch, 2, ' data-sw-c="' + i + '"') : rect(x + 1, 1, w - 2, ch - 2, 2, FS + '2" data-sw-c="' + i + '"');
+}
+return '<g data-sw-lit="' + nl + '" data-sw-ncell="5" data-sw-bal></g><g data-sw-st="e">' + g(OC(), off) + '</g><g data-sw-on data-sw-st="a">' + (API.mode && !DKM() && !b1() ? '<g data-sw-dg>' + g(act(), on) + '</g>' : glow(on, GPX)) + '</g>';
 }
 function mrow(m, W, H, n, lc) {
 n = n || 10;
@@ -511,7 +522,7 @@ return o;
 function hbar(q, hs0, W, H, hi, all) {
 var G = hgeo(all, W, H), hs = G.hs || hs0;
 if (!q || q.tV === null || q.tV === undefined || !hs) return svg(W, H, '');
-var fs = G.fs, C = G.C, cells = '', n, ty, fill = blk(hi || B2());   /* no offset shadows; black on 2-bit and 1-bit (the 4-bit panel keeps the lighter grey for the hours that are not now) */
+var fs = G.fs, C = G.C, cells = '', n, ty, fill = blk(hi);   /* no offset shadows; the current hour black, the others the meters' dark grey on 2-bit and 4-bit (owner 2026-11-16 withdrew the black bars on 2-bit), black on 1-bit */
 if (G.below) {
 var v = Math.round(q.tV), up = v >= 0, lh = G.lh, gp = Math.max(2, lh * 0.2), top;
 n = up ? Math.ceil(v / G.per) : Math.ceil(-v / G.per);   /* 0 draws no segment (its label stands on the line); the bars start at the first degree in both directions */

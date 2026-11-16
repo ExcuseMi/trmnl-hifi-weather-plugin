@@ -144,7 +144,7 @@ test('time format: the setting decides, 24 h when missing, the TIME constant ove
   eq(fields.filter((f) => B31.includes(f.key)).map((f) => [f.key, f.group]), [['week_style', 'Display'], ['show_wear', 'Display']], 'B31: the week display and what-to-wear settings are new fields in the Display group');
   ok(keys.indexOf('week_style') === keys.indexOf('hide_title_bar') + 1 && keys.indexOf('show_wear') === keys.indexOf('week_style') + 1, 'B31: both sit right after hide_title_bar, no existing key moved');
   const ws = y.split(/^- keyname: week_style/m)[1].split(/^- keyname: /m)[0];
-  ok(/options:\n  - Auto: auto\n  - EQ sliders: eq\n  - Digital: digital\n  - Blocks: blocks\n  default: auto\n/.test(ws), 'B31/B32: week_style options auto, eq, digital, blocks (the existing values unchanged, Blocks new), default Auto');
+  ok(/options:\n  - Blocks: blocks\n  - Digital: digital\n  default: blocks\n/.test(ws), 'B32: week_style options Blocks (new, the default) and Digital (value unchanged); the removed auto and eq values map to Blocks in the page');
   ok(/default: true/.test(y.split(/^- keyname: show_wear/m)[1].split(/^- keyname: /m)[0]), 'B31: show_wear is a boolean, default on');
   ['name', 'name-de', 'name-fr', 'name-es-ES', 'name-nl', 'name-ja', 'description-de', 'description-fr', 'description-es-ES', 'description-nl', 'description-ja'].forEach((k) => ok(new RegExp('^  ' + k + ': ', 'm').test(ws), 'B31: week_style has ' + k));
   const grp = keys.slice(keys.indexOf('sensor_source'), keys.indexOf('legend'));
@@ -328,6 +328,11 @@ test('block meter: half lit lights five of ten, no data lights none', () => {
   const nr = D.meter({ frac: 0.5 }, 120, 40);   // B32: a row whose cells would be taller than wide draws 5 wider cells, the values scale to 5, no offset shadow
   eq([(nr.match(/data-sw-c=/g) || []).length, lit(nr), /text--gray-65/.test(nr)], [5, 3, false], 'narrow row: 5 cells, half lit = 3 of 5, no shadow');
 });
+test('indoor humidity balance meter (owner 2026-11-16): the cells fill outward from the centre tick by the bands, the edge cells are the lamp', () => {
+  const st = (h) => { const x = D.meter({ tw: { m: { frac: h / 100 } } }, 300, 20, 10, 1), on = x.split('<g data-sw-on data-sw-st="a">')[1] || ''; return { cells: [...on.matchAll(/data-sw-c="(\d)"/g)].map((m) => +m[1]), tick: /data-sw-bt/.test(on), shadow: /text--gray-65/.test(x) }; };
+  eq([25, 30, 39, 40, 55, 56, 65, 66, 100].map((h) => st(h).cells), [[0, 1], [1], [1], [], [], [3], [3], [3, 4], [3, 4]], 'under 30 two left, 30 to under 40 one left, 40 to 55 none, over 55 to 65 one right, over 65 two right');
+  ok(st(50).tick && !st(50).shadow, 'one centre tick, no shadow');
+}); 
 test('rain calendar: 12 hours from the first wet hour, rain hours lit', () => {
   const hrs = Array.from({ length: 25 }, (_, i) => ({ h: String(i).padStart(2, '0') }));
   const c = T.rainHours(hrs, { from: 5, to: 7 });
@@ -348,15 +353,11 @@ test('dials: needle drawn last, low mark hollow, high mark solid, baro zone icon
 test('right column: no rule between the rain calendar and the sun times (owner 2026-11-12, later decision)', () => {
   ok(sh.indexOf('data-sw-sep="rain-sun"') < 0, 'no rain-sun separator');
 });
-test('week display colours (owner 2026-11-16): today dark, other days mid grey on 4-bit; black on 2-bit and 1-bit; the Digital lows as dark as the highs, no ghost segments', () => {
+test('week display colours (owner 2026-11-16; B32: the EQ sliders are gone): the Digital lows as dark as the highs, no ghost segments, black on 2-bit and 1-bit', () => {
   const SWD = { scale: { major: 5, deg: '°' }, days: [{ hi: '13°', lo: '1°', hiV: 13, loV: 1, today: true }, { hi: '12°', lo: '3°', hiV: 12, loV: 3 }] };
   const wk = (m, i, st) => { D.mode = m; D.nCols = 7; D.wcw = 200; D.ws = st; const r = D.part(SWD, 'wday', i, 200, 200); D.mode = null; return r; };
-  ok(/text--gray-10/.test(wk({ dark: false, bits: 4 }, 0, 'eq')) && /dark:text--gray-75/.test(wk({ dark: false, bits: 4 }, 0, 'eq')), 'sliders 4-bit: today dark (mirrored in dark mode)');
-  ok(/text--gray-45/.test(wk({ dark: false, bits: 4 }, 1, 'eq')), 'sliders 4-bit: other days mid grey');
-  [{ dark: false, bits: 2 }, { dark: false, bits: 1 }].forEach((m) => [0, 1].forEach((i) => ok(!/gray-4\d/.test(wk(m, i, 'eq')), 'sliders ' + m.bits + '-bit: every range black, day ' + i)));
-  ok(/data-sw-groove/.test(wk({ bits: 4 }, 0, 'eq')) && !/data-sw-glyph/.test(wk({ bits: 4 }, 0, 'eq')), 'sliders: a groove line, no digits');
   const dg = wk({ dark: false, bits: 4 }, 0, 'dig');
-  ok(/data-sw-glyph/.test(dg) && !/data-sw-groove/.test(dg), 'digital: segment digits, no groove');
+  ok(/data-sw-glyph/.test(dg) && !/data-sw-groove/.test(dg), 'digital: segment digits, no groove, no divider line (calm, spaced)');
   ok(!/text--gray-45|text--gray-40 /.test(dg.replace(/text--gray-40/, '')), 'digital 4-bit: the lows are not the mid grey (darkest grey like the highs)');
   ok(!/(^|[^:])text--gray-(7\d|80)/.test(dg), 'digital: no ghost segments (no faint grey digit parts)');
   ok(!/text--gray-45/.test(wk({ dark: false, bits: 2 }, 0, 'dig')) && !/text--gray-45/.test(wk({ dark: false, bits: 1 }, 0, 'dig')), 'digital 2-bit and 1-bit: lows black');
@@ -401,8 +402,7 @@ test('moon glow outside the disk in dark mode, none in light or 1-bit (owner 202
 test('week columns by size class (owner 2026-11-16, never measured): full 7, 4 on the OG portrait; half vertical 4, 3 in portrait; smaller views and the half vertical always Digital', () => {
   ok(/assign wk_cs = '5,4,7,7' \| split/.test(sh), 'full view: md landscape 5 (owner 2026-11-16: calmer on small screens), md portrait 4, lg landscape 7, lg portrait 7');
   ok(/if view == 3 %\}\{% assign wk_cs = '4,3,4,3' \| split/.test(sh), 'half vertical: 4 landscape, 3 portrait on both sizes');
-  ok(/assign ws = 'dig' %\}\{% if view == 1 %\}\{% if cf.week_style == 'eq' %\}\{% assign ws = 'eq' %\}\{% elsif cf.week_style == 'blocks' %\}\{% assign ws = 'blocks' %\}\{% elsif cf.week_style != 'digital' %\}\{% assign ws = 'auto' %\}/.test(sh), 'only the full view takes the setting (Auto is the default); every smaller view is Digital');
-  ok(/wsv === 'auto' \? \(sc\.contains\('screen--lg'\) && SWDraw\.mode\.bits >= 4 \? 'eq' : 'dig'\)/.test(fs.readFileSync(path.join(__dirname, '../../source/shared.liquid'), 'utf8').replace(/\s+/g, ' ')) || /auto/.test(sh), 'Auto: sliders on a large 4-bit screen from the size class and bit depth, Digital elsewhere');
+  ok(/assign ws = 'blocks' %\}\{% if cf.week_style == 'digital' %\}\{% assign ws = 'dig' %\}/.test(sh), 'B32: Blocks (the old day rows) is the default on every view; only the saved value digital is Digital, any other (the removed eq and auto, unknown) is Blocks');
   ok(/<span class="title title--base text--bold" data-sw-dname>\{\{ d\.name \}\}/.test(sh) && /data-sw-today>/.test(sh), 'names: today lit, the others plain');
   ok(/lg:portrait:\{% if i < wk_cd %\}block/.test(sh) && /grow basis--0 w--min-0 h--full/.test(sh), 'columns equal width, shown per size class');
 });

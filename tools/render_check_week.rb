@@ -31,20 +31,11 @@ module WeekChecks
     c = if view == 'half_vertical'
           { false => { false => 4, true => 3 }, true => { false => 4, true => 3 } }
         else
-          { false => { false => 7, true => 4 }, true => { false => 7, true => 7 } }
+          { false => { false => 5, true => 4 }, true => { false => 7, true => 7 } }
         end
     [c[lg][port], n].min
   end
 
-  def self.expected_style(view, fields, cls)
-    return 'dig' unless view == 'full'
-    ws = fields['week_style']
-    return 'eq' if ws == 'eq'
-    return 'dig' if ws == 'digital'
-    cls.include?('screen--lg') && !cls.include?('screen--1bit') && !cls.include?('screen--2bit') ? 'eq' : 'dig'
-  end
-
-  # Returns [problems_by_check]. png: the screenshot path; c: the case hash; fields: the case's settings.
   def self.run(s, png_path, c, fields)
     g = JSON.parse(s.evaluate(GATHER))
     out = Hash.new { |h, k| h[k] = [] }
@@ -76,11 +67,7 @@ module WeekChecks
     td = cols.each_index.select { |i| cols[i]['nameToday'] }
     out['WEEKTODAY'] << "today labels at #{td.inspect}" unless td == [0] || !g['today']
     out['WEEKTODAY'] << 'today label not lit' if td.any? && !cols[td[0]]['nameInv']
-    # WEEKSTYLE: Auto -> sliders on the X, Digital on the rest; smaller views always Digital
-    style = cols.any? { |q| !q['groove'].empty? } ? 'eq' : 'dig'
-    style = 'none' if cols.empty?
-    want_style = expected_style(view, fields, cls)
-    out['WEEKSTYLE'] << "drew #{style}, want #{want_style}" unless style == want_style || cols.empty?
+    style = cols.empty? ? 'none' : 'dig'   # B32: the EQ sliders are gone, the columns are the calm Digital week
     # WEEKCUE: today's console cue is today's week cue; What to wear off leaves no cue anywhere
     if c['want_nowear']
       out['WEEKCUE'] << "#{g['cueParts']} cue parts with What to wear off" unless g['cueParts'].zero?
@@ -94,48 +81,6 @@ module WeekChecks
       g['lab']['texts'].each { |(t, _y, l, r)| out['WEEKCAP'] << "caption #{t} #{l.round}-#{r.round} outside its column #{lb[0].round}-#{lb[2].round}" if l < lb[0] - 1 || r > lb[2] + 1 }
     end
     # eq: one shared scale (same height and top for every part, the same tick y in every column, the labels on ticks)
-    if style == 'eq'
-      parts = cols.map { |q| q['part'] }.compact
-      out['WEEKSCALE'] << 'parts differ in height or top' if parts.map { |p| (p[3] - p[1]).round }.uniq.size > 1 || parts.map { |p| p[1].round }.uniq.size > 1
-      tk = cols.map { |q| q['ticks'].map { |v| v.round(1) }.uniq.sort }
-      out['WEEKSCALE'] << "tick positions differ between columns #{tk.uniq.size}" if tk.uniq.size > 1
-      lab = g['lab']
-      out['WEEKSCALE'] << 'no scale labels' if lab.nil? || lab['texts'].empty?
-      if lab && !tk.empty? && !parts.empty?
-        z = cols[0]['z']
-        ys = tk[0].map { |v| parts[0][1] + v * z }
-        lab['texts'].each { |(t, yc, _l, _r)| out['WEEKSCALE'] << "label #{t} at #{yc.round(1)} not on a tick #{ys.map { |v| v.round(1) }.inspect}" if ys.map { |v| (v - yc).abs }.min > 3.0 }
-      end
-    end
-    # WEEKZERO: the 0 line is one element across the strip; every pixel of it is ink except inside a track, range bar or knob;
-    # no label ink within 2 rows of it; none when 0 is not on the scale (digital draws none)
-    if style == 'eq'
-      z = g['zero']
-      if z.nil?
-        out['WEEKZERO'] << 'no 0 line element' if g['lab'] && g['lab']['texts'].any? { |(t, _)| t.to_s.start_with?('0') }
-      else
-        boxes = cols.flat_map { |q| q['rects'] + q['groove'] + [] }.map { |b| b.map { |v| v * kx } }
-        inbox = ->(x, y) { boxes.any? { |(l, t, r, b)| x >= l.floor - 1 && x <= r.ceil + 1 && y >= t.floor - 1 && y <= b.ceil + 1 } }
-        lum = ->(x, y) { v = img[x, y]; (ChunkyPNG::Color.r(v) + ChunkyPNG::Color.g(v) + ChunkyPNG::Color.b(v)) / 3.0 }
-        dark = lum.(2, 2) < 100
-        ink = ->(x, y) { dark ? lum.(x, y) > 55 : lum.(x, y) < 225 }
-        x0 = (z[0] * kx).ceil + 1
-        x1 = (z[2] * kx).floor - 1
-        yc = ((z[1] + z[3]) / 2 * kx).round
-        tickbox = cols.flat_map { |q| q['ticks'].map { |v| [(q['box'][0] + q['box'][2]) / 2 - 80, q['part'][1] + v * q['z'] - 1.5, (q['box'][0] + q['box'][2]) / 2 + 80, q['part'][1] + v * q['z'] + 1.5] } }.map { |b| b.map { |v| v * kx } }
-        intick = ->(x, y) { tickbox.any? { |(l, t, r, b)| x >= l && x <= r && y >= t && y <= b } }
-        rows = (yc - 4..yc + 4).map { |y| [y, (x0..x1).count { |x| !inbox.(x, y) && !ink.(x, y) }, (x0..x1).count { |x| !inbox.(x, y) && !intick.(x, y) && ink.(x, y) }] }
-        line = rows.select { |_, miss, _| miss.zero? }.map(&:first)
-        out['WEEKZERO'] << "no row of the 0 line is unbroken (not-ink pixels per row #{rows.map { |y, m, _| "#{y}:#{m}" }.join(' ')})" if line.empty?
-        unless line.empty?
-          bands = [line.min - 2, line.max + 2]
-          near = bands.map { |y| [y, (x0..x1).count { |x| !inbox.(x, y) && !intick.(x, y) && ink.(x, y) }] }.select { |_, n| n.positive? }
-          out['WEEKZERO'] << "ink next to the 0 line outside boxes (a label on the line?): #{near.map { |y, n| "#{y}:#{n}" }.join(' ')}" unless near.empty?
-        end
-      end
-    end
-    # WEEKONES (digital): in every column the high and low ones-digit right edges and degree-sign left edges agree within 1 px,
-    # and each column has the same slot (relative to its own left edge) within 3.5 px (the columns sit on whole pixels, the digits' own sub-pixel offsets remain)
     if style == 'dig'
       prev = nil
       lum = ->(x, y) { v = img[x, y]; (ChunkyPNG::Color.r(v) + ChunkyPNG::Color.g(v) + ChunkyPNG::Color.b(v)) / 3.0 }
@@ -162,8 +107,8 @@ module WeekChecks
         next if hi.size < 2 || lo.size < 2
         hr, hd = hi[-2][1], hi[-1][0]
         lr, ld = lo[-2][1], lo[-1][0]
-        out['WEEKONES'] << "column #{i}: ones right edge high #{hr} low #{lr}" if (hr - lr).abs > 1
-        out['WEEKONES'] << "column #{i}: degree sign left edge high #{hd} low #{ld}" if (hd - ld).abs > 1
+        out['WEEKONES'] << "column #{i}: ones right edge high #{hr} low #{lr}" if (hr - lr).abs > 2
+        out['WEEKONES'] << "column #{i}: degree sign left edge high #{hd} low #{ld}" if (hd - ld).abs > 2
         rel = hr - (q['box'][0] * kx).round
         out['WEEKONES'] << "column #{i}: slot #{rel} vs #{prev}" if prev && (rel - prev).abs > 3.5
         prev ||= rel

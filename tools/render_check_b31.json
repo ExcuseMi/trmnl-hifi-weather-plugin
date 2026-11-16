@@ -1,153 +1,5 @@
 [
  {
-  "name": "b31-x-auto-eq",
-  "device": "v2",
-  "view": "full",
-  "locale": "en-US",
-  "fields": {
-   "bottom": "days"
-  }
- },
- {
-  "name": "b31-x-frost",
-  "device": "v2",
-  "view": "full",
-  "locale": "en-US",
-  "fields": {
-   "bottom": "days"
-  },
-  "daily": {
-   "temperature_2m_max": [
-    6.0,
-    5.2,
-    7.4,
-    3.1,
-    9.0,
-    4.4,
-    8.2,
-    11.9,
-    9.0,
-    8.1,
-    6.0,
-    5.5,
-    7.7,
-    9.9
-   ],
-   "temperature_2m_min": [
-    0.2,
-    -0.6,
-    1.0,
-    -1.2,
-    2.0,
-    0.4,
-    -0.3,
-    4.1,
-    2.0,
-    1.2,
-    0.4,
-    -0.5,
-    1.0,
-    2.2
-   ]
-  }
- },
- {
-  "name": "b31-x-nozero",
-  "device": "v2",
-  "view": "full",
-  "locale": "en-US",
-  "fields": {
-   "bottom": "days"
-  },
-  "daily": {
-   "temperature_2m_max": [
-    12.0,
-    13.5,
-    9.5,
-    11.2,
-    10.0,
-    12.4,
-    14.8,
-    11.9,
-    9.0,
-    8.1,
-    6.0,
-    5.5,
-    7.7,
-    9.9
-   ],
-   "temperature_2m_min": [
-    6.1,
-    7.6,
-    8.0,
-    6.5,
-    7.0,
-    9.4,
-    8.3,
-    4.1,
-    2.0,
-    1.2,
-    0.4,
-    -0.5,
-    1.0,
-    2.2
-   ]
-  }
- },
- {
-  "name": "b31-x-close",
-  "device": "v2",
-  "view": "full",
-  "locale": "en-US",
-  "fields": {
-   "bottom": "days"
-  },
-  "daily": {
-   "temperature_2m_max": [
-    13.1,
-    12.0,
-    5.4,
-    7.2,
-    5.0,
-    6.4,
-    10.8,
-    11.9,
-    9.0,
-    8.1,
-    6.0,
-    5.5,
-    7.7,
-    9.9
-   ],
-   "temperature_2m_min": [
-    1.4,
-    2.6,
-    4.5,
-    0.5,
-    -2.1,
-    -1.0,
-    3.3,
-    4.1,
-    2.0,
-    1.2,
-    0.4,
-    -0.5,
-    1.0,
-    2.2
-   ]
-  }
- },
- {
-  "name": "b31-x-dark",
-  "device": "v2",
-  "view": "full",
-  "locale": "en-US",
-  "fields": {
-   "bottom": "days"
-  },
-  "dark": true
- },
- {
   "name": "b31-x-forced-dig",
   "device": "v2",
   "view": "full",
@@ -202,16 +54,6 @@
   }
  },
  {
-  "name": "b31-x-hv-forced-eq",
-  "device": "v2",
-  "view": "half_vertical",
-  "locale": "en-US",
-  "fields": {
-   "bottom": "days",
-   "week_style": "eq"
-  }
- },
- {
   "name": "b31-x-nowear",
   "device": "v2",
   "view": "full",
@@ -234,22 +76,13 @@
   "want_nowear": true
  },
  {
-  "name": "b31-og-auto-dig",
-  "device": "og_plus",
-  "view": "full",
-  "locale": "en-US",
-  "fields": {
-   "bottom": "days"
-  }
- },
- {
-  "name": "b31-og-forced-eq",
+  "name": "b31-og-dig-og",
   "device": "og_plus",
   "view": "full",
   "locale": "en-US",
   "fields": {
    "bottom": "days",
-   "week_style": "eq"
+   "week_style": "digital"
   }
  },
  {
@@ -297,22 +130,13 @@
   }
  },
  {
-  "name": "b31-og-1bit-auto",
-  "device": "og_png",
-  "view": "full",
-  "locale": "en-US",
-  "fields": {
-   "bottom": "days"
-  }
- },
- {
-  "name": "b31-og-1bit-eq",
+  "name": "b31-og-1bit-dig",
   "device": "og_png",
   "view": "full",
   "locale": "en-US",
   "fields": {
    "bottom": "days",
-   "week_style": "eq"
+   "week_style": "digital"
   }
  },
  {
@@ -513,7 +337,8 @@
   "view": "full",
   "locale": "de",
   "fields": {
-   "bottom": "days"
+   "bottom": "days",
+   "week_style": "digital"
   }
  },
  {
@@ -1254,257 +1079,6 @@
   "want_small": true
  },
  {
-  "name": "b31-og2-port-half_vertical-rain",
-  "device": "og_plus",
-  "palette": "gray-4",
-  "view": "half_vertical",
-  "locale": "en-US",
-  "past_press": 1016,
-  "orientation": "portrait",
-  "current": {
-   "temperature_2m": 4.1,
-   "apparent_temperature": 1,
-   "weather_code": 3,
-   "relative_humidity_2m": 88
-  },
-  "aq": {
-   "current": {
-    "time": "2026-11-12T06:00",
-    "european_aqi": 25
-   }
-  },
-  "portrait_console": true,
-  "fields": {
-   "bottom": "days"
-  }
- },
- {
-  "name": "b31-og1-port-half_vertical-dry",
-  "device": "og_png",
-  "view": "half_vertical",
-  "locale": "en-US",
-  "past_press": 1016,
-  "current": {
-   "temperature_2m": 4.1,
-   "apparent_temperature": 1,
-   "weather_code": 3,
-   "relative_humidity_2m": 88
-  },
-  "daily": {
-   "weather_code": [
-    3,
-    3,
-    3,
-    3,
-    3,
-    3,
-    3,
-    3,
-    3,
-    3,
-    3,
-    3,
-    3,
-    3
-   ],
-   "precipitation_sum": [
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0
-   ],
-   "precipitation_probability_max": [
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0
-   ]
-  },
-  "aq": {
-   "current": {
-    "time": "2026-11-12T06:00",
-    "european_aqi": 25
-   }
-  },
-  "hourly": {
-   "precipitation_probability": [
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0
-   ],
-   "weather_code": [
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1,
-    1
-   ],
-   "precipitation": [
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0
-   ]
-  },
-  "orientation": "portrait",
-  "portrait_console": true,
-  "fields": {
-   "bottom": "days"
-  }
- },
- {
   "device": "og_png",
   "view": "full",
   "locale": "nl",
@@ -1638,107 +1212,6 @@
     16.8,
     19.0
    ]
-  }
- },
- {
-  "name": "b31-x-port-sens-co2-dig",
-  "device": "v2",
-  "view": "full",
-  "locale": "en-US",
-  "orientation": "portrait",
-  "portrait_console": true,
-  "past_press": 1016,
-  "fields": {
-   "bottom": "days",
-   "week_style": "digital"
-  },
-  "vars": {
-   "sensor_readings": {
-    "device_1": {
-     "temperature": [
-      {
-       "2026-11-08 04:50:00 UTC": 21.6
-      }
-     ],
-     "humidity": [
-      {
-       "2026-11-08 04:50:00 UTC": 48
-      }
-     ],
-     "carbon_dioxide": [
-      {
-       "2026-11-08 04:50:00 UTC": 1500
-      }
-     ],
-     "pressure": []
-    }
-   }
-  },
-  "co2": "yes"
- },
- {
-  "name": "b31-x-port-sens-co2-eq",
-  "device": "v2",
-  "view": "full",
-  "locale": "en-US",
-  "orientation": "portrait",
-  "portrait_console": true,
-  "past_press": 1016,
-  "fields": {
-   "bottom": "days"
-  },
-  "vars": {
-   "sensor_readings": {
-    "device_1": {
-     "temperature": [
-      {
-       "2026-11-08 04:50:00 UTC": 21.6
-      }
-     ],
-     "humidity": [
-      {
-       "2026-11-08 04:50:00 UTC": 48
-      }
-     ],
-     "carbon_dioxide": [
-      {
-       "2026-11-08 04:50:00 UTC": 1500
-      }
-     ],
-     "pressure": []
-    }
-   }
-  },
-  "co2": "yes"
- },
- {
-  "name": "b31-x-port-sens-dig",
-  "view": "full",
-  "device": "v2",
-  "locale": "en-US",
-  "past_press": 1016,
-  "fields": {
-   "bottom": "days",
-   "week_style": "digital"
-  },
-  "palette": "gray-16",
-  "orientation": "portrait",
-  "vars": {
-   "sensor_readings": {
-    "device_1": {
-     "temperature": [
-      {
-       "2026-11-08 04:50:00 UTC": 21.6
-      }
-     ],
-     "humidity": [
-      {
-       "2026-11-08 04:50:00 UTC": 48
-      }
-     ],
-     "pressure": []
-    }
-   }
   }
  }
 ]

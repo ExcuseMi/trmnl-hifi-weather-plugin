@@ -465,7 +465,7 @@
   "want_lit": []
  },
  {
-  "name": "b30-x-hum-high",
+  "name": "b30-x-bal-25",
   "device": "v2",
   "view": "full",
   "locale": "en-US",
@@ -479,7 +479,391 @@
      ],
      "humidity": [
       {
-       "2026-11-08 04:50:00 UTC": 65
+       "2026-11-08 04:50:00 UTC": 25
+      }
+     ],
+     "pressure": [],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 600
+      }
+     ]
+    }
+   }
+  },
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days"
+  },
+  "co2": "yes",
+  "want_lit": [
+   "humidity"
+  ]
+ },
+ {
+  "name": "b30-x-bal-50",
+  "device": "v2",
+  "view": "full",
+  "locale": "en-US",
+  "vars": {
+   "sensor_readings": {
+    "device_1": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 21.6
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 50
+      }
+     ],
+     "pressure": [],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 600
+      }
+     ]
+    }
+   }
+  },
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days"
+  },
+  "co2": "yes",
+  "want_lit": []
+ },
+ {
+  "name": "b30-x-bal-60",
+  "device": "v2",
+  "view": "full",
+  "locale": "en-US",
+  "vars": {
+   "sensor_readings": {
+    "device_1": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 21.6
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 60
+      }
+     ],
+     "pressure": [],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 600
+      }
+     ]
+    }
+   }
+  },
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days"
+  },
+  "co2": "yes",
+  "want_lit": []
+ },
+ {
+  "name": "b30-x-bal-68",
+  "device": "v2",
+  "view": "full",
+  "locale": "en-US",
+  "vars": {
+   "sensor_readings": {
+    "device_1": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 21.6
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 68
+      }
+     ],
+     "pressure": [],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 600
+      }
+     ]
+    }
+   }
+  },
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days"
+  },
+  "co2": "yes",
+  "want_lit": [
+   "humidity"
+  ]
+ },
+ {
+  "name": "b30-og-bal-25",
+  "device": "og_plus",
+  "view": "full",
+  "locale": "en-US",
+  "vars": {
+   "sensor_readings": {
+    "device_1": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 21.6
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 25
+      }
+     ],
+     "pressure": [],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 600
+      }
+     ]
+    }
+   }
+  },
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days"
+  },
+  "co2": "yes",
+  "want_lit": [
+   "humidity"
+  ]
+ },
+ {
+  "name": "b30-og-bal-50",
+  "device": "og_plus",
+  "view": "full",
+  "locale": "en-US",
+  "vars": {
+   "sensor_readings": {
+    "device_1": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 21.6
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 50
+      }
+     ],
+     "pressure": [],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 600
+      }
+     ]
+    }
+   }
+  },
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days"
+  },
+  "co2": "yes",
+  "want_lit": []
+ },
+ {
+  "name": "b30-og-bal-60",
+  "device": "og_plus",
+  "view": "full",
+  "locale": "en-US",
+  "vars": {
+   "sensor_readings": {
+    "device_1": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 21.6
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 60
+      }
+     ],
+     "pressure": [],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 600
+      }
+     ]
+    }
+   }
+  },
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days"
+  },
+  "co2": "yes",
+  "want_lit": []
+ },
+ {
+  "name": "b30-og-bal-68",
+  "device": "og_plus",
+  "view": "full",
+  "locale": "en-US",
+  "vars": {
+   "sensor_readings": {
+    "device_1": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 21.6
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 68
+      }
+     ],
+     "pressure": [],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 600
+      }
+     ]
+    }
+   }
+  },
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days"
+  },
+  "co2": "yes",
+  "want_lit": [
+   "humidity"
+  ]
+ },
+ {
+  "name": "b30-og1-bal-25",
+  "device": "og_png",
+  "view": "full",
+  "locale": "en-US",
+  "vars": {
+   "sensor_readings": {
+    "device_1": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 21.6
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 25
+      }
+     ],
+     "pressure": [],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 600
+      }
+     ]
+    }
+   }
+  },
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days"
+  },
+  "co2": "yes",
+  "want_lit": [
+   "humidity"
+  ]
+ },
+ {
+  "name": "b30-og1-bal-50",
+  "device": "og_png",
+  "view": "full",
+  "locale": "en-US",
+  "vars": {
+   "sensor_readings": {
+    "device_1": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 21.6
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 50
+      }
+     ],
+     "pressure": [],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 600
+      }
+     ]
+    }
+   }
+  },
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days"
+  },
+  "co2": "yes",
+  "want_lit": []
+ },
+ {
+  "name": "b30-og1-bal-60",
+  "device": "og_png",
+  "view": "full",
+  "locale": "en-US",
+  "vars": {
+   "sensor_readings": {
+    "device_1": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 21.6
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 60
+      }
+     ],
+     "pressure": [],
+     "carbon_dioxide": [
+      {
+       "2026-11-08 04:50:00 UTC": 600
+      }
+     ]
+    }
+   }
+  },
+  "past_press": 1016,
+  "fields": {
+   "bottom": "days"
+  },
+  "co2": "yes",
+  "want_lit": []
+ },
+ {
+  "name": "b30-og1-bal-68",
+  "device": "og_png",
+  "view": "full",
+  "locale": "en-US",
+  "vars": {
+   "sensor_readings": {
+    "device_1": {
+     "temperature": [
+      {
+       "2026-11-08 04:50:00 UTC": 21.6
+      }
+     ],
+     "humidity": [
+      {
+       "2026-11-08 04:50:00 UTC": 68
       }
      ],
      "pressure": [],
