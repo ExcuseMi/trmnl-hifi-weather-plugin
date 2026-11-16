@@ -430,14 +430,13 @@ for (var i = 0; i < str.length; i++) {
 var ch = str.charAt(i);
 // Owner 2026-11-15 ("-12" showed as "-  12"): the minus ends 0.3 gaps before the ink of the first digit (a 1 has its ink on the right of its cell), so no empty cell sits between them; the width stays the LCD cells'.
 if (ch === '-' && !i && al) { body += '<g data-sw-glyph="-">' + poly(shapes(x - W - G, W, HH, T).g) + '</g>'; continue; }
-if (ch === '-' && !i) { var d1 = GLYPH[str.charAt(1)] || '', cs = idg < 2 && !tr ? W + G : 46 + G * 0.3; body += '<g data-sw-glyph="-">' + poly(shapes(cs + (/[fe]/.test(d1) ? 0 : (/[adg]/.test(d1) ? T / 2 + 2 : W - T)) - G * 0.3 - 46 + T / 2 + 2, 46, HH, T).g) + '</g>'; x = cs; continue; }
+if (ch === '-' && !i) { var d1 = GLYPH[str.charAt(1)] || '', cs = idg < 2 && !tr ? W + G : 46 + G * 0.3; body += '<g data-sw-glyph="-">' + poly(shapes(cs + (/[fe]/.test(d1) ? 0 : (/[adg]/.test(d1) ? T / 2 + 2 : (d1 === 'bc' && !al ? 0 : W - T))) - G * 0.3 - 46 + T / 2 + 2, 46, HH, T).g) + '</g>'; x = cs; continue; }
 if (ch === '.') { post = true; body += rect(x - G + 3, HH - T, T, T); x += 20 - G; continue; }
 if (ch === '°') { post = false; body += '<circle cx="' + (x + 9 + (al ? al.dr || 0 : 0)) + '" cy="10" r="7" fill="none" ' + SK + '5"/>'; x += 22 + G; continue; }
-if (tr && !al && ch === '1' && !i) lead = x + W - T;   /* tr: a leading 1 has its ink on the right of its cell, the empty left part is cut so the visible digits can be centred */
-var kk = post ? DK : 1, w = (ch === '-' ? 46 : W) * kk, on = GLYPH[ch] || '', sh = shapes(x, w, HH * kk, T * kk), gb = '';
+var kk = post ? DK : 1, w = (ch === '-' ? 46 : W) * kk, nar = !al && ch === '1', on = GLYPH[ch] || '', sh = shapes(nar ? x - (w - T * kk) : x, w, HH * kk, T * kk), gb = '';   /* B33 (owner 2026-11-16): a 1 in the main temperature takes a narrow cell of its own ink (two right segments), so 21.6 and 12.8 read as one number; the week digits and the sun times keep their cells */
 'abcdefg'.split('').forEach((s) => { if (on.indexOf(s) >= 0) gb += poly(sh[s]); });
 body += '<g data-sw-glyph="' + ch + '"' + (post ? ' data-sw-dec transform="translate(0 ' + n1(HH * (1 - DK)) + ')"' : '') + '>' + gb + '</g>';
-x += w + G;
+x += (nar ? T * kk : w) + G;
 }
 var vw = al ? al.n * (W + G) + 22 + (al.dr || 0) : Math.max(1, x - G - lead);
 return svg(H * vw / HH, H, glow(body, GPX * HH / H), (lead ? lead : 0) + ' 0 ' + vw + ' ' + HH);

@@ -1007,7 +1007,7 @@ return bad.join('; ');})()})
       # (a decimal point between them allowed) at most 30 of the 100-unit digit height (normal 14, with a point 20).
       sp = s.evaluate(%q{(function(){var bad=[];document.querySelectorAll('[data-sw-part] svg').forEach(function(v){var r=v.getBoundingClientRect();if(!r.height)return;var k=100/r.height,gl=[].filter.call(v.querySelectorAll('g[data-sw-glyph]'),function(g){return /[0-9]/.test(g.getAttribute('data-sw-glyph'))&&g.getBoundingClientRect().width>0});
 for(var i=1;i<gl.length;i++){if(v.closest('[data-sw-part="wrow"]')&&gl[i].closest('svg')!==gl[i-1].closest('svg'))continue;   /* portrait rows: the high and the low are two numbers side by side */
-var a=gl[i-1].getBoundingClientRect(),b=gl[i].getBoundingClientRect(),gp=((gl[i].getAttribute('data-sw-glyph')==='1'&&v.closest('[data-sw-part="temp"],[data-sw-part="itemp"],[data-sw-part="wday"],[data-sw-part="wrow"]')?b.right-56/k:b.left)-a.right)*k;   // LCD cells (owner 2026-11-14): a 1 sits right in a full cell, the gap counts to the cell edge
+var a=gl[i-1].getBoundingClientRect(),b=gl[i].getBoundingClientRect(),gp=((gl[i].getAttribute('data-sw-glyph')==='1'&&v.closest('[data-sw-part="wday"],[data-sw-part="wrow"]')   /* B33: the main temperature's 1 has a narrow cell: its gap counts from its own ink like every other digit */?b.right-56/k:b.left)-a.right)*k;   // LCD cells (owner 2026-11-14): a 1 sits right in a full cell, the gap counts to the cell edge
 if(gp>30)bad.push(gl[i-1].getAttribute('data-sw-glyph')+gl[i].getAttribute('data-sw-glyph')+' gap '+gp.toFixed(0));}});return bad.join('; ');})()})
       puts "DIGITGAP #{c['name']}: #{sp}" unless sp.empty?
       expect(sp).to eq('')
