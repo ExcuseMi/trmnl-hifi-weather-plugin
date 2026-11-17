@@ -1026,3 +1026,13 @@ test('site favicon (owner 2026-11-16): the page links the plugin icon as SVG, a 
   });
   eq(fs.readFileSync(path.join(root, 'tools/site/page/favicon.svg'), 'utf8'), fs.readFileSync(path.join(root, 'assets/icon.svg'), 'utf8'), 'favicon.svg is the plugin icon');
 });
+test('i18n word lists (TRMNL review 2026-11-17): every language has one word per OURS key and per condition slot; it: thunderstorm TEMPORALE, clear night SERENO, heavy ice GRANDINE FORTE; sv, da, no, pl, cs word the sensor offline label', () => {
+  const grab = (n) => new Function(src.match(new RegExp('var ' + n + ' = (\\{[\\s\\S]*?\\}|\\[[\\s\\S]*?\\]);'))[1].replace(/^/, 'return ') )();
+  const KEYS = grab('OURS_KEYS'), OURS = grab('OURS'), COND = grab('OURS_COND'), SLOTS = grab('SLOTS');
+  const nCond = SLOTS.filter((s) => s.charAt(0) === 'c').length;
+  Object.keys(OURS).forEach((l) => eq([l, OURS[l].split('|').length], [l, KEYS.length], 'OURS words'));
+  Object.keys(COND).forEach((l) => eq([l, COND[l].split('|').length], [l, nCond], 'OURS_COND words'));
+  const it = T.buildI18n('it');
+  eq([it.cond[95][0], it.cond[0][1], it.cond[96][0]], ['TEMPORALE', 'SERENO', 'GRANDINE FORTE'], 'it conditions');
+  ['sv', 'da', 'no', 'pl', 'cs'].forEach((l) => ok(OURS[l].split('|')[KEYS.indexOf('sensor_off')], l + ' sensor_off'));
+});
