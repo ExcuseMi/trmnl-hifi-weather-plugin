@@ -317,8 +317,9 @@ if(b1){if(cc!==(dk?'rgb(255, 255, 255)':'rgb(0, 0, 0)'))bad.push('unit '+u+' '+c
 var gl=[].filter.call(document.querySelectorAll('[data-sw-glabel]'),function(e){return e.getBoundingClientRect().width>0}),ml=[].filter.call(document.querySelectorAll('[data-sw-mlabel]'),function(e){return e.getBoundingClientRect().width>0})[0];
 gl.forEach(function(e){var sv=e.ownerSVGElement,ks=sv.getBoundingClientRect().width/(+sv.getAttribute('width')||1),fs=parseFloat(e.getAttribute('font-size'))*ks,ts=e.querySelector('tspan');
 if(ml){var lf=parseFloat(getComputedStyle(ml).fontSize)*(ml.getBoundingClientRect().width/(ml.offsetWidth||1));if(fs<lf-0.5)bad.push('rain amount '+fs.toFixed(1)+' px under the meter label '+lf.toFixed(1))}
-if(!ts||parseFloat(ts.getAttribute('font-size'))>=parseFloat(e.getAttribute('font-size')))bad.push('rain unit not smaller');
-else if(!b1&&want.indexOf(getComputedStyle(ts).color)<0)bad.push('rain unit '+getComputedStyle(ts).color+' not the unit grey')});
+var tr=ts?parseFloat(ts.getAttribute('font-size'))/parseFloat(e.getAttribute('font-size')):0;if(!ts||tr>=1)bad.push('rain unit not smaller');
+else if(tr<0.75)bad.push('rain unit '+tr.toFixed(2)+' of its number, want 0.75 or more (owner 2026-11-21: nearly invisible on the X)');
+if(ts&&getComputedStyle(ts).color!==getComputedStyle(e).color)bad.push('rain unit '+getComputedStyle(ts).color+' not its number ink')});
 return bad.slice(0,4).join('; ')})()})
       puts "UNIT #{c['name']}: #{ug}" unless ug.empty?
       expect(ug).to eq('')

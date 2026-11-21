@@ -487,8 +487,8 @@ else off += DK ? rect(x, 0, w, ch, 2, ' data-sw-c="' + i + '"') : rect(x + 1, 1,
 var PV = DKM() ? 'text--gray-45' : (b1() ? 'text--gray-75' : 'text--gray-' + (B2() ? 65 : 40));   /* B26: the X's empty outline is gray-50 (153, 85 from the panel's 238), the forecast fill gray-40 (119); owner 2026-11-14: lighter grey for the forecast cells; B18: gray-75 equals the X's panel grey (238), the OG's 170 shows */
 return ('<g data-sw-lit="' + lit + '" data-sw-ncell="' + n + '"></g>' + (lc || nar ? '' : g(SHADOW + ' text--gray-65', sh)) + '<g data-sw-st="e">' + g(OC(), off) + '</g>' + '<g data-sw-st="p">' + g(PV, pv) + '</g><g data-sw-st="l">' + g(PV, lt) + (lo ? g(OC(), lo) : '') + '</g><g data-sw-on data-sw-st="a">' + (lc ? g(lc, on) : API.mode && !DKM() && !b1() ? '<g data-sw-dg>' + g(act(), on) + '</g>' : glow(on, GPX)) +   /* owner: 2-bit+ light dark grey, 1-bit black, dark white */ (zc[1] ? hg('yellow', zc[1]) : '') + (zc[2] ? hg('red', zc[2]) : '') + '</g>' + gk);
 }
-/* B27 (owner photo): the rain amount's number is at least as big as a meter label (the unit 0.6 of it, grey, one baseline), else the gauge goes; the number's width plus the unit's fits the column left of the bar */
-function gfs(lab, x0, lp) { var p = lab.split(' '); return Math.min(1.15 * (lp || 16), x0 / (p[0].length * 0.62 + p[1].length * 0.37 + 0.45)); }
+/* B27 (owner photo): the rain amount's number is at least as big as a meter label (the unit 0.8 of it in the number's ink, one baseline; owner 2026-11-21: 0.6 and grey was nearly invisible on the X), else the gauge goes; the number's width plus the unit's fits the column left of the bar */
+function gfs(lab, x0, lp) { var p = lab.split(' '); return Math.min(1.15 * (lp || 16), x0 / (p[0].length * 0.62 + p[1].length * 0.7 + 0.45)); }
 function gauge(gq, W, H) {
 if (!gq) return '';
 var lab = String(gq.label), x0 = API.gx0 || 0, bw = W - x0, fs = gfs(lab, x0, API.lp), n = 3, cw = bw / n, gp = API.gp || Math.max(2, Math.min(cw, H) * 0.06), on = '', sh = '', off = '', DK = DKM() && API.mode.bits >= 2;
@@ -497,7 +497,7 @@ var x = x0 + i * cw + gp / 2, w = cw - gp;
 if (i < gq.segs) { on += rect(x, 0, w, H, 2, ' data-sw-c="' + i + '"'); sh += rect(x + SO, SO, w, H, 2); }
 else off += DK ? rect(x, 0, w, H, 2, ' data-sw-c="' + i + '"') : rect(x + 1, 1, w - 2, H - 2, 2, FS + '2" data-sw-c="' + i + '"');
 }
-return svg(W, H, '<g data-sw-gauge="' + gq.segs + '"></g>' + g(SHADOW + ' text--gray-65', sh) + '<g data-sw-st="e">' + g(OC(), off) + '</g><g data-sw-on data-sw-st="a">' + (API.mode && !DKM() && !b1() ? '<g data-sw-dg>' + g(act(), on) + '</g>' : glow(on, GPX)) + '</g>' + '<text x="' + n1(x0 / 2) + '" y="' + n1(H / 2 + 0.36 * fs) + '" font-size="' + n1(fs) + '" font-weight="700" text-anchor="middle" data-sw-glabel>' + lab.split(' ')[0] + '<tspan font-size="' + n1(0.6 * fs) + '"' + (inc() ? ' class="' + inc() + '"' : '') + '> ' + lab.split(' ')[1] + '</tspan></text>');
+return svg(W, H, '<g data-sw-gauge="' + gq.segs + '"></g>' + g(SHADOW + ' text--gray-65', sh) + '<g data-sw-st="e">' + g(OC(), off) + '</g><g data-sw-on data-sw-st="a">' + (API.mode && !DKM() && !b1() ? '<g data-sw-dg>' + g(act(), on) + '</g>' : glow(on, GPX)) + '</g>' + '<text x="' + n1(x0 / 2) + '" y="' + n1(H / 2 + 0.36 * fs) + '" font-size="' + n1(fs) + '" font-weight="700" text-anchor="middle" data-sw-glabel>' + lab.split(' ')[0] + '<tspan font-size="' + n1(0.8 * fs) + '"> ' + lab.split(' ')[1] + '</tspan></text>');
 }
 function hscale(all, nc) {
 var ts = (all || []).slice(0, nc || (all || []).length).map((q) => q && q.tV).filter((v) => v !== null && v !== undefined).map(Math.round);
