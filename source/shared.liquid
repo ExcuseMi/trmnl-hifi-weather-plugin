@@ -157,7 +157,7 @@
  </div>{{ p_close }}</div>
 {%- endif %}
 {%- if view == 4 %}
-<div class="h--[42cqh] grow" data-sw-mbp>{{ p_open_g }}<div class="relative h--full w--full p--2">{{ bm }}</div>{{ p_close }}</div>
+<div class="h--[42cqh] grow" data-sw-mbp>{{ p_open_g }}<div class="absolute top--0 left--5 right--5" data-sw-between><div class="border--h-55" data-sw-rule></div></div><div class="relative h--full w--full p--2">{{ bm }}</div>{{ p_close }}</div>
 {%- endif %}
 {%- if days_h %}
 <div class="{{ days_h }} grow" data-sw-dstrip>{{ p_open_g }}<div class="absolute top--0 left--5 right--5" data-sw-between><div class="border--h-55" data-sw-rule></div></div><div class="relative flex flex--col flex--center{% if view == 1 %} lg:portrait:flex--evenly{% endif %} h--full p--2 lg:p--4">
@@ -467,14 +467,14 @@ return { st: st, peak: k - 1 };
 }
 function meter(m, W, H, n, ind) {
 /* owner 2026-11-15: every meter row looks the same, main or secondary, only the icon differs (the dial keeps its grey secondary needle) */
-if (!ind && m.key === 'baro') return svg(W, H, balrow(m.frac === null || m.frac === undefined ? null : Math.round(970 + m.frac * 80), W, H, BARO_BAL));
+if (!ind && m.key === 'baro') return svg(W, H, balrow(m.frac === null || m.frac === undefined ? null : Math.round(970 + m.frac * 80), W, H, BARO_BAL, n));
 if (!ind) return svg(W, H, m.tw ? '<g data-sw-twrow="out">' + mrow(m, W, H, n, '') + '</g>' : mrow(m, W, H, n, ''));
-return svg(W, H, '<g data-sw-twrow="in">' + balrow(m.tw.m.frac === null || m.tw.m.frac === undefined ? null : Math.round(m.tw.m.frac * 1000) / 10, W, H, HUM_BAL) + '</g>');
+return svg(W, H, '<g data-sw-twrow="in">' + balrow(m.tw.m.frac === null || m.tw.m.frac === undefined ? null : Math.round(m.tw.m.frac * 1000) / 10, W, H, HUM_BAL, n) + '</g>');
 }
 /* B32/B33 (owner 2026-11-16): a balance meter, the middle of five slots a fixed tick, two cells left and two right that fill outward from it. Indoor humidity: 40 to 55 % nothing, over 55 up to 65 one cell right, over 65 two (the lamp), 30 up to under 40 one left, under 30 two (the lamp); the edge cells light the label as for every other meter. BARO: 1009 to 1017 hPa nothing (changeable), under 1009 one cell left, under 1001 two (low, rain or storm), over 1017 one right, over 1025 two (high, fair); no lamp. No shadow */
 var HUM_BAL = [30, 40, 55, 65], BARO_BAL = [1001, 1009, 1017, 1025];   /* two cells left, one cell left, one cell right, two cells right: the bounds */
-function balrow(v, W, H, B) {
-var r = v === null ? 0 : (v > B[3] ? 2 : (v > B[2] ? 1 : 0)), l = v === null ? 0 : (v < B[0] ? 2 : (v < B[1] ? 1 : 0)), cw = (W - SO) / 5, gp = cw * 0.12, ch = H - SO, on = '', off = '', DK = DKM() && API.mode.bits >= 2, nl = 0;
+function balrow(v, W, H, B, n) {
+var r = v === null ? 0 : (v > B[3] ? 2 : (v > B[2] ? 1 : 0)), l = v === null ? 0 : (v < B[0] ? 2 : (v < B[1] ? 1 : 0)), cw = (W - SO) / 5, gp = cw * (n > 5 && (W - SO) / n >= H - SO ? 0.06 : 0.12), ch = H - SO, on = '', off = '', DK = DKM() && API.mode.bits >= 2, nl = 0;   /* when the rows next to it draw n > 5 cells (mrow: gap 0.12 of a cell, half of it at each edge) the balance row takes the same edge inset, so it lines up with them */
 for (var i = 0; i < 5; i++) {
 var x = i * cw + gp / 2, w = cw - gp;
 if (i === 2) { var tw = Math.max(3, Math.min(w * 0.14, 6)); on += rect(x + (w - tw) / 2, ch * 0.1, tw, ch * 0.8, 1, ' data-sw-bt'); continue; }
