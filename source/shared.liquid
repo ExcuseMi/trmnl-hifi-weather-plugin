@@ -24,10 +24,12 @@
 {%- assign stk = false %}{% assign hm = 1 %}{% assign hl = 1 %}{% assign wm = 1 %}{% assign wl = 1 %}{% assign n_md = 9 %}{% assign n_lg = 9 %}{% assign rgw_l = 18 %}
 {%- if view == 1 %}{% assign con_h = 'h--[56cqh] lg:h--[38cqh] lg:portrait:h--[31cqh]' %}{% assign days_h = 'h--[37cqh] portrait:h--[38cqh] lg:h--[28cqh] lg:portrait:h--[33cqh]' %}{% if inn %}{% assign con_h = con_h | replace: 'portrait:h--[31', 'portrait:h--[37' %}{% assign days_h = days_h | replace: 'lg:portrait:h--[33', 'lg:portrait:h--[30' %}{% endif %}{% if cf.week_style == 'digital' %}{% assign con_h = con_h | replace: 'portrait:h--[31', 'portrait:h--[29' | replace: 'portrait:h--[37', 'portrait:h--[35' %}{% endif %}{% comment %} review 3 A1: the Digital rows of a large portrait screen get a taller band (pitch about 107 px, a gap of 15 % of the row on the X); the sliders keep their size {% endcomment %}{% comment %} B12 round 4: portrait X with a sensor, the twin readout row (icon above the digits) takes 3 cqh more, from the days strip {% endcomment %}
 {%- elsif view == 2 %}{% assign hm = 1.7 %}{% assign hl = 2.2 %}{% assign rgw_l = 15 %}{% assign mh_l = 1.5 %}{% assign con_h = 'h--full' %}
-{%- elsif view == 3 %}{% assign stk = true %}{% assign wm = 2 %}{% assign wl = 2 %}{% assign n_md = 2 %}{% assign n_lg = 5 %}{% assign mr_m = 6 %}{% assign mb_m = 4 %}{% assign con_h = 'h--[60cqh] lg:h--[54cqh] lg:portrait:h--[44cqh]' %}{% assign days_h = 'h--[38cqh] lg:h--[44cqh] lg:portrait:h--[54cqh]' %}
-{%- else %}{% assign stk = true %}{% assign wm = 2 %}{% assign wl = 2 %}{% assign hm = 1.6 %}{% assign hl = 2.3 %}{% assign n_md = 1 %}{% assign n_lg = 2 %}{% assign con_h = 'h--[50cqh]' %}{% endif %}
+{%- elsif view == 3 %}{% assign stk = true %}{% assign wm = 2 %}{% assign wl = 2 %}{% assign n_md = 5 %}{% assign n_lg = 5 %}{% assign mr_m = 6 %}{% assign mb_m = 4 %}{% assign con_h = 'h--[60cqh] lg:h--[54cqh] lg:portrait:h--[44cqh]' %}{% assign days_h = 'h--[38cqh] lg:h--[44cqh] lg:portrait:h--[54cqh]' %}
+{%- else %}{% assign stk = true %}{% assign wm = 2 %}{% assign wl = 2 %}{% assign hm = 1.6 %}{% assign hl = 2.3 %}{% assign n_md = 1 %}{% assign n_lg = 2 %}{% assign con_h = 'h--full' %}{% endif %}
 {%- assign calm_q = false %}{% if view == 4 %}{% assign calm_q = true %}{% endif %}{% comment %} Calm quadrant (owner) {% endcomment %}
 {%- assign dev_r = 0 %}{% if trmnl.device.height > 0 %}{% assign dev_r = trmnl.device.width | times: 10 | divided_by: trmnl.device.height %}{% endif %}
+{%- assign mb_on = false %}{% if view == 3 and ui.hours == nil %}{% assign mb_on = true %}{% endif %}{% comment %} B33: the OG half vertical shows tomorrow and the meters instead of the day rows (not in the hours view) {% endcomment %}
+{%- if mb_on %}{% assign days_h = days_h | replace: 'h--[38cqh] lg', 'h--[38cqh] portrait:h--[31cqh] lg' %}{% assign con_h = con_h | replace: 'h--[60cqh] lg', 'h--[60cqh] portrait:h--[67cqh] lg' %}{% endif %}
 {%- if view == 3 and dev_r >= 17 %}{% assign days_h = days_h | replace: 'h--[38cqh] lg', 'h--[44cqh] lg' %}{% assign con_h = con_h | replace: 'h--[60cqh] lg', 'h--[54cqh] lg' %}{% endif %}{% comment %} wide screens (16:9): the half vertical gives the days 44 cqh of the height, the console 54 (md: 38 / 60) {% endcomment %}
 {%- if mr_m == nil %}{% assign mr_m = 9 %}{% assign mb_m = 7 %}{% endif %}
 {%- if view == 1 %}{% for m in ml %}{% if m.key == ph_tw %}{% assign mr_m = 7.4 %}{% endif %}{% endfor %}{% endif %}
@@ -67,8 +69,8 @@
 {%- endif %}
 {% if calm_q %}{% assign mr_m = 6 %}{% assign mb_m = 4 %}{% endif %}
 {% capture c_meters %}
-  <div class="flex flex--col gap--small shrink-0 w--[{% if inn and view < 3 %}{{ 25 | times: wm | round }}{% else %}{{ 30 | times: wm | round }}{% endif %}cqw]{% if view < 3 and inn == nil %} landscape:w--[24cqw] lg:landscape:w--[{{ 22 | times: wm | round }}cqw]{% endif %} lg:w--[{% if inn and view == 2 %}19{% else %}{{ 22 | times: wm | round }}{% endif %}cqw] lg:portrait:w--full">{% comment %} owner: no lamps; the rain unit's {% endcomment %}{% comment %} owner: the meters take the full {% endcomment %}
-   <div class="flex flex--row grow{% if view == 2 %} lg:portrait:flex--stretch-y{% endif %} gap--small w--full">{% capture c_lab %}{% endcapture %}{% capture c_blk %}{% endcapture %}{% for m in ms %}{% if forloop.index > n_lg %}{% break %}{% endif %}{% assign passes = 1 %}{% if m.key == ph_tw %}{% assign passes = 2 %}{% endif %}{% capture rc %}{% if view == 1 and m.key == 'baro' %}{% if forloop.index > n_md %} hidden{% else %} flex lg:hidden{% endif %}{% elsif forloop.index > n_md %} hidden lg:flex{% else %} flex{% endif %} flex--row flex--center-y{% endcapture %}{% capture rh %}h--[{{ mr_m | times: hm | round | at_most: 100 }}cqh] lg:h--[{{ 5 | times: hl | round }}cqh]{% if view == 1 %} lg:portrait:h--[3cqh]{% endif %}{% endcapture %}{% for pass in (1..passes) %}{% assign h2 = '' %}{% assign pk = 'meter' %}{% assign is_in = false %}{% if pass == 2 %}{% assign h2 = ' data-sw-hum2' %}{% endif %}{% if m.key == ph_tw %}{% if pass == 1 and inm %}{% assign is_in = true %}{% elsif pass == 2 and inm == false %}{% assign is_in = true %}{% endif %}{% if is_in %}{% assign pk = 'meterin' %}{% endif %}{% endif %}{% comment %} owner 2026-11-14: the indoor row first {% endcomment %}{% unless m.key == ph_tw and is_in == false %}{% capture c_lab %}{{ c_lab }}<div class="{{ rc }} flex--right w--full gap--xsmall {{ rh }}"{{ h2 }}>{% if m.key == ph_tw %}<div class="shrink-0" data-sw-part="loc" data-sw-sq data-sw-for="{{ m.key }}" data-sw-i="{% if is_in %}1{% else %}0{% endif %}" data-sw-loc="{% if is_in %}in{% else %}out{% endif %}"></div>{% endif %}<span class="title title--base lg:title--small text--bold" data-sw-mlabel data-sw-lk="{{ m.key }}"{% if is_in %} data-sw-lin{% endif %}>{{ m.label }}</span></div>{% endcapture %}{% capture c_blk %}{{ c_blk }}<div class="{{ rc }} w--full {{ rh }}"{{ h2 }}><div class="w--full h--[{{ mb_m | times: hm | round | at_most: 100 }}cqh] lg:hidden" data-sw-part="{{ pk }}" data-sw-n="5" data-sw-i="{{ m.idx }}" data-sw-key="{{ m.key }}"></div><div class="hidden lg:block w--full h--[{{ 4 | times: hl | round }}cqh]{% if view == 1 %} lg:portrait:h--[3cqh]{% endif %}" data-sw-part="{{ pk }}" data-sw-n="10" data-sw-i="{{ m.idx }}" data-sw-key="{{ m.key }}"></div></div>{% endcapture %}{% endunless %}{% endfor %}{% endfor %}{% capture mcol %}flex flex--col flex--between{% endcapture %}
+  <div class="flex flex--col gap--small shrink-0 {% if mb_on %}w--full{% else %}w--[{% if inn and view < 3 %}{{ 25 | times: wm | round }}{% else %}{{ 30 | times: wm | round }}{% endif %}cqw]{% endif %}{% if view < 3 and inn == nil %} landscape:w--[24cqw] lg:landscape:w--[{{ 22 | times: wm | round }}cqw]{% endif %} lg:w--[{% if inn and view == 2 %}19{% else %}{{ 22 | times: wm | round }}{% endif %}cqw] lg:portrait:w--full{% if view == 3 %} portrait:w--full{% endif %}">{% comment %} owner: no lamps; the rain unit's {% endcomment %}{% comment %} owner: the meters take the full {% endcomment %}
+   <div class="flex flex--row grow{% if view == 2 %} lg:portrait:flex--stretch-y{% endif %}{% if view == 3 %} flex--stretch-y{% endif %} gap--small w--full">{% assign mb_nr = ms.size | at_most: n_md %}{% assign mb_rp = 50.0 | divided_by: mb_nr | round %}{% assign mb_bp = mb_rp | times: 0.8 | round | at_most: 14 %}{% capture c_lab %}{% endcapture %}{% capture c_blk %}{% endcapture %}{% for m in ms %}{% if forloop.index > n_lg %}{% break %}{% endif %}{% assign passes = 1 %}{% if m.key == ph_tw %}{% assign passes = 2 %}{% endif %}{% capture rc %}{% if view == 1 and m.key == 'baro' %}{% if forloop.index > n_md %} hidden{% else %} flex lg:hidden{% endif %}{% elsif forloop.index > n_md %} hidden lg:flex{% else %} flex{% endif %} flex--row flex--center-y{% endcapture %}{% capture rh %}h--[{{ mr_m | times: hm | round | at_most: 100 }}cqh]{% if view == 3 %} portrait:h--[{{ mb_rp }}cqh]{% endif %} lg:h--[{{ 5 | times: hl | round }}cqh]{% if view == 1 %} lg:portrait:h--[3cqh]{% endif %}{% endcapture %}{% for pass in (1..passes) %}{% assign h2 = '' %}{% assign pk = 'meter' %}{% assign is_in = false %}{% if pass == 2 %}{% assign h2 = ' data-sw-hum2' %}{% endif %}{% if m.key == ph_tw %}{% if pass == 1 and inm %}{% assign is_in = true %}{% elsif pass == 2 and inm == false %}{% assign is_in = true %}{% endif %}{% if is_in %}{% assign pk = 'meterin' %}{% endif %}{% endif %}{% comment %} owner 2026-11-14: the indoor row first {% endcomment %}{% unless m.key == ph_tw and is_in == false %}{% capture c_lab %}{{ c_lab }}<div class="{{ rc }} flex--right w--full gap--xsmall {{ rh }}"{{ h2 }}>{% if m.key == ph_tw %}<div class="shrink-0" data-sw-part="loc" data-sw-sq data-sw-for="{{ m.key }}" data-sw-i="{% if is_in %}1{% else %}0{% endif %}" data-sw-loc="{% if is_in %}in{% else %}out{% endif %}"></div>{% endif %}<span class="{% if view == 3 %}label label--small{% else %}title title--base lg:title--small{% endif %} text--bold" data-sw-mlabel data-sw-lk="{{ m.key }}"{% if is_in %} data-sw-lin{% endif %}>{{ m.label }}</span></div>{% endcapture %}{% capture c_blk %}{{ c_blk }}<div class="{{ rc }} w--full {{ rh }}"{{ h2 }}><div class="w--full h--[{{ mb_m | times: hm | round | at_most: 100 }}cqh]{% if view == 3 %} portrait:h--[{{ mb_bp }}cqh]{% endif %} lg:hidden" data-sw-part="{{ pk }}" data-sw-n="5" data-sw-i="{{ m.idx }}" data-sw-key="{{ m.key }}"></div><div class="hidden lg:block w--full h--[{{ 4 | times: hl | round }}cqh]{% if view == 1 %} lg:portrait:h--[3cqh]{% endif %}" data-sw-part="{{ pk }}" data-sw-n="10" data-sw-i="{{ m.idx }}" data-sw-key="{{ m.key }}"></div></div>{% endcapture %}{% endunless %}{% endfor %}{% endfor %}{% capture mcol %}flex flex--col flex--between{% endcapture %}
     <div class="{{ mcol }} shrink-0">{{ c_lab }}</div>
     <div class="{{ mcol }} grow">{{ c_blk }}</div>
    </div>
@@ -110,7 +112,7 @@
  low/high), the meters only when they fit readable. The page script (swSmall) sizes every part from the digit height and drops lower
  items whole. In the full view both consoles are in the markup and the script keeps one (data-sw-big / data-sw-alt). {%- endcomment -%}
 {%- if view != 2 %}
- <div data-sw-console data-sw-small{% if view == 1 %} data-sw-alt{% endif %}{% if view == 4 %} data-sw-nomr="all"{% elsif view == 3 %} data-sw-nomr="md"{% endif %} class="{{ con_h }}">{{ p_open_g }}{% if view == 1 %}<div class="hidden lg:block absolute top--0 left--5 right--5" data-sw-between><div class="border--h-55"></div></div>{% endif %}<div class="relative flex flex--col flex--center h--full w--full p--2 lg:p--4" data-sw-sbox{% if view == 4 %} data-sw-nocue{% elsif view == 1 %} data-sw-keepcue{% endif %}>
+ <div data-sw-console data-sw-small{% if view == 1 %} data-sw-alt{% endif %}{% if mb_on %} data-sw-nomr="md"{% endif %} class="{{ con_h }}">{{ p_open_g }}{% if view == 1 %}<div class="hidden lg:block absolute top--0 left--5 right--5" data-sw-between><div class="border--h-55"></div></div>{% endif %}<div class="relative flex flex--col flex--center h--full w--full p--2 lg:p--4" data-sw-sbox{% if view == 4 %} data-sw-nocue{% elsif view == 1 %} data-sw-keepcue{% endif %}>
   <div class="{{ fcy }} flex--center-x gap--small w--full" data-sw-srow="cond">
    {%- if ui.icon %}<span class="block shrink-0 h--full aspect--1/1" data-sw-sicon><img class="{{ iia }} h--full w--full" src="{{ ui.icon }}" alt="" data-sw-ink="{{ ui.iconInk }}" data-sw-icon></span>{% endif %}
    <span class="{{ tsb }}" data-sw-cond data-sw-scond>{{ ui.cond }}</span>
@@ -129,22 +131,13 @@
   {%- assign sms = ml | sort: 'rank' %}
   {%- assign smx = 2 %}{% if view == 4 %}{% assign smx = 4 %}{% endif %}{% comment %} tall quadrants (portrait) may show up to four {% endcomment %}
   {%- comment %} B20d (owner rule B13): a twin meter (humidity with a sensor) is two rows as in the full view, the main reading's first, the other right after it, so dropping rows for space (swSmall keeps the first n) never keeps the sensor's row while the outdoor one is dropped when outside is main. {% endcomment %}
-  {%- for m in sms %}{% if forloop.index > smx %}{% break %}{% endif %}{% assign sk = 'meter' %}{% if m.key == ph_tw %}{% assign sk = 'meter,meterin' %}{% if inm %}{% assign sk = 'meterin,meter' %}{% endif %}{% endif %}{% assign sk = sk | split: ',' %}
+  {%- for m in sms %}{% if forloop.index > smx %}{% break %}{% endif %}{% assign sk = 'meter' %}{% if m.key == ph_tw %}{% assign sk = 'meterin' %}{% endif %}{% assign sk = sk | split: ',' %}{% comment %} B33: with an indoor humidity reading the outdoor humidity row is dropped {% endcomment %}
   {%- for spk in sk %}
   <div class="hidden flex--row flex--center-y gap--small w--full" data-sw-srow="meter"><span class="{{ tsb }} shrink-0" data-sw-mlabel data-sw-lk="{{ m.key }}">{{ m.label }}</span><div class="grow" data-sw-part="{{ spk }}" data-sw-n="5" data-sw-i="{{ m.idx }}" data-sw-key="{{ m.key }}"></div></div>
   {%- endfor %}
   {%- endfor %}
  </div>{{ p_close }}</div>
 {%- endif %}
-{%- comment %} B33 variant (owner 2026-11-16, render only): in the narrow views (half vertical on md screens, the quadrants) the bottom shows the meter block under one compact tomorrow line instead of the day rows {% endcomment %}
-{%- assign mbn = 5 %}{% assign mbr = 5 %}{% assign mbt = 6 %}{% if view == 4 %}{% assign mbn = 3 %}{% assign mbr = 9 %}{% assign mbt = 10 %}{% endif %}
-{%- capture bm %}<div class="flex flex--col flex--center gap--xsmall w--full h--full" data-sw-mb>
- {%- assign tm = ui.days[1] %}
- <div class="flex flex--row flex--center-y gap--small w--full shrink-0 h--[{{ mbt }}cqh]"><span class="title title--small text--bold shrink-0 w--[24cqw]" data-sw-tname>{{ tm.name }}</span>{% if tm.icon %}<img class="{{ iia }} h--full" src="{{ tm.icon }}" alt="">{% endif %}<span class="title title--small text--bold">{{ tm.lo }}</span><span class="title title--small text--bold">{{ tm.hi }}</span>{% if tm.cue.size > 0 %}<div class="h--full aspect--1/1" data-sw-part="dcue" data-sw-i="1"></div>{% endif %}</div>
- {%- for m in ms %}{% if forloop.index > mbn %}{% break %}{% endif %}{% assign pk = 'meter' %}{% if m.key == ph_tw %}{% assign pk = 'meterin' %}{% endif %}
- <div class="flex flex--row flex--center-y gap--small w--full shrink-0 h--[{{ mbr }}cqh]"><div class="shrink-0 w--[34cqw] flex flex--row flex--center-y flex--right gap--xsmall">{% if m.key == ph_tw %}<div class="shrink-0" data-sw-part="loc" data-sw-sq data-sw-for="{{ m.key }}" data-sw-i="1" data-sw-loc="in"></div>{% endif %}<span class="title title--small text--bold" data-sw-mlabel data-sw-lk="{{ m.key }}"{% if m.key == ph_tw %} data-sw-lin{% endif %}>{{ m.label }}</span></div><div class="grow h--full" data-sw-part="{{ pk }}" data-sw-n="5" data-sw-i="{{ m.idx }}" data-sw-key="{{ m.key }}"></div></div>
- {%- endfor %}
-</div>{% endcapture %}
 {%- if view <= 2 %}
  <div data-sw-console{% if view == 1 %} data-sw-big{% endif %} class="{{ con_h }}">{{ p_open_g }}{% if view == 1 %}<div class="hidden lg:block absolute top--0 left--5 right--5" data-sw-between><div class="border--h-55"></div></div>{% endif %}<div class="relative flex flex--row lg:portrait:flex--col-reverse{% if view == 2 %} lg:portrait:flex--between{% endif %} {% if view == 1 %}landscape:{% endif %}flex--stretch-y gap--medium lg:gap--large{% if view == 1 %} lg:portrait:gap--medium{% endif %} p--2 lg:p--4 h--full">{% comment %} X portrait (owner step 12) {% endcomment %}
 {{ c_meters }}
@@ -156,12 +149,9 @@
   </div>
  </div>{{ p_close }}</div>
 {%- endif %}
-{%- if view == 4 %}
-<div class="h--[42cqh] grow" data-sw-mbp>{{ p_open_g }}<div class="absolute top--0 left--5 right--5" data-sw-between><div class="border--h-55" data-sw-rule></div></div><div class="relative h--full w--full p--2">{{ bm }}</div>{{ p_close }}</div>
-{%- endif %}
 {%- if days_h %}
 <div class="{{ days_h }} grow" data-sw-dstrip>{{ p_open_g }}<div class="absolute top--0 left--5 right--5" data-sw-between><div class="border--h-55" data-sw-rule></div></div><div class="relative flex flex--col flex--center{% if view == 1 %} lg:portrait:flex--evenly{% endif %} h--full p--2 lg:p--4">
-{%- if view == 3 %}<div class="lg:hidden w--full h--full">{{ bm }}</div><div class="hidden lg:flex flex--col flex--center w--full h--full">{% endif %}
+{%- if mb_on %}<div class="lg:hidden flex flex--col gap--xsmall w--full h--full" data-sw-mb>{% assign tm = ui.days[1] %}<div class="flex flex--row flex--center-y flex--center-x gap--small w--full shrink-0 h--[6cqh] portrait:h--[8cqh]"><span class="title title--small portrait:title--base text--bold shrink-0 w--[22cqw]" data-sw-tname>{{ tm.name }}</span>{% if tm.icon %}<img class="{{ iia }} h--full" src="{{ tm.icon }}" alt="">{% endif %}<span class="title title--small portrait:title--base text--bold">{{ tm.lo }}</span><span class="title title--small portrait:title--base text--bold">{{ tm.hi }}</span>{% if tm.cue.size > 0 %}<div class="h--full aspect--1/1" data-sw-part="dcue" data-sw-i="1"></div>{% endif %}</div><div class="flex flex--row flex--center-x flex--stretch-y grow w--full">{{ c_meters }}</div></div><div class="hidden lg:flex flex--col flex--center w--full h--full">{% endif %}
 {%- if ui.hours %}{% comment %} Hours strip (owner) {% endcomment %}
   {%- assign nh_md = 8 %}{% assign nh_lg = 12 %}{% if view == 3 %}{% assign nh_md = 6 %}{% assign nh_lg = 8 %}{% endif %}
   <div class="relative z--2 flex flex--row w--full h--full gap--xsmall" data-sw-hours="{{ nh_md }},{{ nh_lg }}"><div class="absolute inset--0" data-sw-part="hzero"></div>
@@ -240,7 +230,7 @@
   {%- endfor %}
   </div>
 {%- endif %}
-{%- if view == 3 %}</div>{% endif %}
+{%- if mb_on %}</div>{% endif %}
  </div>{{ p_close }}</div>
 {%- endif %}
 </div>
@@ -286,7 +276,7 @@ function swNameFit() {
 var cx = swCv();
 document.querySelectorAll('[data-sw-slab]').forEach(function (e) {
 var b = e.getBoundingClientRect(); if (!b.width || !b.height) return;
-if (e.parentElement.hasAttribute('data-sw-lw')) { var fs0 = e.style.fontSize, wa = e.parentElement.clientWidth; if (fs0 && fs0 === e.getAttribute('data-sw-fsa')) fs0 = e.getAttribute('data-sw-fs0'); if (fs0 && wa > 0) {   /* a size this function set itself is never shrunk again: it starts from the size the layout gave (b13 long label went 3 times 0.6) */ cx.font = getComputedStyle(e).fontWeight + ' ' + parseFloat(fs0) + 'px ' + getComputedStyle(e).fontFamily; var tw0 = cx.measureText(e.getAttribute('data-clamp-original') || e.textContent).width; if (tw0 > wa) { var fk = 0.98 * wa / tw0; if (fk >= 0.85) { e.setAttribute('data-sw-fs0', fs0); e.style.fontSize = (fk * parseFloat(fs0)).toFixed(2) + 'px'; e.setAttribute('data-sw-fsa', e.style.fontSize); b = e.getBoundingClientRect(); } else if (e.style.fontSize !== fs0) { e.style.fontSize = fs0; } } else if (e.style.fontSize !== fs0) { e.style.fontSize = fs0; } } }   /* B31: the narrower digits (smaller tenths) leave the sensor label less room: it shrinks to fit, never under 0.85 of its size (B20: the label's caps stay over 0.35 of the icon); a label that would need less is left to the clamp; the Framework clamp is the last resort */
+if (e.parentElement.hasAttribute('data-sw-lw')) { var fs0 = e.style.fontSize, wa = e.parentElement.clientWidth; if (fs0 && fs0 === e.getAttribute('data-sw-fsa')) fs0 = e.getAttribute('data-sw-fs0'); if (fs0 && wa > 0) {   /* a size this function set itself is never shrunk again: it starts from the size the layout gave (b13 long label went 3 times 0.6) */ cx.font = getComputedStyle(e).fontWeight + ' ' + parseFloat(fs0) + 'px ' + getComputedStyle(e).fontFamily; var tw0 = cx.measureText(e.getAttribute('data-clamp-original') || e.textContent).width; if (tw0 > wa) { var fk = 0.98 * wa / tw0; if (fk >= 0.85) { e.setAttribute('data-sw-fs0', fs0); e.style.fontSize = (fk * parseFloat(fs0)).toFixed(2) + 'px'; e.setAttribute('data-sw-fsa', e.style.fontSize); b = e.getBoundingClientRect(); } else if (0.95 * tw0 * 1.02 > 1.4 * wa) { if (e.style.fontSize !== fs0) e.style.fontSize = fs0; } else { var tpd = e.parentElement.parentElement.parentElement.lastElementChild, ex = 0.95 * tw0 * 1.02 - wa; /* B33: the narrow 1 leaves the label less room than its floor: the readout grows to the label at 0.95 of its size */ if (tpd && ex > 0 && !tpd.hasAttribute('data-sw-mw')) { tpd.setAttribute('data-sw-mw', '1'); tpd.style.minWidth = (tpd.clientWidth + ex).toFixed(1) + 'px'; } e.setAttribute('data-sw-fs0', fs0); e.style.fontSize = (0.95 * parseFloat(fs0)).toFixed(2) + 'px'; e.setAttribute('data-sw-fsa', e.style.fontSize); b = e.getBoundingClientRect(); } } else if (e.style.fontSize !== fs0) { e.style.fontSize = fs0; } } }   /* B31: the narrower digits (smaller tenths) leave the sensor label less room: it shrinks to fit, never under 0.85 of its size (B20: the label's caps stay over 0.35 of the icon); a label that would need less is left to the clamp; the Framework clamp is the last resort */
 var wr = e.parentElement.hasAttribute('data-sw-lw') ? e.parentElement : e, ic = wr.previousElementSibling, ib = ic && ic.getBoundingClientRect(), ip = ic && ic.querySelector('path'); if (!ib || !ib.height || !ip) return;
 e.style.transform = ''; e.style.color = getComputedStyle(ip).color;
 var n = e.querySelector('text') || e, cs = getComputedStyle(n), kk = (e.offsetWidth && e.getBoundingClientRect().width / e.offsetWidth) || 1, ik = ((ic.querySelector('[data-sw-ink]') || ic).getAttribute('data-sw-ink') || '0,1').split(',').map(Number), rr = document.createRange();
@@ -426,6 +416,7 @@ var W = 56, HH = 100, T = 13, G = 14, x = 0, body = '', post = false, DK = 0.58,
 var ip = (/^-?\d*/.exec(str) || [''])[0], idg = ip.replace('-', '').length, neg = ip.charAt(0) === '-';
 if (al) x = (al.n - idg) * (W + G);
 else if (idg < 2 && !neg && !tr) x += W + G;   /* tr: the outdoor readout beside its icons drops the empty cell */
+var nsv = 0;
 for (var i = 0; i < str.length; i++) {
 var ch = str.charAt(i);
 // Owner 2026-11-15 ("-12" showed as "-  12"): the minus ends 0.3 gaps before the ink of the first digit (a 1 has its ink on the right of its cell), so no empty cell sits between them; the width stays the LCD cells'.
@@ -436,10 +427,12 @@ if (ch === '°') { post = false; body += '<circle cx="' + (x + 9 + (al ? al.dr |
 var kk = post ? DK : 1, w = (ch === '-' ? 46 : W) * kk, nar = !al && ch === '1', on = GLYPH[ch] || '', sh = shapes(nar ? x - (w - T * kk) : x, w, HH * kk, T * kk), gb = '';   /* B33 (owner 2026-11-16): a 1 in the main temperature takes a narrow cell of its own ink (two right segments), so 21.6 and 12.8 read as one number; the week digits and the sun times keep their cells */
 'abcdefg'.split('').forEach((s) => { if (on.indexOf(s) >= 0) gb += poly(sh[s]); });
 body += '<g data-sw-glyph="' + ch + '"' + (post ? ' data-sw-dec transform="translate(0 ' + n1(HH * (1 - DK)) + ')"' : '') + '>' + gb + '</g>';
+if (nar && !(tr && !i)) nsv += w - T * kk;   /* the width a narrow 1 saves over the full cell (a leading 1 of a readout beside its icons was already trimmed): the big console's fit counts it as taken, so its digits keep their size */
 x += (nar ? T * kk : w) + G;
 }
 var vw = al ? al.n * (W + G) + 22 + (al.dr || 0) : Math.max(1, x - G - lead);
-return svg(H * vw / HH, H, glow(body, GPX * HH / H), (lead ? lead : 0) + ' 0 ' + vw + ' ' + HH);
+var dsv = svg(H * vw / HH, H, glow(body, GPX * HH / H), (lead ? lead : 0) + ' 0 ' + vw + ' ' + HH);
+return nsv > 0 ? dsv.replace('<svg', '<svg data-sw-nsave="' + n1(nsv * H / HH) + '"') : dsv;
 }
 function segtime(str, cap) {   /* B31 (owner 2026-11-16, review 3 C1): the sun times in the page's own 7-segment digits: fixed cells (a 1 is the cell's two right segments, as in the week digits), so the colons of the two times stand on one x; the cell gap is small (8 of 100), the colon two dots, no ghosts */
 var T = 12, W = 48, G = 8, HH = 100, s = String(str).trim();
@@ -926,7 +919,7 @@ var side = q('[data-sw-sgrp="side"]'), cue = box.hasAttribute('data-sw-nocue') ?
 if (scue) cue = null;   /* owner 2026-11-14: with an outdoor readout the clothing cue sits next to its tree icon */
 if (scE) scE.classList.toggle('hidden', !scue);
 var mrows = [].slice.call(box.querySelectorAll('[data-sw-srow="meter"]'));
-if (box.getAttribute('data-sw-nomr') === 'all' || (box.getAttribute('data-sw-nomr') === 'md' && !SWS[4])) mrows = [];   /* B33 variant: the meters are in the bottom block of the narrow views */
+if (box.hasAttribute('data-sw-nomr') && !SWS[4]) mrows = [];   /* B33: on the OG half vertical the meters are in the bottom block, under tomorrow */
 var cs = getComputedStyle(cond), fam = cs.fontFamily, wt = cs.fontWeight;
 var ct = cond.getAttribute('data-sw-t0'); if (ct === null) { ct = cond.textContent.trim(); cond.setAttribute('data-sw-t0', ct); }
 var lht = lh ? lh.getAttribute('data-sw-slohi').split('|') : null;
@@ -1114,9 +1107,10 @@ var kids = [].filter.call(row.children, function (c) { return c.getBoundingClien
 var col = rs.flexDirection.indexOf('column') === 0, need = col ? kids.reduce(function (a, c) { return Math.max(a, w(c)); }, 0) : kids.reduce(function (a, c) { return a + w(c); }, 0) + gap * (kids.length - 1), avail = Math.min(row.clientWidth - parseFloat(rs.paddingLeft) - parseFloat(rs.paddingRight), row.parentElement.clientWidth) - (row.querySelector(':scope > [data-sw-part="cue"]') ? gap : 0);
 var h = function (e) { return e.getBoundingClientRect().height / k; };
 var cu = row.querySelector(':scope > [data-sw-part="cue"]'); if (cu && !cu.getBoundingClientRect().width) cu = null;
+var sv0 = t.querySelector('svg'), nsp = sv0 && h(sv0) ? (+sv0.getAttribute('data-sw-nsave') || 0) * h(sv0) / (+sv0.getAttribute('height') || h(sv0)) : 0; need += nsp;   /* B33: the narrow 1's saving stays taken, the digits keep the size they had */
 if (!g.hasAttribute('data-sw-h0')) { if (need <= avail + 0.5) return; g.setAttribute('data-sw-h0', h(g)); }
 var hs = function (e) { var v = e && e.querySelector('svg'); return v ? h(v) : 0; }, gr = +g.getAttribute('data-sw-h0') / (hs(t) || 1);
-var tw = w(t.querySelector('svg')) * gr, bw = cu && !col ? w(cu) * gr : 0; need += tw - w(t.querySelector('svg')) + (bw ? bw - w(cu) : 0);
+var tw = (w(t.querySelector('svg')) + nsp) * gr, bw = cu && !col ? w(cu) * gr : 0; need += tw - w(t.querySelector('svg')) - nsp + (bw ? bw - w(cu) : 0);
 if (!tw) return;
 var ex = w(g) - w(t.querySelector('svg')), f = col ? Math.min(1, Math.max(0.4, (avail - 1 - ex) / tw)) : Math.min(1, Math.max(0.4, (tw + bw - (need - avail) - 1) / (tw + bw)));
 function set(e, v, p) { if (Math.abs(h(e) - v) > 0.3) { e.style.setProperty('height', px(v, 1), 'important'); if (swRepaint) swRepaint(p); } }

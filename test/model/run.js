@@ -343,6 +343,11 @@ test('the try-it page offers exactly the options of settings.yml for every selec
   }
   ok(n >= 4 && wk, 'the check saw ' + n + ' selects (week_style among them)');
 });
+test('BARO balance bar (owner 2026-11-16): bands 1001 / 1009 / 1017 / 1025 hPa, no lamp, same geometry as the indoor humidity', () => {
+  const st = (p) => { const x = D.meter({ key: 'baro', frac: p === null ? null : (p - 970) / 80 }, 300, 20, 10), on = x.split('<g data-sw-on data-sw-st="a">')[1] || ''; return [...on.matchAll(/data-sw-c="(\d)"/g)].map((m) => +m[1]); };
+  eq([985, 1000, 1001, 1005, 1008, 1009, 1013, 1017, 1018, 1025, 1026, 1032].map(st), [[0, 1], [0, 1], [1], [1], [1], [], [], [], [3], [3], [3, 4], [3, 4]], 'under 1001 two left, 1001 to under 1009 one left, 1009 to 1017 none, over 1017 one right, over 1025 two right');
+  eq(st(null), [], 'no pressure: nothing lit'); ok(/data-sw-bt/.test(D.meter({ key: 'baro', frac: 0.5 }, 300, 20, 10)), 'the centre tick');
+});
 test('rain calendar: 12 hours from the first wet hour, rain hours lit', () => {
   const hrs = Array.from({ length: 25 }, (_, i) => ({ h: String(i).padStart(2, '0') }));
   const c = T.rainHours(hrs, { from: 5, to: 7 });
