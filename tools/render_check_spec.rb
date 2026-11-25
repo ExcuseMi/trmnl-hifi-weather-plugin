@@ -491,6 +491,12 @@ if(BETWEEN){p.querySelectorAll('[data-sw-rule]').forEach(function(e){var r=e.get
         puts "BAND #{c['name']}: #{band}" unless band.empty?
         expect(band).to eq('')
       end
+      # B33 (owner 2026-11-25): an OG portrait half vertical shows the day rows (or the hours strip), never the tomorrow + meters block (tall narrow meter boxes)
+      if c['view'] == 'half_vertical' && !is_lg && s.evaluate("document.querySelector('.screen').classList.contains('screen--portrait')")
+        pv = s.evaluate(%q{(function(){var v=function(e){var b=e.getBoundingClientRect();return b.width>0&&b.height>0};var mb=[].filter.call(document.querySelectorAll('[data-sw-mb]'),v).length,dr=[].filter.call(document.querySelectorAll('[data-sw-row="day"]'),v).length,hs=[].filter.call(document.querySelectorAll('[data-sw-hours]'),v).length;return (mb?'meter block shown; ':'')+(dr<3&&!hs?'day rows '+dr:'')})()})
+        puts "PORTHV #{c['name']}: #{pv}" unless pv.empty?
+        expect(pv).to eq('')
+      end
       # OG portrait (owner 2026-11-13, "portrait for the OG is still broken"): a well-filled tall layout, not landscape
       # pieces squeezed. Icons (condition, rain, moon, sun) have drawn ink at least 0.8 x the cap height
       # of the text beside them; no empty band over 12 % of the panel height inside the console, the days
