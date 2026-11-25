@@ -276,7 +276,7 @@ function swNameFit() {
 var cx = swCv();
 document.querySelectorAll('[data-sw-slab]').forEach(function (e) {
 var b = e.getBoundingClientRect(); if (!b.width || !b.height) return;
-if (e.parentElement.hasAttribute('data-sw-lw')) { var fs0 = e.style.fontSize, wa = e.parentElement.clientWidth; if (fs0 && fs0 === e.getAttribute('data-sw-fsa')) fs0 = e.getAttribute('data-sw-fs0'); if (fs0 && wa > 0) {   /* a size this function set itself is never shrunk again: it starts from the size the layout gave (b13 long label went 3 times 0.6) */ cx.font = getComputedStyle(e).fontWeight + ' ' + parseFloat(fs0) + 'px ' + getComputedStyle(e).fontFamily; var tw0 = cx.measureText(e.getAttribute('data-clamp-original') || e.textContent).width; if (tw0 > wa) { var fk = 0.98 * wa / tw0, tq = e.parentElement.parentElement.parentElement.lastElementChild, sq = fk < 0.85 && tq && !tq.hasAttribute('data-sw-mw') && tq.querySelector('svg[data-sw-nsave]'); if (sq) { var gx = Math.min(+sq.getAttribute('data-sw-nsave') * sq.getBoundingClientRect().height / sq.getAttribute('height') / ((e.offsetWidth && b.width / e.offsetWidth) || 1), tw0 / 0.98 - wa); if (0.98 * (wa + gx) / tw0 >= 0.85) { tq.setAttribute('data-sw-mw', '1'); tq.style.minWidth = (tq.clientWidth + gx).toFixed(1) + 'px'; wa = e.parentElement.clientWidth; fk = 0.98 * wa / tw0; } }   /* B33: the readout gives the label back the room its narrow 1 saved (b20 SCHLAFZIMMER, whole before the narrow 1) */ if (fk >= 0.85) { e.setAttribute('data-sw-fs0', fs0); e.style.fontSize = (fk * parseFloat(fs0)).toFixed(2) + 'px'; e.setAttribute('data-sw-fsa', e.style.fontSize); b = e.getBoundingClientRect(); } else if (0.95 * tw0 * 1.02 > 1.4 * wa) { if (e.style.fontSize !== fs0) e.style.fontSize = fs0; } else { var tpd = e.parentElement.parentElement.parentElement.lastElementChild, ex = 0.95 * tw0 * 1.02 - wa; /* B33: the narrow 1 leaves the label less room than its floor: the readout grows to the label at 0.95 of its size */ if (tpd && ex > 0 && !tpd.hasAttribute('data-sw-mw')) { tpd.setAttribute('data-sw-mw', '1'); tpd.style.minWidth = (tpd.clientWidth + ex).toFixed(1) + 'px'; } e.setAttribute('data-sw-fs0', fs0); e.style.fontSize = (0.95 * parseFloat(fs0)).toFixed(2) + 'px'; e.setAttribute('data-sw-fsa', e.style.fontSize); b = e.getBoundingClientRect(); } } else if (e.style.fontSize !== fs0) { e.style.fontSize = fs0; } } }   /* B31: the narrower digits (smaller tenths) leave the sensor label less room: it shrinks to fit, never under 0.85 of its size (B20: the label's caps stay over 0.35 of the icon); a label that would need less is left to the clamp; the Framework clamp is the last resort */
+if (e.parentElement.hasAttribute('data-sw-lw')) { var fs0 = e.style.fontSize, wa = e.parentElement.clientWidth; if (fs0 && fs0 === e.getAttribute('data-sw-fsa')) fs0 = e.getAttribute('data-sw-fs0'); if (fs0 && wa > 0) {   /* a size this function set itself is never shrunk again: it starts from the size the layout gave (b13 long label went 3 times 0.6) */ cx.font = getComputedStyle(e).fontWeight + ' ' + parseFloat(fs0) + 'px ' + getComputedStyle(e).fontFamily; var tw0 = cx.measureText(e.getAttribute('data-clamp-original') || e.textContent).width; if (tw0 > wa) { var fk = 0.98 * wa / tw0, tq = e.parentElement.parentElement.parentElement.lastElementChild, sq = fk < 0.85 && tq && !tq.hasAttribute('data-sw-mw') && tq.querySelector('svg[data-sw-nsave]'); if (sq) { var gx = Math.min(+sq.getAttribute('data-sw-nsave') * sq.getBoundingClientRect().height / sq.getAttribute('height') / (b.width / e.offsetWidth || 1), tw0 / 0.98 - wa); if ((wa + gx) / tw0 >= 0.85 / 0.98) { tq.setAttribute('data-sw-mw', '1'); tq.style.minWidth = tq.clientWidth + gx + 'px'; fk = 0.98 * (wa = e.parentElement.clientWidth) / tw0; } }   /* B33: the readout gives the label back the room its narrow 1 saved (b20 SCHLAFZIMMER, whole before the narrow 1) */ if (fk >= 0.85) { e.setAttribute('data-sw-fs0', fs0); e.style.fontSize = (fk * parseFloat(fs0)).toFixed(2) + 'px'; e.setAttribute('data-sw-fsa', e.style.fontSize); b = e.getBoundingClientRect(); } else if (e.style.fontSize !== fs0) { e.style.fontSize = fs0; } } else if (e.style.fontSize !== fs0) { e.style.fontSize = fs0; } } }   /* B31: the narrower digits (smaller tenths) leave the sensor label less room: it shrinks to fit, never under 0.85 of its size (B20: the label's caps stay over 0.35 of the icon); a label that would need less is left to the clamp; the Framework clamp is the last resort */
 var wr = e.parentElement.hasAttribute('data-sw-lw') ? e.parentElement : e, ic = wr.previousElementSibling, ib = ic && ic.getBoundingClientRect(), ip = ic && ic.querySelector('path'); if (!ib || !ib.height || !ip) return;
 e.style.transform = ''; e.style.color = getComputedStyle(ip).color;
 var n = e.querySelector('text') || e, cs = getComputedStyle(n), kk = (e.offsetWidth && e.getBoundingClientRect().width / e.offsetWidth) || 1, ik = ((ic.querySelector('[data-sw-ink]') || ic).getAttribute('data-sw-ink') || '0,1').split(',').map(Number), rr = document.createRange();
@@ -511,6 +511,7 @@ function hscale(all, nc) {
 var ts = (all || []).slice(0, nc || (all || []).length).map((q) => q && q.tV).filter((v) => v !== null && v !== undefined).map(Math.round);
 return ts.length ? { a: Math.min(...ts) - 1, b: Math.max(...ts) } : null;
 }
+function frame(x, y, w, h, t) { return '<path data-sw-frost fill-rule="evenodd" d="M' + n1(x) + ' ' + n1(y) + 'h' + n1(w) + 'v' + n1(h) + 'h' + n1(-w) + 'zM' + n1(x + t) + ' ' + n1(y + t) + 'v' + n1(h - 2 * t) + 'h' + n1(w - 2 * t) + 'v' + n1(2 * t - h) + 'z"/>'; }   /* a hollow block: outer box minus inner box */
 function hper(hs, cap) { return Math.max(1, Math.ceil(Math.max(1, hs.b - hs.a) / cap)); }
 function hlevels(hs, C) {
 var steps = Math.max(1, hs.b - hs.a), cap = Math.max(1, Math.min(6, Math.floor(C / 6))), per = hper(hs, cap);
@@ -520,24 +521,25 @@ function hgeo(all, W, H) {   /* the hours strip's one geometry, for the bars and
 var hs = hscale(all, API.hcols), HH = API.hbarH || H, lw = 2, o;
 (all || []).slice(0, API.hcols || (all || []).length).forEach((q) => { if (q && q.tV !== null && q.tV !== undefined) lw = Math.max(lw, String(q.t).length); });   /* the longest label of the shown hours: one size and one reserve for every column, so the 0 line is one height */
 var fs = Math.max(8, Math.min(W / (lw * 0.62), HH * 0.2, 30)), R = Math.round(fs * 1.45) + 3, C = Math.min(H, HH) - R;
-o = { hs: hs, fs: fs, C: C, below: !!hs && hs.a + 1 < 0 };
+o = { hs: hs, fs: fs, C: C, R: R, below: !!hs && hs.a + 1 < 0 };
 if (!o.below) return o;
-var cap = Math.max(2, Math.min(6, Math.floor(C / 6))), per = 1, U, D, bD = -(hs.a + 1);   /* B31 hours (owner 2026-11-16): bars from the 0 line, up for 0 and more (a nub at 0), down below it, one block per degree while they fit */
+var Rb = Math.round(fs * 1.05) + 3; R = Math.round(fs * 1.3) + 3; C = Math.min(H, HH) - R - Rb; o.R = R; o.C = C; o.Rb = Rb;   /* frost strip (owner 2026-11-25): a second label row under the blocks, so the + labels sit in one row above the zero area and the - labels in one row below it */
+var cap = Math.max(2, Math.min(6, Math.floor(C / 8))), per = 1, U, D, bD = -(hs.a + 1);   /* B31 hours (owner 2026-11-16): blocks from the 0 line, up for 1 and more, down below it, one block per degree while they fit */
 for (; per < 100; per++) { U = hs.b <= 0 ? 0 : Math.ceil(hs.b / per); D = Math.ceil(bD / per); if (U + D <= cap) break; }
-o.per = per; o.U = U; o.D = D; o.e = 1.5; o.lh = (C - 2 * o.e) / (U + D); o.y0 = H - C + U * o.lh + o.e;
+o.per = per; o.U = U; o.D = D; o.e = 1.5; o.lh = (C - 2 * o.e) / (U + D); o.top = H - Rb - C; o.y0 = o.top + U * o.lh + o.e; o.bot = o.y0 + D * o.lh + o.e;
 return o;
 }
 function hbar(q, hs0, W, H, hi, all) {
 var G = hgeo(all, W, H), hs = G.hs || hs0;
 if (!q || q.tV === null || q.tV === undefined || !hs) return svg(W, H, '');
 var fs = G.fs, C = G.C, cells = '', n, ty, fill = blk(hi);   /* no offset shadows; the current hour black, the others the meters' dark grey on 2-bit and 4-bit (owner 2026-11-16 withdrew the black bars on 2-bit), black on 1-bit */
-if (G.below) {
-var v = Math.round(q.tV), up = v >= 0, lh = G.lh, gp = Math.max(2, lh * 0.2), top;
-n = up ? Math.ceil(v / G.per) : Math.ceil(-v / G.per);   /* 0 draws no segment (its label stands on the line); the bars start at the first degree in both directions */
-for (var k = 0; k < n; k++) cells += rect(0, up ? G.y0 - G.e - (k + 1) * lh + gp / 2 : G.y0 + G.e + k * lh + gp / 2, W, lh - gp, 2);
-top = n > 0 && up ? G.y0 - G.e - n * lh + gp / 2 : G.y0 - G.e - gp / 2;   /* a value below 0 has its label above the line, clear of it */
-ty = top - 3 - fs * 0.36;
-return svg(W, H, '<g data-sw-cells="' + n + '" data-sw-area="' + n1(G.U * lh) + '"' + (v >= 0 ? '' : ' data-sw-below="1"') + '>' + g(fill, cells) + '</g>' + text(W / 2, ty, q.t, fs, 'middle', 0, ' data-sw-htemp'));
+if (G.below) {   /* one 0 line: blocks up for + (same size per degree), a thin ink bar on the line for 0, outlined blocks down for frost; + and 0 labels in one row above the zero area, frost labels in one row below it */
+var v = Math.round(q.tV), up = v > 0, lh = G.lh, gp = Math.max(2, lh * 0.2);
+n = Math.ceil(Math.abs(v) / G.per);
+for (var k = 0; k < n; k++) cells += up ? rect(0, G.y0 - G.e - (k + 1) * lh + gp / 2, W, lh - gp) : frame(0, G.y0 + G.e + k * lh + gp / 2, W, lh - gp, 2);
+if (!up) fill = blk(true);   /* frost outlines in the full ink (dark mode: the brightest grey), the filled blocks keep their grey; drawn as a filled frame, not a stroke, so they take the same paint (pattern or colour) as every other block */
+ty = v < 0 ? G.bot + 3 + fs * 0.8 : G.top - 3 - fs * 0.36;
+return svg(W, H, '<g data-sw-cells="' + n + '" data-sw-area="' + n1(G.U * lh) + '"' + (v >= 0 ? '' : ' data-sw-below="1"') + '>' + g(fill, cells) + '</g>' + (v === 0 ? rect(0, G.y0 - 2, W, 4, 1, ' data-sw-zero' + (blk(true) ? ' class="' + blk(true) + '"' : '')) : '') + text(W / 2, ty, q.t, fs, 'middle', 0, ' data-sw-htemp'));
 }
 var L = hlevels(hs, C), per = hper(hs, Math.max(1, Math.min(6, Math.floor(C / 6))));
 n = Math.max(1, Math.min(L, per > 1 ? Math.ceil((Math.round(q.tV) - hs.a) / per) : Math.round((Math.round(q.tV) - hs.a) / (hs.b - hs.a) * L)));
