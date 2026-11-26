@@ -10,6 +10,7 @@ for f in "$@"; do
   if [ -z "$sums" ]; then echo "RED $f: no rspec summary" >&2; bad=1; continue; fi
   if echo "$sums" | grep -qvE ' 0 failures'; then echo "RED $f: $(echo "$sums" | tr '\n' ' ')" >&2; bad=1; fi
   if grep -qE '^rspec .*#' "$f"; then echo "RED $f: failed examples listed" >&2; bad=1; fi
+  if grep -qE 'errors? occurred outside of examples' "$f"; then echo "RED $f: error outside of examples (an after(:all) spread check such as DIALR or CONDRATIO)" >&2; bad=1; fi
 done
 [ $bad -eq 0 ] && echo GREEN
 exit $bad
