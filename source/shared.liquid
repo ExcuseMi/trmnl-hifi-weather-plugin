@@ -388,6 +388,7 @@ var f = tok && API.paint ? API.paint(tok) : null, at = '';
 if (f && f.url && f.size) { var id = 'swp' + (K++); DEFS += '<pattern id="' + id + '" patternUnits="userSpaceOnUse" width="' + f.size + '" height="' + f.size + '">' + (f.color ? '<rect width="' + f.size + '" height="' + f.size + '" fill="' + f.color + '"/>' : '') + '<image href="' + f.url + '" width="' + f.size + '" height="' + f.size + '"/></pattern>'; at = ' fill="url(#' + id + ')"' + (f.color ? ' color="' + f.color + '"' : ''); }
 else if (f && f.color) at = ' fill="' + f.color + '" color="' + f.color + '"';
 else if (tok) keep.push('text--' + tok);
+if (at) keep = keep.filter((c) => c.indexOf('dark:text--') !== 0);   /* painted: a dark: class would set color to the Framework's transparent dither text and blank the currentColor digits (dark OG: the week's MIN row was invisible, owner 2026-11-26) */
 return '<g' + (keep.length ? ' class="' + keep.join(' ') + '"' : '') + at + '>' + body + '</g>';
 }
 function hue(tok) {

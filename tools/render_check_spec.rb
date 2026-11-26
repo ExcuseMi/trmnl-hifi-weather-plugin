@@ -890,6 +890,10 @@ var td=document.querySelector('[data-sw-today]');if(td&&td.getBoundingClientRect
 return bad.slice(0,4).join('; ');})()})
       puts "OGLOOK #{c['name']}: #{ogl}" unless ogl.empty?
       expect(ogl).to eq('')
+      # Digital week ink (owner 2026-11-26, dark OG: the MIN row was invisible): every drawn digit of a visible Digital day has a fill that is not transparent.
+      wdk = s.evaluate(%q{(function(){var bad=[];document.querySelectorAll('[data-sw-part="wday"][data-sw-ws="dig"]').forEach(function(d){if(!d.getBoundingClientRect().width)return;d.querySelectorAll('[data-sw-glyph] polygon').forEach(function(p){var f=getComputedStyle(p).fill;if(f==='none'||/rgba\(.*, 0\)$/.test(f)||f==='transparent')bad.push(f)})});return bad.length?bad.length+' digit parts without ink ('+bad[0]+')':''})()})
+      puts "WDINK #{c['name']}: #{wdk}" unless wdk.empty?
+      expect(wdk).to eq('')
       # B31 hours (owner 2026-11-16): no offset shadow on the bars, black bars on 2-bit and 1-bit, and an hour below 0 draws one unbroken 0 line
       # across the strip with the bars below 0 hanging down from it (others up), labels clear of the line.
       hz = s.evaluate(%q{(function(){var bad=[],cs=[].filter.call(document.querySelectorAll('[data-sw-part="hbar"]'),function(e){return e.getBoundingClientRect().width>0});if(!cs.length)return '';
