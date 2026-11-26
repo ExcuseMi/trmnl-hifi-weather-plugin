@@ -96,6 +96,7 @@ RSpec.describe 'renders' do
       is_lg = s.evaluate("!!document.querySelector('.screen--lg')")   # the X layouts follow the lg size class, not the model name (device tier, 2026-11-13)
       # a native portrait screen (reMarkable, Poke 5) runs with no orientation but takes the portrait layouts (B12): the portrait checks follow the layout
       is_port = s.evaluate("!!document.querySelector('.screen--portrait')")
+      puts "EVAL #{c['name']}: #{s.evaluate(ENV['SW_EVAL'])}" if ENV['SW_EVAL']   # debugging: any page expression
       puts "SCREEN #{c['name']}: #{s.evaluate("document.querySelector('.screen').className+' '+innerWidth")}" if ENV['SW_SCREEN']
       FileUtils.mkdir_p(out)
       FileUtils.cp(s.png_path, File.join(out, "#{c['name']}.png"))
@@ -155,7 +156,8 @@ if(b.width>0&&b.height>0&&b.left<L.right-1&&b.right>L.left+1&&b.top<L.bottom-1&&
       cr0 = s.evaluate(%q{(function(){var v=function(e){var b=e&&e.getBoundingClientRect();return b&&b.width>0&&b.height>0},c=[].filter.call(document.querySelectorAll('[data-sw-cond]'),v)[0],h=function(e){return e.getBBox().height*e.getBoundingClientRect().height/(e.viewBox.baseVal.height||1)},te=[].filter.call(document.querySelectorAll('[data-sw-part="temp"] svg,[data-sw-part="itemp"] svg'),v).sort(function(a,b){return h(b)-h(a)})[0];if(!c||!te)return '';var ti=h(te),fz=(+c.getAttribute('data-sw-fs')||parseFloat(getComputedStyle(c).fontSize))*(c.getBoundingClientRect().width/(c.offsetWidth||1));return String(fz/ti)})()})
       puts "CONDR #{c[%q(name)]}: #{cr0}"
       # group: the console that is on screen (a narrow full view, og-devsize, shows the small one)
-      COND_R[[dev.is_a?(Hash) ? dev[:model] : dev, c['orientation'], c['text_scale'], c['fixture'], c['dark'] ? 1 : 0, s.evaluate('!!SW.inn'), c['want_nowear'] ? 'nowear' : 'wear', (c['fields'] || {})['week_style'] == 'digital' ? 'digrows' : 'auto', c['co2'] ? 'co2' : 'noco2',   # review 4 B1: the digits of a portrait screen with a CO2 row fit the height left, a group of their own
+      COND_R[[dev.is_a?(Hash) ? dev[:model] : dev, dev.is_a?(Hash) ? dev[:screen_classes].to_s[/screen--fonts-\w+/] : nil, c['orientation'],   # the classic fonts (OG look) are a group of their own
+         c['text_scale'], c['fixture'], c['dark'] ? 1 : 0, s.evaluate('!!SW.inn'), c['want_nowear'] ? 'nowear' : 'wear', (c['fields'] || {})['week_style'] == 'digital' ? 'digrows' : 'auto', c['co2'] ? 'co2' : 'noco2',   # review 4 B1: the digits of a portrait screen with a CO2 row fit the height left, a group of their own
            # review 3 A1: an explicit Digital week on a portrait X has a smaller console (taller rows), its own group
          s.evaluate("[].some.call(document.querySelectorAll('[data-sw-console][data-sw-small]'),function(e){return e.getBoundingClientRect().width>0})") ? 'small' : 'big']] << [c['name'], cr0.to_f, c['view'] || 'full'] unless cr0.empty? || (c['fields'] || {})['unit'] == 'fahrenheit' || c['name'].start_with?('wide-')   # wide numbers shrink their digits (fit rule), the ratio is for normal values
       DIAL_R[[dev.is_a?(Hash) ? dev[:model] : dev, c['view'] || 'full', c['orientation'], c['text_scale']]] << [c['name'], rw.split.map(&:to_f).min] unless rw.empty?
@@ -879,6 +881,15 @@ v.forEach(function(o){if(o.n===0&&Math.round(o.t)!==0)bad.push(o.t+': no block')
 var top=v.reduce(function(m,o){return o.t>m.t?o:m},v[0]);if(top&&top.g&&top.n>0){   /* all hours below 0: nothing above the line to fill */var C=+top.g.getAttribute('data-sw-area'),r=[].map.call(top.g.querySelectorAll('rect, path'),function(x){return x.getBoundingClientRect()}),h=r.length?Math.max.apply(null,r.map(function(x){return x.bottom}))-Math.min.apply(null,r.map(function(x){return x.top})):0;if(h<0.8*C-8)bad.push('warmest stack '+h.toFixed(0)+' of '+C.toFixed(0));}
 return bad.slice(0,4).join('; ');})()})
       puts "HCURVE #{c['name']}: #{hc}" unless hc.empty?
+      # OG look (owner 2026-11-26, live OG with TRMNL's classic fonts): on md screens the hours' temperatures and the Digital week's captions are
+      # drawn in the small title font at its own size (a pixel font at another size drew "0" and the degree sign broken), and today's name
+      # in the Digital week sits at least 4 px under the low digits of its column (it touched the "-3").
+      ogl = s.evaluate(%q{(function(){var sc=document.querySelector('.screen');if(sc.classList.contains('screen--lg'))return '';var bad=[],sp=document.createElement('span');sp.className='title title--small';sp.textContent='0';(document.querySelector('.view')||sc).appendChild(sp);var cs=getComputedStyle(sp),fam=cs.fontFamily.replace(/["']/g,''),fz=parseFloat(cs.fontSize);sp.remove();
+document.querySelectorAll('[data-sw-htemp], [data-sw-part="wlab"][data-sw-ws="dig"] text').forEach(function(t){if(!t.getBoundingClientRect().width)return;var c=getComputedStyle(t),f=c.fontFamily.replace(/["']/g,''),z=parseFloat(t.getAttribute('font-size'));if(f!==fam||Math.abs(z-fz)>0.1)bad.push((t.textContent||'').trim()+' '+f+' '+z)});
+var td=document.querySelector('[data-sw-today]');if(td&&td.getBoundingClientRect().width){var col=td.closest('[data-sw-wcol]'),w=col&&col.querySelector('[data-sw-part="wday"][data-sw-ws="dig"] svg');if(w){var lo=[].map.call(w.querySelectorAll('svg polygon, svg path, svg rect, svg circle'),function(e){return e.getBoundingClientRect().bottom});var gap=td.getBoundingClientRect().top-Math.max.apply(null,[0].concat(lo));if(lo.length&&gap<4)bad.push('today '+gap.toFixed(1)+' px under the low')}}
+return bad.slice(0,4).join('; ');})()})
+      puts "OGLOOK #{c['name']}: #{ogl}" unless ogl.empty?
+      expect(ogl).to eq('')
       # B31 hours (owner 2026-11-16): no offset shadow on the bars, black bars on 2-bit and 1-bit, and an hour below 0 draws one unbroken 0 line
       # across the strip with the bars below 0 hanging down from it (others up), labels clear of the line.
       hz = s.evaluate(%q{(function(){var bad=[],cs=[].filter.call(document.querySelectorAll('[data-sw-part="hbar"]'),function(e){return e.getBoundingClientRect().width>0});if(!cs.length)return '';

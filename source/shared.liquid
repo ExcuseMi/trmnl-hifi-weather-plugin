@@ -40,6 +40,7 @@
 {%- assign q1 = 5 | times: wm | round %}{% assign q2 = 23 | times: wm | round %}{% assign q3w = 26 %}{% if ui.rain %}{% assign q3w = 23 %}{% endif %}{% assign q3 = q3w | times: wl | round %}{% assign q4 = 30 | times: wm | round | at_most: 100 %}{% assign ru_cls = 'flex--row lg:portrait:flex--col' %}{% assign su_cls = 'flex--row' %}{% assign q6b = 20 %}{% if stk %}{% assign q6b = 15 %}{% assign ru_cls = 'flex--col lg:flex--row' %}{% endif %}{% assign q6 = q6b | times: wm | round %}{% assign rg_m = 'w--[' | append: q6 | append: 'cqw]' %}{% assign rc_w = 'w--[' | append: q2 | append: 'cqw] lg:w--[' | append: q3 | append: 'cqw] lg:portrait:gap--xsmall' %}{% assign rule_w = 'w--[' | append: q4 | append: 'cqw]' %}
 {%- if stk %}{% assign rgw_l = 15 %}{% assign su_cls = 'flex--row' %}{% assign rc_w = 'w--[40cqw] lg:w--[37cqw] shrink-0' %}{% assign rule_w = 'w--full' %}{% assign tf = 0.7 %}{% assign mh_l = 0.4 %}{% if ui.rain %}{% assign su_cls = 'hidden lg:flex flex--row' %}{% assign sep_cls = ' hidden lg:block' %}{% endif %}{% if view == 3 %}{% assign su_cls = 'flex--row' %}{% assign sep_cls = '' %}{% assign ru_cls = 'flex--row' %}{% assign rc_w = 'w--[44cqw] lg:w--[37cqw] lg:portrait:w--[42cqw] shrink-0' %}{% endif %}{% endif %}
 {%- if view <= 2 %}{% assign ru_cls = 'flex--row' %}{% endif %}{% comment %} X full and half horizontal {% endcomment %}
+{%- if view == 1 and ui.rain == nil %}{% assign su_cls = 'flex--col lg:flex--row' %}{% endif %}{% comment %} OG look (owner 2026-11-26): on the OG full view without rain the moon sits above the sun times, so the times take the column's width and its larger title size {% endcomment %}
 {%- if calm_q %}{% assign rc_w = 'w--[33cqw] lg:w--[39cqw] lg:portrait:w--full shrink-0' %}{% assign rg_m = 'w--[31cqw]' %}{% endif %}
 {%- if tf == nil %}{% assign tf = 1 %}{% endif %}{% assign tm = tf %}{% if view == 3 %}{% assign tm = 1 %}{% endif %}
 {%- if view == 4 and ui.rain == nil %}{% assign n_lg = 3 %}{% endif %}{% comment %} X quadrant without rain {% endcomment %}
@@ -398,6 +399,8 @@ return ok ? f.color : null;
 }
 function hg(tok, body) { return '<g data-sw-hue="' + tok + '">' + g('text--' + tok, body) + '</g>'; }
 function circ(x, y, r, ex) { return '<circle cx="' + n1(x) + '" cy="' + n1(y) + '" r="' + n1(r) + '"' + (ex || '') + '/>'; }
+function sft(fs) { return !API.lg && API.sf && fs >= API.sf.s * 0.6 && fs <= API.sf.s * 1.3; }   /* a small label on an md screen: snap to the small title font */
+function stext2(x, y, s, fs, anc, bl, extra) { return sft(fs) ? text(x, y, s, API.sf.s, anc, bl, ' font-family="' + API.sf.f + '" data-sw-sf' + (extra || '')).replace('font-weight="700"', 'font-weight="' + API.sf.w + '"') : text(x, y, s, fs, anc, bl, extra); }
 function text(x, y, s, fs, anc, bl, extra) { return '<text x="' + n1(x) + '" y="' + n1(y) + '" font-size="' + n1(fs) + '" font-weight="700" text-anchor="' + (anc || 'middle') + '"' + (bl ? ' dominant-baseline="' + bl + '"' : '') + (extra || '') + '>' + s + '</text>'; }
 function svg(W, H, body, vb) { var d0 = DEFS; DEFS = ''; return svg0(W, H, body, vb, d0); }
 function svg0(W, H, body, vb, DEFS) { return '<svg xmlns="http://www.w3.org/2000/svg" ' + wh(W, H) + ' viewBox="' + (vb || '0 0 ' + n1(W) + ' ' + n1(H)) + '" fill="currentColor" overflow="visible"' + (API.font ? ' font-family="' + API.font.replace(/"/g, "'") + '"' : '') + '>' + (DEFS ? '<defs>' + DEFS + '</defs>' : '') + body + '</svg>'; }
@@ -519,10 +522,10 @@ return per > 1 ? Math.ceil(steps / per) : steps * Math.floor(cap / steps);
 function hgeo(all, W, H) {   /* the hours strip's one geometry, for the bars and the 0 line: label size, the stack area C, and (an hour below 0) the cells above and below the line */
 var hs = hscale(all, API.hcols), HH = API.hbarH || H, lw = 2, o;
 (all || []).slice(0, API.hcols || (all || []).length).forEach((q) => { if (q && q.tV !== null && q.tV !== undefined) lw = Math.max(lw, String(q.t).length); });   /* the longest label of the shown hours: one size and one reserve for every column, so the 0 line is one height */
-var fs = Math.max(8, Math.min(W / (lw * 0.62), HH * 0.2, 30)), R = Math.round(fs * 1.45) + 3, C = Math.min(H, HH) - R;
+var fs = Math.max(8, Math.min(W / (lw * 0.62), HH * 0.2, 30)), sn = sft(fs) && API.sf.s * lw * 0.62 <= W; if (sn) fs = API.sf.s; var R = Math.round(fs * (sn ? 1.2 : 1.45)) + 3, C = Math.min(H, HH) - R;   /* the snapped font: its own line box, a tighter row */
 o = { hs: hs, fs: fs, C: C, R: R, below: !!hs && hs.a + 1 < 0 };
 if (!o.below) return o;
-var Rb = Math.round(fs * 1.05) + 3; R = Math.round(fs * 1.3) + 3; C = Math.min(H, HH) - R - Rb; o.R = R; o.C = C; o.Rb = Rb;   /* frost strip (owner 2026-11-25): a second label row under the blocks, so the + labels sit in one row above the zero area and the - labels in one row below it */
+var Rb = Math.round(fs * (sn ? 0.95 : 1.05)) + 3; R = Math.round(fs * (sn ? 1.1 : 1.3)) + 3; C = Math.min(H, HH) - R - Rb; o.R = R; o.C = C; o.Rb = Rb;   /* frost strip (owner 2026-11-25): a second label row under the blocks, so the + labels sit in one row above the zero area and the - labels in one row below it */
 var cap = Math.max(2, Math.min(6, Math.floor(C / 8))), per = 1, U, D, bD = -(hs.a + 1);   /* B31 hours (owner 2026-11-16): blocks from the 0 line, up for 1 and more, down below it, one block per degree while they fit */
 for (; per < 100; per++) { U = hs.b <= 0 ? 0 : Math.ceil(hs.b / per); D = Math.ceil(bD / per); if (U + D <= cap) break; }
 o.per = per; o.U = U; o.D = D; o.e = 1.5; o.lh = (C - 2 * o.e) / (U + D); o.top = H - Rb - C; o.y0 = o.top + U * o.lh + o.e; o.bot = o.y0 + D * o.lh + o.e;
@@ -538,14 +541,14 @@ n = Math.ceil(Math.abs(v) / G.per);
 for (var k = 0; k < n; k++) cells += up ? rect(0, G.y0 - G.e - (k + 1) * lh + gp / 2, W, lh - gp) : frame(0, G.y0 + G.e + k * lh + gp / 2, W, lh - gp, 2);
 if (!up) fill = blk(true);   /* frost outlines in the full ink (dark mode: the brightest grey), the filled blocks keep their grey; drawn as a filled frame, not a stroke, so they take the same paint (pattern or colour) as every other block */
 ty = v < 0 ? G.bot + 3 + fs * 0.8 : G.top - 3 - fs * 0.36;
-return svg(W, H, '<g data-sw-cells="' + n + '" data-sw-area="' + n1(G.U * lh) + '"' + (v >= 0 ? '' : ' data-sw-below="1"') + '>' + g(fill, cells) + '</g>' + (v === 0 ? rect(0, G.y0 - 2, W, 4, 1, ' data-sw-zero' + (blk(true) ? ' class="' + blk(true) + '"' : '')) : '') + text(W / 2, ty, q.t, fs, 'middle', 0, ' data-sw-htemp'));
+return svg(W, H, '<g data-sw-cells="' + n + '" data-sw-area="' + n1(G.U * lh) + '"' + (v >= 0 ? '' : ' data-sw-below="1"') + '>' + g(fill, cells) + '</g>' + (v === 0 ? rect(0, G.y0 - 2, W, 4, 1, ' data-sw-zero' + (blk(true) ? ' class="' + blk(true) + '"' : '')) : '') + stext2(W / 2, ty, q.t, fs, 'middle', 0, ' data-sw-htemp'));
 }
 var L = hlevels(hs, C), per = hper(hs, Math.max(1, Math.min(6, Math.floor(C / 6))));
 n = Math.max(1, Math.min(L, per > 1 ? Math.ceil((Math.round(q.tV) - hs.a) / per) : Math.round((Math.round(q.tV) - hs.a) / (hs.b - hs.a) * L)));
 var lh2 = C / L, gp2 = Math.max(2, lh2 * 0.2);
 for (var k2 = 0; k2 < n; k2++) cells += rect(0, H - (k2 + 1) * lh2 + gp2 / 2, W, lh2 - gp2, 2);
 ty = H - n * lh2 + gp2 / 2 - 3 - fs * 0.36;
-return svg(W, H, '<g data-sw-cells="' + n + '" data-sw-area="' + n1(C) + '">' + g(fill, cells) + '</g>' + text(W / 2, ty, q.t, fs, 'middle', 0, ' data-sw-htemp'));
+return svg(W, H, '<g data-sw-cells="' + n + '" data-sw-area="' + n1(C) + '">' + g(fill, cells) + '</g>' + stext2(W / 2, ty, q.t, fs, 'middle', 0, ' data-sw-htemp'));
 }
 function hzero(SW, W, H) {   /* the hours' 0 line: one element across the strip, only when an hour is below 0 */
 var G = hgeo(SW.hours, API.hbarW || 0, API.hbarH || 0);
@@ -560,7 +563,7 @@ var n = 2;
 return { n: n };
 }
 function wdl(SW, W, H) {   /* the Digital layout: one box for every value (wal), the high digits' height from its width, the low ones 0.6 of it; xr = the right edge of the ones cell, one x for the high and the low row; shared by the column and the captions */
-var al = wal(SW), vw = al.n * 70 + 22, h1 = Math.min(H * (API.lg ? 0.5 : 0.55), W * (API.lg ? 0.8 : 0.94) * 100 / vw), h2 = h1 * 0.6, fr = H - h1 * 1.78, sp = fr > 0.45 * h1, y1 = sp ? fr * 0.3 : fr / 2;   /* tall and narrow column: the spare height is shared above, between and below the two rows (no big empty band) */
+var al = wal(SW), vw = al.n * 70 + 22, h1 = Math.min(H * (API.lg ? 0.5 : 0.48), W * (API.lg ? 0.8 : 0.94) * 100 / vw), h2 = h1 * 0.6, fr = H - h1 * 1.78, sp = fr > 0.45 * h1, y1 = sp ? fr * 0.3 : fr / 2;   /* tall and narrow column: the spare height is shared above, between and below the two rows (no big empty band) */
 return { h1: h1, h2: h2, y1: y1, y2: y1 + h1 * 1.18 + (sp ? fr * 0.4 : 0), al: al, xr: W / 2 + ((al.n - 1) * 70 + 56 - vw / 2) * h1 / 100 };
 }
 function wdig(s, h, L, y, lo) { var n = L.al.n, v = digits(s, h, 0, lo ? { n: n, dr: 13.5 * (L.h1 / L.h2 - 1) } : L.al); v = v.replace('<svg ', '<svg x="' + n1(L.xr - ((n - 1) * 70 + 56) * h / 100) + '" y="' + n1(y) + '" '); return lo ? g(blk(true), v) : v; }   /* the low row: ones cell right edge and degree sign left edge on the high row's */
@@ -570,7 +573,7 @@ if (d.hiV !== null && d.hiV !== undefined) body += wdig(d.hi, L.h1, L, L.y1) + w
 return svg(W, H, body);
 }
 function diglab(SW, W, H) {
-var L = wdl(SW, API.wcw || W, H), hl = SW.hl || ['HI', 'LO'], fs = Math.max(8, Math.min(L.h2 * 0.5, W * 0.9 / Math.max(2, hl[0].length, hl[1].length))), mk = (t, y, c) => c ? g(c, text(W / 2, y, t, fs, 'middle', 'central')) : text(W / 2, y, t, fs, 'middle', 'central');
+var L = wdl(SW, API.wcw || W, H), hl = SW.hl || ['HI', 'LO'], fs = Math.max(8, Math.min(L.h2 * 0.5, W * 0.9 / Math.max(2, hl[0].length, hl[1].length))), mk = (t, y, c) => c ? g(c, stext2(W / 2, y, t, fs, 'middle', 'central')) : stext2(W / 2, y, t, fs, 'middle', 'central');
 return svg(W, H, mk(hl[0], L.y1 + L.h1 / 2) + mk(hl[1], L.y2 + L.h2 / 2, blk(true)));   /* the low row and its caption as dark as the range: darkest grey on 4-bit, black on 2-bit and 1-bit; the words come from the language (SW.hl) */
 }
 /* B32 (owner 2026-11-16): the Blocks week style, the old day rows of 8dedf73 (one row per day: name, icon, low, high, a bar of blocks on one shared scale, the clothing cue) */
@@ -1285,7 +1288,7 @@ SWDraw.nDR = rows.filter(function (q) { return q.getAttribute('data-sw-part') ==
 SWDraw.scaleH = rows.length && rows[0].getAttribute('data-sw-part') === 'scale' ? Math.round(rows[0].getBoundingClientRect().height) : null;
 SWDraw.top = el.hasAttribute('data-sw-top');
 SWDraw.extD = k >= 0 && k + 1 < rows.length ? Math.max(0, rows[k + 1].getBoundingClientRect().top - r.bottom + 1) : 0;
-var wr0 = swVis('[data-sw-part="wrow"]'); SWDraw.nRows = wr0.length; SWDraw.lg = sc.contains('screen--lg'); var wd = swVis('[data-sw-part="wday"]'); SWDraw.nCols = wd.length; SWDraw.wcw = wd.length ? Math.floor(wd[0].getBoundingClientRect().width) : 0;   /* B31: the week's columns shown, one column's width */
+var wr0 = swVis('[data-sw-part="wrow"]'); SWDraw.nRows = wr0.length; SWDraw.lg = sc.contains('screen--lg'); if (!SWDraw.sf) { var sf0 = document.createElement('span'); sf0.className = 'title title--small'; sf0.textContent = '0'; (document.querySelector('.view') || sc).appendChild(sf0); var sfc = getComputedStyle(sf0); SWDraw.sf = { f: sfc.fontFamily.replace(/"/g, "'"), s: parseFloat(sfc.fontSize), w: sfc.fontWeight }; sf0.remove(); }   /* OG look (owner 2026-11-26): small svg labels on md screens take this font at its own size; a pixel font (classic fonts: BlockKie, NicoPups) at any other size drew 0 and the degree sign broken */ var wd = swVis('[data-sw-part="wday"]'); SWDraw.nCols = wd.length; SWDraw.wcw = wd.length ? Math.floor(wd[0].getBoundingClientRect().width) : 0;   /* B31: the week's columns shown, one column's width */
 var hb = [].map.call(document.querySelectorAll('[data-sw-part="hbar"]'), function (q) { return q.getBoundingClientRect().height; }).filter(function (h) { return h > 0; }); SWDraw.hbarH = hb.length ? Math.floor(Math.min(...hb)) : null; SWDraw.hcols = hb.length || null;
 var hq = swVis('[data-sw-part="hbar"]')[0]; SWDraw.hbarW = hq ? Math.floor(hq.getBoundingClientRect().width) : 0; SWDraw.hzt = hq ? hq.getBoundingClientRect().top - r.top : 0;   /* the first hours bar's width and its top inside the painted box (the 0 line) */
 if (/^(baro|tdial)$/.test(el.getAttribute('data-sw-part'))) { SWDraw.caps = {}; document.querySelectorAll('[data-sw-part="baro"], [data-sw-part="tdial"]').forEach(function (d) { var b = d.getBoundingClientRect(); if (!b.width) return; SWDraw.caps[d.getAttribute('data-sw-part')] = [].map.call(d.parentElement.querySelectorAll('[data-sw-cap]'), function (c) { var rg = document.createRange(); rg.selectNodeContents(c); var q = rg.getBoundingClientRect(), l0 = q.left - b.left; return [l0, q.top - b.top, Math.max(q.right - b.left, l0 < b.width / 2 ? l0 + (d.getAttribute('data-sw-part') === 'baro' ? 0.264 : 0.311) * b.width : 0), q.bottom - b.top]; });   /* the left caption counts at least as wide as the English one, so the radius never depends on the language (DIALR, ja) */ }); }
